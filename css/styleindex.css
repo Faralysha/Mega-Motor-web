@@ -110,7 +110,7 @@ section{
 .btn:hover,
 .option-btn:hover,
 .delete-btn:hover{
-   background-color: var(--black);
+   background-color: var(--red);
 }
 
 .white-btn,
@@ -123,7 +123,7 @@ section{
 }
 
 .delete-btn{
-   background-color: var(--red);
+   background-color: var(--crimson);
 }
 
 .white-btn:hover{
@@ -288,7 +288,7 @@ section{
  }
  
  .form-container form .form-btn:hover {
-    background: crimson;
+    background: var(--red);
     color: #fff;
  }
  
@@ -371,7 +371,7 @@ section{
 }
 
 .header .flex .navbar a:hover{
-   color: #dc143c;
+   color: var(--red);
    text-decoration: underline;
 }
 
@@ -449,15 +449,15 @@ margin:0 auto;
 }
    
 .products .box-container .box{
-   width: 30rem; /* Fixed width */
-    height: 45rem; /* Fixed height */
-    border: 1px solid;
-    border-radius: 10px;
+    width: 30rem; /* Fixed width */
+    height: 50rem; /* Fixed height */
+    border: 0.5px solid;
+    border-radius: 5px;
     box-shadow: var(--box-shadow);
     padding: 2rem;
     text-align: center;
-   position: relative;
-   overflow: hidden;
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -465,12 +465,12 @@ margin:0 auto;
 }
    
 .products .box-container .box .image{
-   height: 30rem;
+   height: 25rem;
    width: 100%;
-   border: 1.7px solid;
-   border-radius:9px;
-   transition: transform 0.2s;
+   border: 1px ;
+   box-shadow:var(--box-shadow);
 }
+
 .products .box-container .box .image:hover{
    transform: scale(1.02);
 }
@@ -481,31 +481,58 @@ margin:0 auto;
 }
 
 .products .box-container .box .name{
-   padding:1rem 0;
-   font-size: 3rem;
-   color:var(--black);
+   padding: 0.5rem 0;
+   font-size: 1.5rem;
+   font-weight: bolder;
+   text-transform: uppercase;
+   color: var(--black);
+   margin-top: 10px;
+   height: 6rem; /* Fixed height for the name */
+   overflow: hidden;
+   text-overflow: ellipsis;
 }
 
 .products .box-container .box .brand-name {
+   padding: 0.5rem 0;
    font-size: 1.5rem;
    font-weight: bolder;
-   margin-top: 0.5rem;
-   color:var(--black);
+   text-transform: uppercase;
+   color: var(--black);
+   margin-top: 10px;
+   height: 6rem; /* Fixed height for the name */
+   width: 100%;
+   overflow: hidden;
+   text-overflow: ellipsis;
 }
 
 .products .box-container .box .category{
+   padding: 5px 0;
    font-size: 1rem;
    font-weight: bold;
+   text-transform: uppercase;
+   text-align: left;
    color:var(--light-color);
+   margin-left: 1rem;
 }
 
 .products .box-container .box .price {
+   font-size: 1rem;
+   font-weight: bold;
+   text-transform: uppercase;
+   text-align: left;
+   margin-bottom: 5px;
+   color:var(--black);
+   margin-left: 1rem;
+}
+
+.products .box-container .box .pro_rates {
    font-size: 1rem;
    font-weight: bold;
    color:var(--black);
 }
    
    .products .box-container .box .qty{
+   text-transform: uppercase;
    width: 100%;
    padding:1.2rem 1.4rem;
    border-radius: .5rem;
@@ -513,16 +540,6 @@ margin:0 auto;
    margin:1rem 0;
    font-size: 2rem;
    }
-   
-   /*.products .box-container .box .price{
-   position: absolute;
-   top:1rem; left:1rem;
-   border-radius: .5rem;
-   padding:1rem;
-   font-size: 2.5rem;
-   color:var(--white);
-   background-color: var(--red);
-   }*/
    
    .h_line {
    border-bottom: 4px solid rgb(80, 80, 78);

@@ -7,50 +7,55 @@ $user_id = $_SESSION['user_id'];
 if (!isset($user_id)) {
     header('location:index.php');
 }
+
 $product_id = $_GET['id'];
 
+// Fetch product details
+$get_idproduct = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$product_id'");
+$fetch_products = mysqli_fetch_assoc($get_idproduct);
 
 if (isset($_POST['add_to_cart'])) {
-
-    $product_name = $_POST['product_name'];
-    $product_price = $_POST['product_price'];
-    $product_size = $_POST['product_size'];
-    $product_image = $_POST['product_image'];
+    $product_name = $fetch_products['name']; // Use the fetched product name directly
+    $product_price = $fetch_products['price']; // Use the fetched product price directly
+    $product_size = $_POST['product_sizes'];
+    $product_image = $fetch_products['image']; // Use the fetched product image directly
     $product_quantity = $_POST['product_quantity'];
- 
-    $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` WHERE name = '$product_name' AND user_id = '$user_id'") or die('query failed');
+
+    // Check if the product is already in the cart
+    $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` WHERE name = '$product_name' AND user_id = '$user_id'");
     $fetch_quantcart = mysqli_fetch_assoc($check_cart_numbers);
+
+    // Fetch the available quantity of the product
     $compare_quant = mysqli_query($conn, "SELECT * FROM products WHERE name='$product_name'");
     $fetch_quantitem = mysqli_fetch_assoc($compare_quant);
- 
-    if (mysqli_num_rows($check_cart_numbers) > 0) {
-       $message[] = 'already added to cart!';
-    } else {
-       // if quantity item = 0 and less than 0 and quantity required more than quantity available
-       if ($fetch_quantitem['quant'] == 0 || $fetch_quantitem['quant'] < 0 || $product_quantity > $fetch_quantitem['quant']) {
-          $message[] = 'Product out of order or exceed the quantity available';
-       } else {
-          mysqli_query($conn, "INSERT INTO `cart`(user_id, name, pro_size,price, quantity, image) 
-                         VALUES('$user_id', '$product_name', $product_size, '$product_price', '$product_quantity', '$product_image')") or die('query failed');
-          $message[] = 'product added to cart!';
-       }
-       // mysqli_query($conn, "INSERT INTO `cart`(user_id, name, price, quantity, image) VALUES('$user_id', '$product_name', '$product_price', '$product_quantity', '$product_image')") or die('query failed');
-       // $message[] = 'product added to cart!';
-    }
- 
- }
-?>
-<html>
 
+    if ($fetch_quantitem['quant'] == 0 || $fetch_quantitem['quant'] < 0 || $product_quantity > $fetch_quantitem['quant']) {
+        // Product is out of stock or quantity exceeds available quantity
+        $message[] = 'Product out of stock or quantity exceeds available quantity';
+    } elseif ($fetch_quantcart) {
+        // Product is already in the cart
+        $message[] = 'Product already added to cart';
+    } else {
+        // Insert the product into the cart
+        mysqli_query($conn, "INSERT INTO `cart`(user_id, name, pro_size, price, quantity, image) VALUES ('$user_id', '$product_name', '$product_size', '$product_price', '$product_quantity', '$product_image')");
+        $message[] = 'Product added to cart';
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>shop</title>
-
-    <!-- font awesome cdn link  -->
+    <title>Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link rel="stylesheet" href="css/styleindex.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <style>
         * {
             padding: 0;
@@ -88,33 +93,21 @@ if (isset($_POST['add_to_cart'])) {
         }
 
         .main_image {
-            width: 100%;
+            width: 40rem;
+            height: 40rem;
             /* Set the width to 100% */
-            height: 0;
-            /* Remove the fixed height */
-            padding-top: 100%;
-            /* Set the padding-top to create a square aspect ratio */
             position: relative;
             overflow: hidden;
-            border: 1px solid black;
-            border-radius: 12px;
+            border-radius: 1px;
+            box-shadow: 5px 5px 8px 3px rgba(0, 0, 0, 0.3);
         }
 
         .main_image .size_image {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .main_image img {
-            width: 100%;
-            /* Make the image fill the available space */
-            height: 100%;
-            /* Make the image fill the available space */
-            object-fit: cover;
-            /* Scale and crop the image to fit */
+            width: 30rem;
+            height: 30rem;
         }
 
         .option img {
@@ -249,114 +242,99 @@ if (isset($_POST['add_to_cart'])) {
                 display: flex;
                 flex-wrap: wrap;
             }
+
+            .size-box {
+            border: 1px solid black;
+            border-radius: 5px;
+            width: 50px;
+            height: 50px;
+            display: inline-block;
+            margin: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            }
+
+            .size-box.selected {
+            background-color: crimson;
+            }
+
+            .size-box.out-of-stock {
+            background-color: grey;
+            cursor: not-allowed;
+            }
         }
-    </style>
-    <!-- custom css file link  -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <!-- <link rel="stylesheet" href="css/popup.css"> -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <!-- boot view popup -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-
-
+</style>
 </head>
-
 <body>
     <?php include 'header.php'; ?>
 
-    <!-- original details fetch data -->
-    <?php $get_idproduct = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$product_id' ");
-    $fetch_products = mysqli_fetch_assoc($get_idproduct);  ?>
-
-
-<section>
-    <button class="btn btn-primary btn-lg" onclick="history.back()">Go Back</button>
-    <div class="container flex">
-        
-        <div class="left">
+    <section>
+        <button class="btn btn-primary btn-lg" onclick="history.back()">Go Back</button>
+        <div class="container flex">
+            <div class="left">
                 <div class="main_image">
                     <div class="size_image">
-                    <!-- <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>"> -->
-
-                        <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" class="slide">
+                        <img class="image" src="uploaded_img/<?php echo htmlspecialchars($fetch_products['image']); ?>" alt="Product Image">
                     </div>
-                </div>
-                <div class="option flex1">
-                    <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" onclick="img('uploaded_img/<?php echo $fetch_products['image']; ?>')">
                 </div>
             </div>
             <div class="right">
-                <h3>
-                    <?php echo $fetch_products['name']; ?>
-                </h3>
-                <h4> <small>RM </small>
-                    <?php echo $fetch_products['price']; ?>
-                </h4>
-                <p>
-                    <?php echo $fetch_products['description'] ?>
-                </p>
-                <h5>Size:
-                    <?php echo $fetch_products['size'] ?>
-                    </php>
-                </h5>
-                <h5>Stock:
-                    <?php echo $fetch_products['quant'] ?>
-                    </php>
-                </h5>
+                <div class="brand"><?php echo htmlspecialchars($fetch_products['brand']); ?></div>
+                <div class="name"><?php echo htmlspecialchars($fetch_products['name']); ?></div>
+                <div class="category"><?php echo htmlspecialchars($fetch_products['category']); ?></div>
+                <div class="description"><?php echo htmlspecialchars($fetch_products['description']); ?></div>
+                <div class="price">RM <?php echo htmlspecialchars($fetch_products['price']); ?></div>
 
-                </br>
-                <h5>Quantity</h5>
-            </br>
-            <!-- <button>Add to cart</button> -->
-            <form action="" method="post">
+                <div class="size-quantity-container">
+                    <?php
+                    $stmt = $conn->prepare("SELECT size, quantity FROM `product_sizes` WHERE product_id = ?");
+                    $stmt->bind_param("i", $product_id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $sizes_quantities = $result->fetch_all(MYSQLI_ASSOC);
+                    $stmt->close();
+
+                    if ($sizes_quantities):
+                        foreach ($sizes_quantities as $size_quantity):
+                            $size = htmlspecialchars($size_quantity['size']);
+                            $quantity = $size_quantity['quantity'];
+                    ?>
+                            <div class="size-box <?php echo ($quantity <= 0) ? 'out-of-stock' : ''; ?>" data-size="<?php echo $size; ?>" onclick="selectSize(this)">
+                                <label><?php echo $size; ?></label>
+                            </div>
+                    <?php endforeach; endif; ?>
+                </div>
+
+                <form action="" method="post" id="add-to-cart-form">
                     <div class="add flex1">
-                        <input type="number" min="1" name="product_quantity" placeholder="Enter Quantity" value="1"
-                            class="form-control form-control-lg">
-        
+                        <input type="number" min="1" name="product_quantity" placeholder="Enter Quantity" value="1" class="form-control form-control-lg">
                     </div>
-                    <!-- <input type="hidden" min="1" name="product_quantity" value="1" class="form-control form-control-lg"> -->
-                    <input type="hidden" name="product_name" value="<?php echo $fetch_products['id']; ?>">
-                    <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
-                    <input type="hidden" name="product_size" value="<?php echo $fetch_products['Size']; ?>">
-                    <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                    <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
+                    <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+                    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['name']); ?>">
+                    <input type="hidden" name="product_size" id="selected-size" value="">
+                    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($fetch_products['price']); ?>">
+                    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($fetch_products['image']); ?>">
                     <input type="submit" value="Add to cart" class="btn btn-outline-primary btn-lg" name="add_to_cart">
                 </form>
-
             </div>
         </div>
     </section>
-    <script>
-        function img(anything) {
-            document.querySelector('.slide').src = anything;
-        }
 
-        function change(change) {
-            const line = document.querySelector('.home');
-            line.style.background = change;
+    <script>
+        function selectSize(element) {
+            var sizeBoxes = document.querySelectorAll('.size-box');
+            sizeBoxes.forEach(function(box) {
+                box.classList.remove('selected');
+            });
+
+            if (!element.classList.contains('out-of-stock')) {
+                element.classList.add('selected');
+                document.getElementById('selected-size').value = element.getAttribute('data-size');
+            }
         }
     </script>
-    <!-- Timer and stop the timer based on the real time  -->
-    <!-- <p id="demo"></p>
 
-    <button onclick="myStop()">Stop the time</button>
-    <script>
-        const myInterval = setInterval(myTimer, 1000);
-
-        function myTimer() {
-            const date = new Date();
-            document.getElementById("demo").innerHTML = date.toLocaleTimeString();
-        }
-
-        function myStop() {
-            clearInterval(myInterval);
-        }
-    </script> -->
-
-    <?php include 'footer.php' ?>
+    <?php include 'footer.php'; ?>
 </body>
-
 </html>

@@ -140,15 +140,17 @@ if (isset($_POST['apply_filters'])) {
 .filter-container button {
     padding: 5px 10px;
     border-radius: 5px;
-    background-color: #007bff;
+    background-color: var(--crimson);
     color: #fff;
     border: none;
     cursor: pointer;
 }
 
 .filter-container button:hover {
-    background-color: #0056b3;
+    background-color: var(--red);
 }
+
+
    </style>
 </head>
 <body>
@@ -198,51 +200,52 @@ if (isset($_POST['apply_filters'])) {
                     <option value="4-5">4 - 5 stars</option>
                 </select>
 
-                <button type="submit" name="apply_filters" class="btn btn-primary mb-2">Apply Filters</button>
+                <button type="submit" name="apply_filters" class="btn btn-primary filter">Apply Filters</button>
             </form>
         </div>
     </div>
         <h1 class="title">Our Products</h1>
+
         <div class="box-container">
 
-            <?php
-            $select_products_query = "SELECT * FROM `products` WHERE 1 $where";
-            $select_products = mysqli_query($conn, $select_products_query) or die('query failed');
-            if (mysqli_num_rows($select_products) > 0) {
-                while ($fetch_products = mysqli_fetch_assoc($select_products)) {
-                    ?>
-                    <form action="" method="post" class="box">
-                    <!-- Product Image -->
-                    <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="Product Image">
+      <?php  
+         $select_products = mysqli_query($conn, "SELECT * FROM `products` LIMIT 6") or die('query failed');
+         if(mysqli_num_rows($select_products) > 0){
+            while($fetch_products = mysqli_fetch_assoc($select_products)){
+      ?>
+     <form action="" method="post" class="box">
+      <!-- Product Image -->
+      <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="Product Image">
       
-                    <div class="name-brand"><?php echo $fetch_products['name'].$fetch_products['brand']; ?>; ?></div>
-                    <div class="price">RM <?php echo $fetch_products['price'];?></div> 
-                
-                        <!-- Product Ratings -->
-                        <div class="pro_rates">
-                            <?php
-                            $rating = $fetch_products['pro_rates'];
-                            for ($i = 1; $i <= 5; $i++) {
-                                if ($i <= $rating) {
-                                    echo '<i class="fa fa-star text-primary" style="margin-right: 5px;"></i>';
-                                } else {
-                                    echo '<i class="fa fa-star text-secondary" style="margin-right: 5px;"></i>';
-                                }
-                            }
-                            ?>
-                        </div>
+      <div class="brand-name"><?php echo $fetch_products['brand'] .' '. $fetch_products['name']; ?></div>
+      <div class="category"><?php echo $fetch_products['category'];?></div> 
+      <div class="price">RM <?php echo $fetch_products['price'];?></div> 
+      
+      <!-- Product Ratings -->
+      <div class="pro_rates">
+         <?php
+         $rating = $fetch_products['pro_rates'];
+         for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $rating) {
+               echo '<i class="fa fa-star text-primary" style="margin-right: 5px;"></i>';
+            } else {
+               echo '<i class="fa fa-star text-secondary" style="margin-right: 5px;"></i>';
+            }
+         }
+         ?>
+         </div>
 
-                        <!-- Hidden Fields for Cart Processing -->
-                        <input type="hidden" name="product_quantity" value="1" class="form-control form-control-lg">
-                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                        <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
-                        <input type="hidden" name="product_size" value="<?php echo $fetch_products['size']; ?>">
-                        <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                        <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                        <a href="shop_details.php?id=<?php echo $fetch_products['id']; ?>" class="btn btn-outline-primary btn-lg">View</a>
-                  
-                        <!-- Display popup -->
-                        <div id="myModal<?php echo $fetch_products['id'] ?>" class="modal fade" role="dialog">
+            <!-- Hidden Fields for Cart Processing -->
+      <input type="hidden" name="product_quantity" value="1" class="form-control form-control-lg">
+      <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+      <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
+      <input type="hidden" name="product_size" value="<?php echo $fetch_products['size']; ?>">
+      <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
+      <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">      
+      <a href="shop_details.php" class="btn btn-primary btn-lg">View</a>
+
+      <!-- Display popup -->
+<div id="myModal<?php echo $fetch_products['id'] ?>" class="modal fade" role="dialog">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -286,15 +289,16 @@ if (isset($_POST['apply_filters'])) {
                                 </div>
                             </div>
                         </div>
-                    </form>
-                    <?php
-                }
-            } else {
-                echo '<p class="empty">No products added yet!</p>';
-            }
-            ?>
-        </div>
-    </section>
+                     </form>   
+                     <?php
+                  }
+               }else{
+                  echo '<p class="empty">no products added yet!</p>';
+               }
+               ?>
+               </div>
+
+</section>
 
     <?php include 'footer.php'; ?>
 
