@@ -155,12 +155,12 @@ if (isset($_POST['apply_filters'])) {
     <?php include 'header.php'; ?>
 
     <div class="heading">
-        <h3>Our Shop</h3>
         <p><a href="home.php">Home</a> / Shop</p>
     </div>
 
     <!-- Product Section -->
     <section class="products">
+
         <!-- Filter Section -->
     <div class="container-fluid">
         <div class="filter-container">
@@ -202,8 +202,9 @@ if (isset($_POST['apply_filters'])) {
             </form>
         </div>
     </div>
-        <h1 class="title">Latest Products</h1>
+        <h1 class="title">Our Products</h1>
         <div class="box-container">
+
             <?php
             $select_products_query = "SELECT * FROM `products` WHERE 1 $where";
             $select_products = mysqli_query($conn, $select_products_query) or die('query failed');
@@ -211,27 +212,12 @@ if (isset($_POST['apply_filters'])) {
                 while ($fetch_products = mysqli_fetch_assoc($select_products)) {
                     ?>
                     <form action="" method="post" class="box">
-                        <!-- Product Image -->
-                        <div class="image">
-                            <img src="uploaded_img/<?=$fetch_products['image']; ?>" >
-                        </div>
-                        
-                        <!-- Product Details -->
-                        <div class="name">
-                            <?php echo $fetch_products['name']; ?>
-                        </div>
-                        <div class="category">
-                            <?php echo $fetch_products['category']; ?>
-                        </div>
-                        <div class="size">Size: 
-                            <?php echo $fetch_products['size']; ?>
-                        </div>
-                        <div class="price">RM
-                            <?php echo $fetch_products['price']; ?>
-                        </div>
-                        <div class="quant">Quantity: 
-                            <?php echo $fetch_products['quant']; ?>
-                        </div>
+                    <!-- Product Image -->
+                    <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="Product Image">
+      
+                    <div class="name-brand"><?php echo $fetch_products['name'].$fetch_products['brand']; ?>; ?></div>
+                    <div class="price">RM <?php echo $fetch_products['price'];?></div> 
+                
                         <!-- Product Ratings -->
                         <div class="pro_rates">
                             <?php
@@ -253,8 +239,7 @@ if (isset($_POST['apply_filters'])) {
                         <input type="hidden" name="product_size" value="<?php echo $fetch_products['size']; ?>">
                         <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
                         <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                        <input type="submit" class="btn btn-primary btn-lg" value="add to cart" name="add_to_cart" class="btn">
-                        <a href="shop_details.php?id=<?php echo $fetch_products['id']; ?>" class="btn btn-outline-primary btn-lg">details</a>
+                        <a href="shop_details.php?id=<?php echo $fetch_products['id']; ?>" class="btn btn-outline-primary btn-lg">View</a>
                   
                         <!-- Display popup -->
                         <div id="myModal<?php echo $fetch_products['id'] ?>" class="modal fade" role="dialog">
