@@ -68,7 +68,7 @@ if (isset($_POST['add_to_cart'])) {
 <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>home</title>
+   <title>Home</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -203,8 +203,8 @@ if (isset($_POST['add_to_cart'])) {
       <input type="hidden" name="product_size" value="<?php echo $fetch_products['size']; ?>">
       <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
       <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">      
-      <a href="shop_details.php" class="btn btn-primary btn-lg">View</a>
-
+      <a href="shop_details.php?id=<?php echo $fetch_products['id']; ?>" class="btn btn-primary btn-lg">View</a>
+      
       <!-- Display popup -->
 <div id="myModal<?php echo $fetch_products['id'] ?>" class="modal fade" role="dialog">
                             <div class="modal-dialog">

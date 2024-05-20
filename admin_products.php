@@ -41,46 +41,49 @@ if (isset($_POST['add_product'])) {
    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
    $description = filter_var($_POST['description'], FILTER_SANITIZE_STRING);
    
-   // Insert product into the main products table
-   $stmt = $conn->prepare("INSERT INTO `products` (name, category, brand, price, image) VALUES (?, ?, ?, ?, ?)");
-   $stmt->bind_param("sssss", $name, $category, $brand, $price, $image_path);
-
-   // Assign values from $_POST to variables
-   $name = $_POST['name'];
-   $category = $_POST['category']; // Assuming this is properly set in the form
-   $brand = $_POST['brand']; // Assuming this is properly set in the form
-   $price = $_POST['price']; // Assuming this is properly set in the form
-   $description = $_POST['description']; // Assuming this is properly set in the form
-
-   // Handle image upload
-   $image_upload = handleImageUpload($_FILES['image']);
-   if (isset($image_upload['error'])) {
-      // Handle the error, for example:
-      echo $image_upload['error'];
-      // You can also redirect back to the form page or display an error message
-      exit; // Stop execution
-   } else {
-      $image_path = $image_upload['success'];
-   }
-
    // Execute the statement to insert the product
-   $stmt->execute();
-   $product_id = $stmt->insert_id; // Get the ID of the inserted product
-   $stmt->close();
+    $stmt->execute();
+    $product_id = $stmt->insert_id; // Get the ID of the inserted product
+    $stmt->close(); 
+   
+   // Insert product into the main products table
+$stmt = $conn->prepare("INSERT INTO `products` (name, category, brand, price, image) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $name, $category, $brand, $price, $image_path);
 
-   // Insert sizes and quantities into the product_sizes table
-   $sizes = $_POST['sizes'];
-   $quantities = $_POST['quantities'];
-   $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
-   $stmt->bind_param("iss", $product_id, $size, $quantity);
+// Assign values from $_POST to variables
+$name = $_POST['name'];
+$category = $_POST['category']; // Assuming this is properly set in the form
+$brand = $_POST['brand']; // Assuming this is properly set in the form
+$price = $_POST['price']; // Assuming this is properly set in the form
+$description = $_POST['description']; // Assuming this is properly set in the form
 
-   // Loop through sizes and quantities and insert them into the database
-   for ($i = 0; $i < count($sizes); $i++) {
-       $size = $sizes[$i];
-       $quantity = $quantities[$i];
-       $stmt->execute();
-   }
-   $stmt->close();
+// Handle image upload
+$image_upload = handleImageUpload($_FILES['image']);
+if (isset($image_upload['error'])) {
+    // Handle the error
+    echo $image_upload['error'];
+    exit; // Stop execution
+} else {
+    $image_path = $image_upload['success'];
+}
+
+// Execute the statement to insert the product
+$stmt->execute();
+$product_id = $stmt->insert_id; // Get the ID of the inserted product
+$stmt->close();
+
+// Prepare the statement for inserting sizes and quantities into the product_sizes table
+$stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
+$stmt->bind_param("iss", $product_id, $size, $quantity);
+
+// Loop through sizes and quantities and insert them into the database
+for ($i = 0; $i < count($sizes); $i++) {
+    $size = $sizes[$i];
+    $quantity = $quantities[$i];
+    $stmt->execute();
+}
+$stmt->close();
+
 }
 
 // Delete product
