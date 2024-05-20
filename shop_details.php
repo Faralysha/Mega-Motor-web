@@ -251,13 +251,6 @@ if (isset($_POST['add_to_cart'])) {
             }
         }
 
-        @media only screen and (max-width:511px) {
-            .container {
-                max-width: 100%;
-                height: auto;
-                padding: 10px;
-            }
-
             .left,
             .right {
                 padding: 0;
@@ -293,86 +286,122 @@ if (isset($_POST['add_to_cart'])) {
             background-color: grey;
             cursor: not-allowed;
             }
+
+            /* Existing CSS styles */
+
+            .size-quantity-details {
+            margin-bottom: 10px;
+            }
+
+            .size-quantity-details div {
+            margin-bottom: 5px;
+            }
+
+            #available-quantity {
+            font-weight: bold;
         }
+        
+        @media only screen and (max-width:511px) {
+            .container {
+                max-width: 100%;
+                height: auto;
+                padding: 10px;
+            }
+
+    }
 </style>
 </head>
 <body>
     <?php include 'header.php'; ?>
 
     <section>
-        <button class="btn btn-primary btn-lg" onclick="history.back()">Go Back</button>
-        <div class="container flex">
-            <div class="left">
-                <div class="main_image">
-                    <div class="size_image">
-                        <img class="image" src="uploaded_img/<?php echo htmlspecialchars($fetch_products['image'] ?? ''); ?>" alt="Product Image">
-                    </div>
+    <button class="btn btn-primary btn-lg btn-go-back" onclick="history.back()">Go Back</button>
+    <div class="container flex">
+        <div class="left">
+            <div class="main_image">
+                <div class="size_image">
+                    <img class="image" src="uploaded_img/<?php echo htmlspecialchars($fetch_products['image'] ?? ''); ?>" alt="Product Image">
                 </div>
-            </div>
-            <div class="right">
-                <div class="size-quantity-container">
-                    <div class='product-details'>
-                        <div><strong>Category:</strong> <?php echo htmlspecialchars($fetch_products['category'] ?? 'N/A'); ?></div>
-                        <div><strong>Brand:</strong> <?php echo htmlspecialchars($fetch_products['brand'] ?? 'N/A'); ?></div>
-
-                        <div class='size-quantity-details'>
-                            <div><strong>Sizes:</strong></div>
-                            <?php foreach ($sizes_quantities as $size_quantity) { ?>
-                                <div class="size-box" data-size="<?php echo htmlspecialchars($size_quantity['size']); ?>" onclick="selectSize(this)">
-                                    <?php echo htmlspecialchars($size_quantity['size']); ?>
-                                </div>
-                            <?php } ?>
-                        </div>
-
-                        <div class='size-quantity-details'>
-                            <div><strong>Quantities:</strong></div>
-                            <?php foreach ($sizes_quantities as $size_quantity) { ?>
-                                <div><?php echo htmlspecialchars($size_quantity['quantity']); ?></div>
-                            <?php } ?>
-                        </div>
-
-                        <div class='size-quantity-details'>
-                            <div><strong>Price:</strong> RM <?php echo htmlspecialchars($fetch_products['price'] ?? 'N/A'); ?></div>
-                        </div>
-                    </div>
-                </div>
-
-                <form action="" method="post" id="add-to-cart-form">
-                    <div class="add flex1">
-                        <input type="number" min="1" name="product_quantity" placeholder="Enter Quantity" value="1" class="form-control form-control-lg">
-                    </div>
-                    <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
-                    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['name'] ?? ''); ?>">
-                    <input type="hidden" name="product_size" id="selected-size" value="">
-                    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($fetch_products['price'] ?? ''); ?>">
-                    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($fetch_products['image'] ?? ''); ?>">
-                    <input type="submit" value="Add to cart" class="btn btn-outline-primary btn-lg" name="add_to_cart">
-                </form>
-
-                <?php if (!empty($message)): ?>
-                    <div class="alert alert-info mt-3">
-                        <?php foreach ($message as $msg): ?>
-                            <p><?php echo $msg; ?></p>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
-    </section>
+        <div class="right">
+            <div class="size-quantity-container">
+                <div class='product-details'>
+                    <div><strong>Category:</strong> <?php echo htmlspecialchars($fetch_products['category'] ?? 'N/A'); ?></div>
+                    <div><strong>Brand:</strong> <?php echo htmlspecialchars($fetch_products['brand'] ?? 'N/A'); ?></div>
 
-    <script>
-        function selectSize(element) {
-            var sizeBoxes = document.querySelectorAll('.size-box');
-            sizeBoxes.forEach(function(box) {
-                box.classList.remove('selected');
-            });
+                    <div class='size-quantity-details'>
+                        <div><strong>Sizes:</strong></div>
+                        <?php foreach ($sizes_quantities as $size_quantity) { ?>
+                            <div class="size-box" data-size="<?php echo htmlspecialchars($size_quantity['size']); ?>" onclick="selectSize(this)">
+                                <?php echo htmlspecialchars($size_quantity['size']); ?>
+                            </div>
+                        <?php } ?>
+                    </div>
 
-            if (!element.classList.contains('out-of-stock')) {
-                element.classList.add('selected');
-                document.getElementById('selected-size').value = element.getAttribute('data-size');
+                    <div class='size-quantity-details'>
+                        <div><strong>Available Quantity:</strong></div>
+                        <div id="available-quantity">0</div>
+                    </div>
+
+                    <div class='size-quantity-details'>
+                        <div><strong>Price:</strong> RM <?php echo htmlspecialchars($fetch_products['price'] ?? 'N/A'); ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <form action="" method="post" id="add-to-cart-form">
+                <div class="add flex1">
+                    <input type="number" min="1" name="product_quantity" placeholder="Enter Quantity" value="1" class="form-control form-control-lg">
+                </div>
+                <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
+                <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['name'] ?? ''); ?>">
+                <input type="hidden" name="product_size" id="selected-size" value="">
+                <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($fetch_products['price'] ?? ''); ?>">
+                <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($fetch_products['image'] ?? ''); ?>">
+                <input type="submit" value="Add to cart" class="btn btn-outline-primary btn-lg" name="add_to_cart">
+            </form>
+
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-info mt-3">
+                    <?php foreach ($message as $msg): ?>
+                        <p><?php echo $msg; ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+<script>
+    function selectSize(element) {
+        var sizeBoxes = document.querySelectorAll('.size-box');
+        sizeBoxes.forEach(function(box) {
+            box.classList.remove('selected');
+        });
+
+        if (!element.classList.contains('out-of-stock')) {
+            element.classList.add('selected');
+            document.getElementById('selected-size').value = element.getAttribute('data-size');
+
+            // Get the selected size
+            var selectedSize = element.getAttribute('data-size');
+
+            // Find the corresponding quantity for the selected size
+            var quantities = <?php echo json_encode($sizes_quantities); ?>;
+            var availableQuantity = 0;
+            for (var i = 0; i < quantities.length; i++) {
+                if (quantities[i].size === selectedSize) {
+                    availableQuantity = quantities[i].quantity;
+                    break;
+                }
             }
+
+            // Update the available quantity display
+            document.getElementById('available-quantity').textContent = availableQuantity;
         }
-    </script>
+    }
+</script>
+
 
     <?php include 'footer.php'; ?>
 </body>
