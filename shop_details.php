@@ -41,7 +41,7 @@ if (isset($_POST['add_to_cart'])) {
     $product_quantity = intval($_POST['product_quantity']);
 
     // Check if the product is already in the cart
-    $check_cart_numbers = mysqli_prepare($conn, "SELECT * FROM `cart` WHERE name = ? AND user_id = ?");
+    $check_cart_numbers = mysqli_prepare($conn, "SELECT * FROM `cart` WHERE product_name = ? AND user_id = ?");
     mysqli_stmt_bind_param($check_cart_numbers, "si", $product_name, $user_id);
     mysqli_stmt_execute($check_cart_numbers);
     $fetch_quantcart = mysqli_stmt_get_result($check_cart_numbers);
@@ -64,11 +64,10 @@ if (isset($_POST['add_to_cart'])) {
         $message[] = 'Product already added to cart';
     } else {
         // Insert the product into the cart
-        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, name, pro_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($insert_cart, "isssis", $user_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
-        mysqli_stmt_execute($insert_cart);
-        mysqli_stmt_close($insert_cart);
-        $message[] = 'Product added to cart';
+    $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_name, pro_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($insert_cart, "isssis", $user_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
+    mysqli_stmt_execute($insert_cart);
+    mysqli_stmt_close($insert_cart);
     }
 }
 ?>
@@ -300,7 +299,7 @@ if (isset($_POST['add_to_cart'])) {
             #available-quantity {
             font-weight: bold;
         }
-        
+
         @media only screen and (max-width:511px) {
             .container {
                 max-width: 100%;
