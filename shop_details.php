@@ -1,4 +1,5 @@
 <?php
+$message = []; // Initialize $message as an empty array
 
 include 'config.php';
 session_start();
@@ -33,6 +34,22 @@ $fetch_sizes_quantities = mysqli_stmt_get_result($get_sizes_quantities);
 $sizes_quantities = mysqli_fetch_all($fetch_sizes_quantities, MYSQLI_ASSOC);
 mysqli_stmt_close($get_sizes_quantities);
 
+// Check if sizes_quantities is an array
+if (is_array($sizes_quantities)) {
+    foreach ($sizes_quantities as $size_quantity) {
+        // Process each size and quantity
+    }
+} else {
+    // Handle the error appropriately
+    echo 'No sizes available for this product.';
+}
+
+// Calculate total quantity
+$total_quantity = 0;
+foreach ($sizes_quantities as $size_quantity) {
+    $total_quantity += $size_quantity['quantity'];
+}
+
 if (isset($_POST['add_to_cart'])) {
     $product_name = $fetch_products['name'];
     $product_price = $fetch_products['price'];
@@ -58,16 +75,16 @@ if (isset($_POST['add_to_cart'])) {
 
     if ($product_stock['quant'] == 0 || $product_stock['quant'] < 0 || $product_quantity > $product_stock['quant']) {
         // Product is out of stock or quantity exceeds available quantity
-        $message[] = 'Product out of stock or quantity exceeds available quantity';
+        $message[] = 'Product out of stock';
     } elseif ($cart_item) {
         // Product is already in the cart
         $message[] = 'Product already added to cart';
     } else {
         // Insert the product into the cart
-    $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_name, pro_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($insert_cart, "isssis", $user_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
-    mysqli_stmt_execute($insert_cart);
-    mysqli_stmt_close($insert_cart);
+        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_name, pro_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($insert_cart, "isssis", $user_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
+        mysqli_stmt_execute($insert_cart);
+        mysqli_stmt_close($insert_cart);
     }
 }
 ?>
@@ -340,7 +357,7 @@ if (isset($_POST['add_to_cart'])) {
 
                     <div class='size-quantity-details'>
                         <div><strong>Available Quantity:</strong></div>
-                        <div id="available-quantity">0</div>
+                        <div id="available-quantity"><?php echo htmlspecialchars($total_quantity); ?></div>
                     </div>
 
                     <div class='size-quantity-details'>
@@ -400,7 +417,6 @@ if (isset($_POST['add_to_cart'])) {
         }
     }
 </script>
-
 
     <?php include 'footer.php'; ?>
 </body>
