@@ -79,11 +79,10 @@ if (isset($_GET['delete_all'])) {
                         <div class="name">
                             <?php echo $fetch_cart['product_name']; ?>
                         </div>
-                        <div class="price">RM
-                            <?php echo $fetch_cart['price']; ?>
-                        </div>
+                        <div class="price">RM <?php echo number_format($fetch_cart['price'], 2); ?></div>
+
                         <div class="name">Size:
-                        <?php echo $fetch_cart['product_size']; ?> // Assuming size is the correct column name ?>
+                        <?php echo $fetch_cart['product_size']; ?> 
                         </div>
                         <div class="name">Quantity:
                             <?php echo $fetch_cart['quantity']; ?>
@@ -113,9 +112,9 @@ if (isset($_GET['delete_all'])) {
 
         <div class="cart-total">
             <p>Shipping Fee: <span>RM 5.00</span></p>
-            <p>Grand Total: <span>RM <?php echo $grand_total;?>.00</span></p>
-            <?php $final_total_checkout = $grand_total + 5 ?>
-            <p>Total Payment: <span>RM <?php echo $final_total_checkout;?>.00</span></p>
+            <p>Grand Total: <span>RM <?php echo number_format($grand_total, 2); ?></span></p>
+            <?php $final_total_checkout = number_format(($grand_total + 5), 2) ?>
+            <p>Total Payment: <span>RM <?php echo $final_total_checkout; ?></span></p>
             <div class="flex">
                 <a href="shop.php" class="btn btn-warning btn-lg">Continue Shopping</a>
                 <a href="checkout.php" class="btn btn-success btn-lg<?php echo ($grand_total > 0) ? '' : 'disabled'; ?>">Checkout</a>

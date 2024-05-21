@@ -57,17 +57,9 @@ if (isset($_POST['add_to_cart'])) {
     $product_image = $fetch_products['image'];
     $product_quantity = intval($_POST['product_quantity']);
 
-    // Check if the product is already in the cart
-    $check_cart_numbers = mysqli_prepare($conn, "SELECT * FROM `cart` WHERE product_name = ? AND user_id = ?");
-    mysqli_stmt_bind_param($check_cart_numbers, "si", $product_name, $user_id);
-    mysqli_stmt_execute($check_cart_numbers);
-    $fetch_quantcart = mysqli_stmt_get_result($check_cart_numbers);
-    $cart_item = mysqli_fetch_assoc($fetch_quantcart);
-    mysqli_stmt_close($check_cart_numbers);
-
-    // Fetch the available quantity of the specific size
-    $compare_quant = mysqli_prepare($conn, "SELECT quantity FROM `cart` WHERE product_name = ? AND product_size = ?");
-    mysqli_stmt_bind_param($compare_quant, "ss", $product_name, $product_size);
+    // Fetch the available quantity of the specific size from the product_sizes table
+    $compare_quant = mysqli_prepare($conn, "SELECT quantity FROM `product_sizes` WHERE product_id = ? AND size = ?");
+    mysqli_stmt_bind_param($compare_quant, "is", $product_id, $product_size);
     mysqli_stmt_execute($compare_quant);
     $fetch_quantitem = mysqli_stmt_get_result($compare_quant);
     $size_stock = mysqli_fetch_assoc($fetch_quantitem);
@@ -76,13 +68,10 @@ if (isset($_POST['add_to_cart'])) {
     if ($size_stock['quantity'] == 0 || $size_stock['quantity'] < 0 || $product_quantity > $size_stock['quantity']) {
         // Specific size is out of stock or quantity exceeds available quantity for that size
         $message[] = 'Product out of stock';
-    } elseif ($cart_item) {
-        // Product is already in the cart
-        $message[] = 'Product already added to cart';
     } else {
         // Insert the product into the cart
-        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_name, product_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($insert_cart, "isssis", $user_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
+        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_id, product_name, product_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($insert_cart, "iisssis", $user_id, $product_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
         mysqli_stmt_execute($insert_cart);
         mysqli_stmt_close($insert_cart);
         $message[] = 'Product added to cart';
