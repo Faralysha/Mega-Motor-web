@@ -65,28 +65,30 @@ if (isset($_POST['add_to_cart'])) {
     $cart_item = mysqli_fetch_assoc($fetch_quantcart);
     mysqli_stmt_close($check_cart_numbers);
 
-    // Fetch the available quantity of the product
-    $compare_quant = mysqli_prepare($conn, "SELECT quant FROM `products` WHERE name = ?");
-    mysqli_stmt_bind_param($compare_quant, "s", $product_name);
+    // Fetch the available quantity of the specific size
+    $compare_quant = mysqli_prepare($conn, "SELECT quantity FROM `cart` WHERE product_name = ? AND product_size = ?");
+    mysqli_stmt_bind_param($compare_quant, "ss", $product_name, $product_size);
     mysqli_stmt_execute($compare_quant);
     $fetch_quantitem = mysqli_stmt_get_result($compare_quant);
-    $product_stock = mysqli_fetch_assoc($fetch_quantitem);
+    $size_stock = mysqli_fetch_assoc($fetch_quantitem);
     mysqli_stmt_close($compare_quant);
 
-    if ($product_stock['quant'] == 0 || $product_stock['quant'] < 0 || $product_quantity > $product_stock['quant']) {
-        // Product is out of stock or quantity exceeds available quantity
+    if ($size_stock['quantity'] == 0 || $size_stock['quantity'] < 0 || $product_quantity > $size_stock['quantity']) {
+        // Specific size is out of stock or quantity exceeds available quantity for that size
         $message[] = 'Product out of stock';
     } elseif ($cart_item) {
         // Product is already in the cart
         $message[] = 'Product already added to cart';
     } else {
         // Insert the product into the cart
-        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_name, pro_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
+        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_name, product_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)");
         mysqli_stmt_bind_param($insert_cart, "isssis", $user_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
         mysqli_stmt_execute($insert_cart);
         mysqli_stmt_close($insert_cart);
+        $message[] = 'Product added to cart';
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -389,34 +391,35 @@ if (isset($_POST['add_to_cart'])) {
     </div>
 </section>
 <script>
-    function selectSize(element) {
-        var sizeBoxes = document.querySelectorAll('.size-box');
-        sizeBoxes.forEach(function(box) {
-            box.classList.remove('selected');
-        });
+   function selectSize(element) {
+    var sizeBoxes = document.querySelectorAll('.size-box');
+    sizeBoxes.forEach(function(box) {
+        box.classList.remove('selected');
+    });
 
-        if (!element.classList.contains('out-of-stock')) {
-            element.classList.add('selected');
-            document.getElementById('selected-size').value = element.getAttribute('data-size');
+    if (!element.classList.contains('out-of-stock')) {
+        element.classList.add('selected');
+        document.getElementById('selected-size').value = element.getAttribute('data-size');
 
-            // Get the selected size
-            var selectedSize = element.getAttribute('data-size');
+        // Get the selected size
+        var selectedSize = element.getAttribute('data-size');
 
-            // Find the corresponding quantity for the selected size
-            var quantities = <?php echo json_encode($sizes_quantities); ?>;
-            var availableQuantity = 0;
-            for (var i = 0; i < quantities.length; i++) {
-                if (quantities[i].size === selectedSize) {
-                    availableQuantity = quantities[i].quantity;
-                    break;
-                }
+        // Find the corresponding quantity for the selected size
+        var quantities = <?php echo json_encode($sizes_quantities); ?>;
+        var availableQuantity = 0;
+        for (var i = 0; i < quantities.length; i++) {
+            if (quantities[i].size === selectedSize) {
+                availableQuantity = quantities[i].quantity;
+                break;
             }
-
-            // Update the available quantity display
-            document.getElementById('available-quantity').textContent = availableQuantity;
         }
+
+        // Update the available quantity display
+        document.getElementById('available-quantity').textContent = availableQuantity;
     }
+}
 </script>
+<script src="js/script.js"></script>
 
     <?php include 'footer.php'; ?>
 </body>
