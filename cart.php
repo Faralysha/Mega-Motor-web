@@ -10,27 +10,99 @@ if (!isset($user_id)) {
     exit;
 }
 
-// Update cart quantity by user
-if (isset($_POST['update_cart'])) {
-    $cart_id = $_POST['cart_id'];
-    $cart_quantity = $_POST['cart_quantity'];
-    mysqli_query($conn, "UPDATE `cart` SET quantity = '$cart_quantity' WHERE id = '$cart_id'") or die('Query failed');
-    $message[] = 'Cart quantity updated!';
-}
+if (isset($_POST['order_btn'])) {
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $number = $_POST['number'];
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['country'] . ' - ' . $_POST['pin_code']);
+    $placed_on = date('d-M-Y');
 
-// Delete specific product from the user cart
-if (isset($_GET['delete'])) {
-    $delete_id = $_GET['delete'];
-    mysqli_query($conn, "DELETE FROM `cart` WHERE id = '$delete_id'") or die('Query failed');
-    header('location:cart.php');
-    exit;
-}
+    $cart_total = 0;
+    $cart_products = [];
+    $cart_query = mysqli_query($conn, "SELECT cart.*, products.price FROM `cart` INNER JOIN `products` ON cart.product_id = products.id WHERE cart.user_id = '$user_id'") or die('Query failed');
+    if (mysqli_num_rows($cart_query) > 0) {
+        while ($cart_item = mysqli_fetch_assoc($cart_query)) {
+            $cart_products[] = $cart_item['name'] . '[' . $cart_item['pro_size'] . ']' . '(' . $cart_item['quantity'] . ') ';
+            $sub_total = ($cart_item['price'] * $cart_item['quantity']);
+            $cart_total += $sub_total;
+        }
+    }
 
-// Delete all products from the user cart
-if (isset($_GET['delete_all'])) {
-    mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');
-    header('location:cart.php');
-    exit;
+    $total_products = implode(', ', $cart_products);
+
+    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND number = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('Query failed');
+    $product_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');
+    $userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id='$user_id' ");
+    $get_useruser = mysqli_fetch_assoc($userdata);
+
+    if ($cart_total == 0) {
+        $message[] = 'Your cart is empty';
+    } else {
+        if (mysqli_num_rows($order_query) > 0) {
+            $message[] = 'Order already placed!';
+        } else {
+            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on')") or die('Query failed');
+            $message[] = 'Order placed successfully!';
+
+            // Get user information
+            $get_useruser = mysqli_fetch_assoc($userdata);
+            $bill_name = $get_useruser['name'];
+            $bill_email = $get_useruser['email'];
+            $bill_pnumber = $get_useruser['pnumber'];
+
+            // Construct bill data
+            $final_price = $cart_total;
+            $some_data = array(
+                'userSecretKey' => '8jyl43vl-asxv-d2cs-1kec-gu2vw7rt2347',
+                'categoryCode' => 'nrkbtcqd',
+                'billName' => $bill_name,
+                'billDescription' => $total_products,
+                'billPriceSetting' => 0,
+                'billPayorInfo' => 1,
+                'billAmount' => $final_price,
+                'billReturnUrl' => 'http://localhost:8080/afterpay.php',
+                'billCallbackUrl' => 'http://localhost:8080/cart.php',
+                'billExternalReferenceNo' => 'AFR341DFI',
+                'billTo' => 'Mega Motor Web',
+                'billEmail' => $bill_email,
+                'billPhone' => $bill_pnumber,
+                'billSplitPayment' => 0,
+                'billSplitPaymentArgs' => '',
+                'billPaymentChannel' => '0',
+                'billContentEmail' => 'Thank you for purchasing product from Berjaya Mega Motor!',
+                'billChargeToCustomer' => 1,
+            );
+
+            // Send bill creation request
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
+
+            $result = curl_exec($curl);
+            $info = curl_getinfo($curl);
+
+            // Handle errors
+            if ($result === false) {
+                $message[] = 'Failed to create bill: ' . curl_error($curl);
+            } else {
+                // Decode bill creation response
+                $obj = json_decode($result, true);
+
+                // Check if bill code is received
+                if (isset($obj[0]['BillCode'])) {
+                    $billcode = $obj[0]['BillCode'];
+                    // Redirect user to payment page
+                    echo '<script type="text/javascript"> window.location.href = "https://dev.toyyibpay.com/' . $billcode . '"; </script>';
+                } else {
+                    $message[] = 'Failed to create bill: Invalid response received';
+                }
+            }
+
+            curl_close($curl);
+        }
+    }
 }
 
 ?>
@@ -39,19 +111,11 @@ if (isset($_GET['delete_all'])) {
 <html lang="en">
 
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Cart</title>
-
-   <!-- Font Awesome CDN Link -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- Custom CSS File Link -->
-   <link rel="stylesheet" href="css/styleindex.css">
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <!-- Add your CSS and JavaScript links here -->
 </head>
 
 <body>
