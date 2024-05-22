@@ -766,10 +766,11 @@ margin:0 auto;
       margin:0 auto;
       display: grid;
       grid-template-columns: repeat(auto-fit, 30rem);
-      align-items: center;
       gap:1.5rem;
+      align-items: flex-start;
       justify-content: center;
-   }
+      background-color: var(--white);
+}
    
    .shopping-cart .box-container .box{
       text-align: center;

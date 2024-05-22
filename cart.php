@@ -39,19 +39,19 @@ if (isset($_GET['delete_all'])) {
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Cart</title>
 
-    <!-- Font Awesome CDN link -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   <!-- Font Awesome CDN Link -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- Custom CSS file link -->
-    <link rel="stylesheet" href="css/styleindex.css">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+   <!-- Custom CSS File Link -->
+   <link rel="stylesheet" href="css/styleindex.css">
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 </head>
 
 <body>
@@ -93,7 +93,7 @@ if (isset($_GET['delete_all'])) {
                             <input type="submit" name="update_cart" value="Update" class="option-btn">
                         </form>
                         <div class="sub-total">Subtotal: <span>RM
-                                <?php echo $sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']); ?>
+                                <?php echo number_format ($sub_total = ($fetch_cart['quantity'] * $fetch_cart['price']), 2); ?>
                             </span>
                         </div>
                     </div>
