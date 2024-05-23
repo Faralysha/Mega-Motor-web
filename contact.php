@@ -1,28 +1,30 @@
 <?php
+
+include 'config.php';
+
 session_start();
-@include 'config.php';
 
 $user_id = $_SESSION['user_id'];
 
 if(!isset($user_id)){
    header('location:index.php');
-};
+}
 
 if(isset($_POST['send'])){
 
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-    $msg = mysqli_real_escape_string($conn, $_POST['message']);
+   $name = mysqli_real_escape_string($conn, $_POST['name']);
+   $email = mysqli_real_escape_string($conn, $_POST['email']);
+   $phone = $_POST['phone'];
+   $msg = mysqli_real_escape_string($conn, $_POST['message']);
 
-    $select_message = mysqli_query($conn, "SELECT * FROM `message` WHERE name = '$name' AND email = '$email' AND phone = '$phone' AND message = '$msg'") or die('query failed');
+   $select_message = mysqli_query($conn, "SELECT * FROM `message` WHERE name = '$name' AND email = '$email' AND phone = '$phone' AND message = '$msg'") or die('query failed');
 
-    if(mysqli_num_rows($select_message) > 0){
-        $message[] = 'message sent already!';
-    }else{
-        mysqli_query($conn, "INSERT INTO `message`(user_id, name, email, phone, message) VALUES('$user_id', '$name', '$email', '$phone', '$msg')") or die('query failed');
-        $message[] = 'message sent successfully!';
-    }
+   if(mysqli_num_rows($select_message) > 0){
+      $message[] = 'message sent already!';
+   }else{
+      mysqli_query($conn, "INSERT INTO `message`(user_id, name, email, phone, message) VALUES('$user_id', '$name', '$email', '$phone', '$msg')") or die('query failed');
+      $message[] = 'message sent successfully!';
+   }
 
 }
 
@@ -44,32 +46,41 @@ if(isset($_POST['send'])){
 
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
+
 </head>
 <body>
    
-<?php @include 'header.php'; ?>
+<?php include 'header.php'; ?>
 
 <div class="heading">
-    <h3>contact us</h3>
-    <p> <a href="home.php">home</a> / Contact </p>
+   <h3>contact us</h3>
+   <p> <a href="home.php">Home</a> / Contact </p>
 </div>
 
 <section class="contact">
 
-    <form action="" method="POST">
-        <h3>Send Us Message!</h3>
-        <input type="text" name="name" placeholder="enter your name" class="box" required> 
-        <input type="email" name="email" placeholder="enter your email" class="box" required>
-        <input type="text" name="phone" placeholder="enter your phone number" class="box" required>
-        <textarea name="message" class="box" placeholder="enter your message" required cols="30" rows="10"></textarea>
-        <input type="submit" value="send message" name="send" class="btn">
-    </form>
+   <form action="" method="post">
+      <h3>say something!</h3>
+      <input type="text" name="name" required placeholder="enter your name" class="box">
+      <input type="email" name="email" required placeholder="enter your email" class="box">
+      <input type="tel" name="phone" required placeholder="enter your phone number" class="box">
+      <textarea name="message" class="box" placeholder="enter your message" id="" cols="30" rows="10"></textarea>
+      <input type="submit" value="send message" name="send" class="btn btn-primary btn-lg btn-block">
+   </form>
+   <p> <i class="fas fa-phone"></i>:<a class="tn btn-primary btn-lg" target="_blank" href="https://wa.link/ivg7gx">Contat Us Directly through Whatsapp</a></p>
 
 </section>
 
 
-<?php @include 'footer.php'; ?>
 
+
+
+
+
+
+<?php include 'footer.php'; ?>
+
+<!-- custom js file link  -->
 <script src="js/script.js"></script>
 
 </body>

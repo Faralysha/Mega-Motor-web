@@ -78,8 +78,8 @@ in both admin and customer.
                      <p> name : <span>
                            <?php echo $fetch_orders['name']; ?>
                         </span> </p>
-                     <p> number : <span>
-                           <?php echo $fetch_orders['number']; ?>
+                     <p> phone number : <span>
+                           <?php echo $fetch_orders['phone']; ?>
                         </span> </p>
                      <p> email : <span>
                            <?php echo $fetch_orders['email']; ?>
@@ -137,8 +137,8 @@ in both admin and customer.
                      <p> name : <span>
                            <?php echo $fetch_orders['name']; ?>
                         </span> </p>
-                     <p> number : <span>
-                           <?php echo $fetch_orders['number']; ?>
+                     <p> phone number : <span>
+                           <?php echo $fetch_orders['phone']; ?>
                         </span> </p>
                      <p> your orders : <span>
                            <?php echo $fetch_orders['total_products']; ?>
@@ -163,8 +163,8 @@ in both admin and customer.
                      <p> name : <span>
                            <?php echo $fetch_orders['name']; ?>
                         </span> </p>
-                     <p> number : <span>
-                           <?php echo $fetch_orders['number']; ?>
+                     <p> phone number : <span>
+                           <?php echo $fetch_orders['phone']; ?>
                         </span> </p>
                      <p> email : <span>
                            <?php echo $fetch_orders['email']; ?>
