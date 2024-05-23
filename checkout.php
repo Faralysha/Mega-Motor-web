@@ -95,7 +95,7 @@ if (isset($_POST['order_btn'])) {
             $get_useruser = mysqli_fetch_assoc($userdata);
             $bill_name = $get_useruser['name'];
             $bill_email = $get_useruser['email'];
-            $bill_pnumber = $get_useruser['pnumber'];
+            $bill_pnumber = $get_useruser['phone'];
 
             // Construct bill data
             $final_price = $cart_total;
@@ -168,7 +168,7 @@ if (isset($_POST['order_btn'])) {
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
    <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+   <link rel="stylesheet" href="css/styleindex.css">
 
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
@@ -257,7 +257,7 @@ if (mysqli_num_rows($select_cart) > 0) {
                <input type="number" name="postcode" required placeholder="e.g. 123456" value="">
             </div>
          </div>
-        <form action=".php" method="post">
+        <form action="payment.php" method="post">
         <input type="submit" value="order now" class="btn btn-primary btn-lg" name="order_btn">
       </form>
 

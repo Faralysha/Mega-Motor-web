@@ -48,7 +48,7 @@ if (isset($_POST['order_btn'])) {
             $get_useruser = mysqli_fetch_assoc($userdata);
             $bill_name = $get_useruser['name'];
             $bill_email = $get_useruser['email'];
-            $bill_pnumber = $get_useruser['pnumber'];
+            $bill_pnumber = $get_useruser['phone'];
 
             // Construct bill data
             $final_price = $cart_total;
