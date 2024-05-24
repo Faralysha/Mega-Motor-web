@@ -5,162 +5,172 @@ session_start();
 
 $admin_id = $_SESSION['admin_id'];
 if (!isset($admin_id)) {
-   header('location:admin_login.php');
-   exit;
+    header('location:admin_login.php');
+    exit;
 }
 
 function handleImageUpload($file) {
-   if ($file['error'] == UPLOAD_ERR_OK) {
-       $image_name = basename($file['name']);
-       $image_size = $file['size'];
+    if ($file['error'] == UPLOAD_ERR_OK) {
+        $image_name = basename($file['name']);
+        $image_size = $file['size'];
 
-       if ($image_size > 2000000) {
-           return ['error' => 'Image size is too large.'];
-       }
+        if ($image_size > 2000000) {
+            return ['error' => 'Image size is too large.'];
+        }
 
-       return ['success' => $image_name];
-      }
+        return ['success' => $image_name];
+    }
 
-   return ['error' => 'No image uploaded.'];
+    return ['error' => 'No image uploaded.'];
 }
 
 // Add product to the database
 if (isset($_POST['add_product'])) {
-   // Ensure that 'name' field is not empty
-   if(empty($_POST['name'])) {
-      // Handle the error, for example:
-      echo "Product name cannot be empty.";
-      // You can also redirect back to the form page or display an error message
-      exit; // Stop execution
-   }
+    // Ensure that 'name' field is not empty
+    if (empty($_POST['name'])) {
+        // Handle the error, for example:
+        echo "Product name cannot be empty.";
+        // You can also redirect back to the form page or display an error message
+        exit; // Stop execution
+    }
 
-   // Sanitize other fields as needed
-   $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
-   $category = filter_var($_POST['category'], FILTER_SANITIZE_STRING);
-   $brand = filter_var($_POST['brand'], FILTER_SANITIZE_STRING);
-   $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
-   $description = filter_var($_POST['description'], FILTER_SANITIZE_STRING);
-   
-   // Execute the statement to insert the product
+    // Sanitize other fields as needed
+    $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+    $category = filter_var($_POST['category'], FILTER_SANITIZE_STRING);
+    $brand = filter_var($_POST['brand'], FILTER_SANITIZE_STRING);
+    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
+    $description = filter_var($_POST['description'], FILTER_SANITIZE_STRING);
+
+    // Handle image upload
+    $image_upload = handleImageUpload($_FILES['image']);
+    if (isset($image_upload['error'])) {
+        // Handle the error
+        echo $image_upload['error'];
+        exit; // Stop execution
+    } else {
+        $image_path = $image_upload['success'];
+    }
+
+    // Calculate total quantity
+    $sizes = $_POST['sizes'];
+    $quantities = $_POST['quantities'];
+    $total_quantity = array_sum($quantities);
+
+    // Insert product into the main products table
+    $stmt = $conn->prepare("INSERT INTO `products` (name, category, brand, price, image, quant) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssi", $name, $category, $brand, $price, $image_path, $total_quantity);
+
+    // Execute the statement to insert the product
     $stmt->execute();
     $product_id = $stmt->insert_id; // Get the ID of the inserted product
-    $stmt->close(); 
-   
-   // Insert product into the main products table
-$stmt = $conn->prepare("INSERT INTO `products` (name, category, brand, price, image) VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("sssss", $name, $category, $brand, $price, $image_path);
+    $stmt->close();
 
-// Assign values from $_POST to variables
-$name = $_POST['name'];
-$category = $_POST['category']; // Assuming this is properly set in the form
-$brand = $_POST['brand']; // Assuming this is properly set in the form
-$price = $_POST['price']; // Assuming this is properly set in the form
-$description = $_POST['description']; // Assuming this is properly set in the form
+    // Prepare the statement for inserting sizes and quantities into the product_sizes table
+    $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $product_id, $size, $quantity);
 
-// Handle image upload
-$image_upload = handleImageUpload($_FILES['image']);
-if (isset($image_upload['error'])) {
-    // Handle the error
-    echo $image_upload['error'];
-    exit; // Stop execution
-} else {
-    $image_path = $image_upload['success'];
-}
-
-// Execute the statement to insert the product
-$stmt->execute();
-$product_id = $stmt->insert_id; // Get the ID of the inserted product
-$stmt->close();
-
-// Prepare the statement for inserting sizes and quantities into the product_sizes table
-$stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
-$stmt->bind_param("iss", $product_id, $size, $quantity);
-
-// Loop through sizes and quantities and insert them into the database
-for ($i = 0; $i < count($sizes); $i++) {
-    $size = $sizes[$i];
-    $quantity = $quantities[$i];
-    $stmt->execute();
-}
-$stmt->close();
-
+    // Loop through sizes and quantities and insert them into the database
+    for ($i = 0; $i < count($sizes); $i++) {
+        $size = $sizes[$i];
+        $quantity = $quantities[$i];
+        $stmt->execute();
+    }
+    $stmt->close();
 }
 
 // Delete product
 if (isset($_GET['delete'])) {
-   $delete_id = $_GET['delete'];
+    $delete_id = $_GET['delete'];
 
-   // Delete related product sizes
-   $stmt = $conn->prepare("DELETE FROM `product_sizes` WHERE product_id = ?");
-   $stmt->bind_param("i", $delete_id);
-   $stmt->execute();
-   $stmt->close();
+    // Delete related product sizes
+    $stmt = $conn->prepare("DELETE FROM `product_sizes` WHERE product_id = ?");
+    $stmt->bind_param("i", $delete_id);
+    $stmt->execute();
+    $stmt->close();
 
-   // Delete the product
-   $stmt = $conn->prepare("DELETE FROM `products` WHERE id = ?");
-   $stmt->bind_param("i", $delete_id);
-   $stmt->execute();
+    // Delete the product
+    $stmt = $conn->prepare("DELETE FROM `products` WHERE id = ?");
+    $stmt->bind_param("i", $delete_id);
+    $stmt->execute();
 
-   if ($stmt->affected_rows > 0) {
-       $message[] = 'Product deleted successfully!';
-   } else {
-       $message[] = 'Product could not be deleted!';
-   }
-   $stmt->close();
+    if ($stmt->affected_rows > 0) {
+        $message[] = 'Product deleted successfully!';
+    } else {
+        $message[] = 'Product could not be deleted!';
+    }
+    $stmt->close();
 
-   header('Location: admin_products.php');
-   exit;
+    header('Location: admin_products.php');
+    exit;
 }
 
 // Update product
 if (isset($_POST['update_product'])) {
-   $update_p_id = $_POST['update_p_id'];
-   $update_name = filter_var($_POST['update_name'], FILTER_SANITIZE_STRING);
-   $update_price = filter_var($_POST['update_price'], FILTER_VALIDATE_FLOAT);
-   $update_quant = filter_var($_POST['update_quant'], FILTER_SANITIZE_NUMBER_INT);
+    $update_p_id = $_POST['update_p_id'];
+    $update_name = filter_var($_POST['update_name'], FILTER_SANITIZE_STRING);
+    $update_price = filter_var($_POST['update_price'], FILTER_VALIDATE_FLOAT);
 
-   $stmt = $conn->prepare("UPDATE `products` SET name = ?, price = ?, quant = ? WHERE id = ?");
-   $stmt->bind_param("sdii", $update_name, $update_price, $update_quant, $update_p_id);
-   $stmt->execute();
+    // Calculate total quantity
+    $sizes = $_POST['sizes'];
+    $quantities = $_POST['quantities'];
+    $total_quantity = array_sum($quantities);
 
-   if (!empty($_FILES['update_image']['name'])) {
-       $update_image_upload = handleImageUpload($_FILES['update_image']);
+    $stmt = $conn->prepare("UPDATE `products` SET name = ?, price = ?, quant = ? WHERE id = ?");
+    $stmt->bind_param("sdii", $update_name, $update_price, $total_quantity, $update_p_id);
+    $stmt->execute();
 
-       if (isset($update_image_upload['error'])) {
-           $message[] = $update_image_upload['error'];
-       } else {
-           $update_image_path = $update_image_upload['success'];
-           $update_old_image = $_POST['update_old_image'];
+    // Delete existing sizes and quantities for the product
+    $stmt = $conn->prepare("DELETE FROM `product_sizes` WHERE product_id = ?");
+    $stmt->bind_param("i", $update_p_id);
+    $stmt->execute();
 
-           $stmt = $conn->prepare("UPDATE `products` SET image = ? WHERE id = ?");
-           $stmt->bind_param("si", $update_image_path, $update_p_id);
-           $stmt->execute();
+    // Insert updated sizes and quantities into the product_sizes table
+    $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $update_p_id, $size, $quantity);
+    for ($i = 0; $i < count($sizes); $i++) {
+        $size = $sizes[$i];
+        $quantity = $quantities[$i];
+        $stmt->execute();
+    }
+    $stmt->close();
 
-           if ($stmt->affected_rows > 0) {
-               $old_image_path = 'uploaded_img/' . $update_old_image;
-               if (file_exists($old_image_path)) {
-                   unlink($old_image_path);
-               }
-               $message[] = 'Product updated successfully!';
-           } else {
-               $message[] = 'Product could not be updated!';
-           }
-       }
-   } else {
-       if ($stmt->affected_rows > 0) {
-           $message[] = 'Product updated successfully!';
-       } else {
-           $message[] = 'Product could not be updated!';
-       }
-   }
+    if (!empty($_FILES['update_image']['name'])) {
+        $update_image_upload = handleImageUpload($_FILES['update_image']);
 
-   $stmt->close();
-   header('Location: admin_products.php');
-   exit;
+        if (isset($update_image_upload['error'])) {
+            $message[] = $update_image_upload['error'];
+        } else {
+            $update_image_path = $update_image_upload['success'];
+            $update_old_image = $_POST['update_old_image'];
+
+            $stmt = $conn->prepare("UPDATE `products` SET image = ? WHERE id = ?");
+            $stmt->bind_param("si", $update_image_path, $update_p_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                $old_image_path = 'uploaded_img/' . $update_old_image;
+                if (file_exists($old_image_path)) {
+                    unlink($old_image_path);
+                }
+                $message[] = 'Product updated successfully!';
+            } else {
+                $message[] = 'Product could not be updated!';
+            }
+        }
+    } else {
+        if ($stmt->affected_rows > 0) {
+            $message[] = 'Product updated successfully!';
+        } else {
+            $message[] = 'Product could not be updated!';
+        }
+    }
+
+    $stmt->close();
+    header('Location: admin_products.php');
+    exit;
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
