@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 21, 2024 at 07:54 PM
+-- Generation Time: May 24, 2024 at 05:17 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,35 @@ SET time_zone = "+00:00";
 --
 -- Database: `shopberjaya`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
+CREATE TABLE `cart` (
+  `id` int(100) NOT NULL,
+  `user_id` int(100) NOT NULL,
+  `product_id` int(100) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_size` varchar(50) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `image` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`id`, `user_id`, `product_id`, `product_name`, `product_size`, `price`, `quantity`, `image`, `created_at`) VALUES
+(5, 1, 28, 'GEOMAX', 's', 1.00, 1, 'pro2.png', '2024-05-21 18:09:39'),
+(6, 1, 29, 'Brake Caliper S Series (NMAX)', 'Nmax', 2.50, 1, 'pro35.jpeg', '2024-05-21 18:11:19'),
+(7, 1, 28, 'GEOMAX', 'm', 1.00, 1, 'pro2.png', '2024-05-23 13:01:45'),
+(8, 1, 28, 'GEOMAX', 'm', 1.00, 1, 'pro2.png', '2024-05-23 13:46:36'),
+(9, 1, 28, 'GEOMAX', 'm', 1.00, 1, 'pro2.png', '2024-05-23 13:47:18');
 
 -- --------------------------------------------------------
 
@@ -50,6 +79,13 @@ CREATE TABLE `message` (
   `phone` varchar(12) NOT NULL,
   `message` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `message`
+--
+
+INSERT INTO `message` (`id`, `user_id`, `name`, `email`, `phone`, `message`) VALUES
+(10, 1, 'Eizrfan', 'user01@gmail.com', '', 'hi');
 
 -- --------------------------------------------------------
 
@@ -147,6 +183,14 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `user_type`) VALUES
 --
 
 --
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
 -- Indexes for table `history`
 --
 ALTER TABLE `history`
@@ -191,6 +235,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
@@ -200,7 +250,7 @@ ALTER TABLE `history`
 -- AUTO_INCREMENT for table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -229,6 +279,13 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 
 --
 -- Constraints for table `history`
