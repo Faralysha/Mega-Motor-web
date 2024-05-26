@@ -547,12 +547,19 @@ margin:0 auto;
    margin: auto;
    overflow: hidden;
    }
+
+   .about{
+      background-color: var(--white);
+      overflow: hidden; /* Ensure no overflow */
+   }
+
    .about .flex{
    max-width: 1200px;
    margin:0 auto;
    display: flex;
    align-items: center;
    flex-wrap: wrap;
+   background-color: var(--white);
    }
    
    .about .flex .image{
@@ -580,6 +587,11 @@ margin:0 auto;
    line-height: 2;
    font-size: 1.7rem;
    color:var(--light-color);
+   }
+
+   .authors{
+      background-color: var(--white);
+      overflow: hidden; /* Ensure no overflow */
    }
    
    .home-contact{
@@ -727,6 +739,11 @@ margin:0 auto;
       /* background-color: gradient var(--crimson); */
    }
    /* Contact -------------------------------------------------------- */
+   .contact{
+         background-color: var(--white);
+         overflow: hidden; /* Ensure no overflow */
+   }
+   
    .contact form{
       margin:0 auto;
       background-color: var(--light-bg);
@@ -769,6 +786,7 @@ margin:0 auto;
       gap:1.5rem;
       align-items: flex-start;
       justify-content: center;
+      background-color: var(--white);
    }
    
    .shopping-cart .box-container .box{

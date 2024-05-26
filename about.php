@@ -29,6 +29,19 @@ if(!isset($user_id)){
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
 </head>
+<style>        
+   .about{
+      background-color: var(--white);
+      overflow: hidden; /* Ensure no overflow */
+   }
+   
+   .authors{
+      background-color: var(--white);
+      overflow: hidden; /* Ensure no overflow */
+   }
+   
+
+</style>
 <body>
 
 <?php include 'header.php'; ?>

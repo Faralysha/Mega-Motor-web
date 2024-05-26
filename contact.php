@@ -48,6 +48,13 @@ if(isset($_POST['send'])){
 
 
 </head>
+<style>
+     .contact{
+         background-color: var(--white);
+         overflow: hidden; /* Ensure no overflow */
+   }
+   
+</style>
 <body>
    
 <?php include 'header.php'; ?>

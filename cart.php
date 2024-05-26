@@ -10,6 +10,31 @@ if (!isset($user_id)) {
     exit;
 }
 
+include 'config.php';
+session_start();
+
+$user_id = $_SESSION['user_id'];
+
+if (!isset($user_id)) {
+    header('location:index.php');
+    exit;
+}
+
+// Delete cart item
+if (isset($_GET['delete'])) {
+    $delete_id = $_GET['delete'];
+    mysqli_query($conn, "DELETE FROM `cart` WHERE id = '$delete_id' AND user_id = '$user_id'") or die('Query failed');
+    header('location:cart.php');
+    exit;
+}
+
+// Delete all cart items for the user
+if (isset($_GET['delete_all'])) {
+    mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');
+    header('location:cart.php');
+    exit;
+}
+
 if (isset($_POST['order_btn'])) {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $number = $_POST['number'];
@@ -115,8 +140,24 @@ if (isset($_POST['order_btn'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-    <!-- Add your CSS and JavaScript links here -->
+   
+    <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/styleindex.css">
+<!-- bootstrap -->
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
 </head>
+<style>   
+
+    .shopping-cart{
+        background-color: var(--white);
+        overflow: hidden; /* Ensure no overflow */
+
+    }
+    </style>
 
 <body>
 
@@ -141,7 +182,7 @@ if (isset($_POST['order_btn'])) {
                         <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times" onclick="return confirm('Delete this from cart?');"></a>
                         <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" alt="">
                         <div class="name">
-                            <?php echo $fetch_cart['product_name']; ?>
+                        <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times" onclick="return confirm('Delete this from cart?');"></a>
                         </div>
                         <div class="price">RM <?php echo number_format($fetch_cart['price'], 2); ?></div>
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 24, 2024 at 05:17 AM
+-- Generation Time: May 26, 2024 at 10:59 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -45,10 +45,7 @@ CREATE TABLE `cart` (
 
 INSERT INTO `cart` (`id`, `user_id`, `product_id`, `product_name`, `product_size`, `price`, `quantity`, `image`, `created_at`) VALUES
 (5, 1, 28, 'GEOMAX', 's', 1.00, 1, 'pro2.png', '2024-05-21 18:09:39'),
-(6, 1, 29, 'Brake Caliper S Series (NMAX)', 'Nmax', 2.50, 1, 'pro35.jpeg', '2024-05-21 18:11:19'),
-(7, 1, 28, 'GEOMAX', 'm', 1.00, 1, 'pro2.png', '2024-05-23 13:01:45'),
-(8, 1, 28, 'GEOMAX', 'm', 1.00, 1, 'pro2.png', '2024-05-23 13:46:36'),
-(9, 1, 28, 'GEOMAX', 'm', 1.00, 1, 'pro2.png', '2024-05-23 13:47:18');
+(6, 1, 29, 'Brake Caliper S Series (NMAX)', 'Nmax', 2.50, 1, 'pro35.jpeg', '2024-05-21 18:11:19');
 
 -- --------------------------------------------------------
 
@@ -61,6 +58,7 @@ CREATE TABLE `history` (
   `user_id` int(100) NOT NULL,
   `order_id` int(100) NOT NULL,
   `product_id` int(100) NOT NULL,
+  `product_size` varchar(50) NOT NULL,
   `product_name` varchar(100) NOT NULL,
   `product_rate` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -110,6 +108,20 @@ CREATE TABLE `orders` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `order_item_id` int(100) NOT NULL,
+  `order_id` int(100) NOT NULL,
+  `product_detail_id` int(100) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -130,8 +142,30 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `category`, `brand`, `size`, `price`, `image`, `quant`, `pro_rates`) VALUES
-(28, 'GEOMAX', 'helemets&visor', 'GRACSHAW', '', 1.00, 'pro2.png', 0, 0),
-(29, 'Brake Caliper S Series (NMAX)', 'helemets&visor', 'RCB', '', 2.50, 'pro35.jpeg', 0, 0);
+(34, 'GEOMAX', 'helemets&visor', 'GRACSHAW', '', 1.00, 'pro2.png', 7, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_details`
+--
+
+CREATE TABLE `product_details` (
+  `product_detail_id` int(100) NOT NULL,
+  `product_id` int(100) NOT NULL,
+  `serial_number` varchar(100) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'Available'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `product_details`
+--
+DELIMITER $$
+CREATE TRIGGER `set_serial_number` BEFORE INSERT ON `product_details` FOR EACH ROW BEGIN
+  SET NEW.serial_number = CONCAT(NEW.product_id, '-', LPAD(NEW.product_detail_id, 5, '0'));
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -151,9 +185,8 @@ CREATE TABLE `product_sizes` (
 --
 
 INSERT INTO `product_sizes` (`id`, `product_id`, `size`, `quantity`) VALUES
-(49, 28, 's', 5),
-(50, 28, 'm', 3),
-(51, 29, 'Nmax', 5);
+(60, 34, 'm', 2),
+(61, 34, 's', 5);
 
 -- --------------------------------------------------------
 
@@ -212,10 +245,25 @@ ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`order_item_id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `product_detail_id` (`product_detail_id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `product_details`
+--
+ALTER TABLE `product_details`
+  ADD PRIMARY KEY (`product_detail_id`),
+  ADD KEY `product_id` (`product_id`);
 
 --
 -- Indexes for table `product_sizes`
@@ -259,16 +307,28 @@ ALTER TABLE `orders`
   MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `order_item_id` int(100) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `product_details`
+--
+ALTER TABLE `product_details`
+  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `product_sizes`
 --
 ALTER TABLE `product_sizes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -284,22 +344,27 @@ ALTER TABLE `users`
 -- Constraints for table `cart`
 --
 ALTER TABLE `cart`
-  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `history`
 --
 ALTER TABLE `history`
   ADD CONSTRAINT `history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `history_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
-  ADD CONSTRAINT `history_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+  ADD CONSTRAINT `history_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`);
 
 --
--- Constraints for table `product_sizes`
+-- Constraints for table `order_items`
 --
-ALTER TABLE `product_sizes`
-  ADD CONSTRAINT `product_sizes_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_detail_id`) REFERENCES `product_details` (`product_detail_id`);
+
+--
+-- Constraints for table `product_details`
+--
+ALTER TABLE `product_details`
+  ADD CONSTRAINT `product_details_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
