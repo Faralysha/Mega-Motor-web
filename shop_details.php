@@ -35,12 +35,13 @@ $sizes_quantities = mysqli_fetch_all($fetch_sizes_quantities, MYSQLI_ASSOC);
 mysqli_stmt_close($get_sizes_quantities);
 
 // Check if sizes_quantities is an array
-if (is_array($sizes_quantities)) {
+if ($sizes_quantities !== false) {
+    // Sizes and quantities are available
     foreach ($sizes_quantities as $size_quantity) {
         // Process each size and quantity
     }
 } else {
-    // Handle the error appropriately
+    // No sizes available for this product
     echo 'No sizes available for this product.';
 }
 

@@ -7,7 +7,7 @@ session_start();
 $admin_id = $_SESSION['admin_id'];
 
 if (!isset($admin_id)) {
-   header('location:admin_login.php');
+   header('location:login.php');
 }
 
 if (isset($_POST['update_order'])) {
@@ -101,7 +101,7 @@ if (isset($_GET['delete'])) {
                            <?php echo $fetch_orders['name']; ?>
                         </span> </p>
                      <p> number : <span>
-                           <?php echo $fetch_orders['number']; ?>
+                           <?php echo $fetch_orders['phone']; ?>
                         </span> </p>
                      <p> email : <span>
                            <?php echo $fetch_orders['email']; ?>
@@ -137,7 +137,7 @@ if (isset($_GET['delete'])) {
                            <?php echo $fetch_orders['name']; ?>
                         </span> </p>
                      <p> number : <span>
-                           <?php echo $fetch_orders['number']; ?>
+                           <?php echo $fetch_orders['phone']; ?>
                         </span> </p>
                      <p> email : <span>
                            <?php echo $fetch_orders['email']; ?>

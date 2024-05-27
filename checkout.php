@@ -12,22 +12,16 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 $total_itemprice = 0;
-$cart_products = [];
+$choose_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
+if (mysqli_num_rows($choose_cart) > 0) {
+   while ($fetch_cart = mysqli_fetch_assoc($choose_cart)) {
+      $total_Iprice = ($fetch_cart['price'] * $fetch_cart['quantity']);
+      $total_itemprice += $total_Iprice;
+      $final_price = $total_itemprice*100;
+      ?>
 
-// Fetch cart items and calculate the total price
-$select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
-
-if (mysqli_num_rows($select_cart) > 0) {
-    while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
-        if (isset($fetch_cart['price'], $fetch_cart['quantity'])) {
-            $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
-            $total_itemprice += $total_price;
-        }
-
-        if (isset($fetch_cart['name'], $fetch_cart['pro_size'], $fetch_cart['price'], $fetch_cart['quantity'])) {
-            $cart_products[] = $fetch_cart['name'] . '[' . $fetch_cart['pro_size'] . '] (' . 'RM' . $fetch_cart['price'] . ' X ' . $fetch_cart['quantity'] . ')';
-        }
-    }
+      <?php
+   }
 }
 
 if (isset($_POST['order_btn'])) {
@@ -35,18 +29,18 @@ if (isset($_POST['order_btn'])) {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $number = mysqli_real_escape_string($conn, $_POST['phone']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['country'] . ' - ' . $_POST['pin_code']);
+    $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ' - ' . $_POST['pin_code']);
     $placed_on = date('d-M-Y');
 
     // Initialize variables
     $cart_total = 0;
-    $cart_products = [];
+    $cart_products[] = '';
 
     // Fetch cart items and calculate total
     $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
     if (mysqli_num_rows($cart_query) > 0) {
         while ($cart_item = mysqli_fetch_assoc($cart_query)) {
-            $cart_products[] = $cart_item['name'] . '[' . $cart_item['pro_size'] . ']' . '(' . $cart_item['quantity'] . ') ';
+            $cart_products[] = $cart_item['product_name'] . '[' . $cart_item['product_size'] . ']' . '(' . $cart_item['quantity'] . ') ';
             $sub_total = ($cart_item['price'] * $cart_item['quantity']);
             $cart_total += $sub_total;
         }
@@ -55,35 +49,36 @@ if (isset($_POST['order_btn'])) {
     $total_products = implode(', ', $cart_products);
 
     // Check if order already exists
-    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('Query failed');
-
+    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND phone = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('query failed');
+    $product_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+    $userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id='$user_id' ");
+    $get_useruser = mysqli_fetch_assoc($userdata);
+     
     if ($cart_total == 0) {
         $message[] = 'Your cart is empty';
     } else {
         if (mysqli_num_rows($order_query) > 0) {
             $message[] = 'Order already placed!';
         } else {
+
             // Insert order details into orders table
             $tracknom = 0;
-            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, phone, email, address, total_products, total_price, placed_on, tracknum) VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom')") or die('query failed');
-
-            // Fetch newly inserted order ID
+            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, phone, email, address, total_products, total_price, placed_on, tracknum) 
+            VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom')") or die('query failed');
             $getidddd = mysqli_query($conn, "SELECT id FROM `orders` WHERE user_id = $user_id");
             while ($getid = mysqli_fetch_assoc($getidddd)) {
-                $_SESSION['idname'] = $getid['id'];
-                $id_order_new = $getid['id'];
+               $_SESSION['idname'] = $getid['id'];
+               $id_order_new = $getid['id'];
             }
-
-            // Insert order history for each product
-            $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-            if (mysqli_num_rows($cart_query) > 0) {
-                while ($product_rating = mysqli_fetch_assoc($cart_query)) {
-                    $product_userid_rate = $product_rating['user_id'];
-                    $product_name_rate = $product_rating['name'];
-                    $get_orderid = $id_order_new;
-                    mysqli_query($conn, "INSERT INTO `history`(user_id, order_id,product_name) VALUES('$product_userid_rate','$get_orderid' ,'$product_name_rate')") or die('query failed');
-                }
+         
+         if (mysqli_num_rows($product_query) > 0) {
+            while ($product_rating = mysqli_fetch_assoc($product_query)) {
+               $product_userid_rate = $product_rating['user_id'];
+               $product_name_rate = $product_rating['name'];
+               $get_orderid = $id_order_new;
+               mysqli_query($conn, "INSERT INTO `history`(user_id, order_id,product_name) VALUES('$product_userid_rate','$get_orderid' ,'$product_name_rate')") or die('query failed');
             }
+         }
 
             $message[] = 'Order placed successfully!';
 
@@ -96,8 +91,10 @@ if (isset($_POST['order_btn'])) {
             $bill_email = $get_useruser['email'];
             $bill_pnumber = $get_useruser['phone'];
 
-            // Construct bill data
-            $final_price = $cart_total;
+            echo $bill_email;
+            echo $bill_pnumber;
+            echo $bill_name;
+   
             $some_data = array(
                 'userSecretKey' => '8jyl43vl-asxv-d2cs-1kec-gu2vw7rt2347',
                 'categoryCode' => 'nrkbtcqd',
@@ -121,34 +118,30 @@ if (isset($_POST['order_btn'])) {
 
             // Send bill creation request
             $curl = curl_init();
-            curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
+         curl_setopt($curl, CURLOPT_POST, 1);
+         curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
+         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
 
-            $result = curl_exec($curl);
-            $info = curl_getinfo($curl);
+         $result = curl_exec($curl);
+         $info = curl_getinfo($curl);
+         curl_close($curl);
+         $obj = json_decode($result, true);
+         $billcode = $obj[0]['BillCode'];
+         echo $billcode;
 
-            // Handle errors
-            if ($result === false) {
-                $message[] = 'Failed to create bill: ' . curl_error($curl);
-            } else {
-                // Decode bill creation response
-                $obj = json_decode($result, true);
+         ?>
 
-                // Check if bill code is received
-                if (isset($obj[0]['BillCode'])) {
-                    $billcode = $obj[0]['BillCode'];
-                    // Redirect user to payment page
-                    echo '<script type="text/javascript"> window.location.href = "https://dev.toyyibpay.com/' . $billcode . '"; </script>';
-                } else {
-                    $message[] = 'Failed to create bill: Invalid response received';
-                }
-            }
+         <script type="text/javascript">
 
-            curl_close($curl);
-        }
-    }
+            window.location.href = "https://dev.toyyibpay.com/e/143251052704195<?php echo $billcode; ?>"; 
+         </script>
+
+<?php
+
+      }
+   }
+
 }
 
 ?>
@@ -185,20 +178,32 @@ if (isset($_POST['order_btn'])) {
 
       <?php
       
-$grand_total = 0;
-$select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
-if (mysqli_num_rows($select_cart) > 0) {
-    while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
-        if (isset($fetch_cart['price'], $fetch_cart['quantity'])) {
-            $sub_total = ($fetch_cart['price'] * $fetch_cart['quantity']);
-            $grand_total += $sub_total;
-        }
-    }
-} else {
-    echo '<p class="empty">your cart is empty</p>';
-}
-?>
-      <div class="grand-total"> Total Payment: <span>RM <?php echo $grand_total; ?></span> </div>
+      $grand_total = 0;
+      $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+      if (mysqli_num_rows($select_cart) > 0) {
+         while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
+            $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
+            $grand_total += $total_price;
+            ?>
+            <p>
+               <?php echo $fetch_cart['product_name'];
+               ?>
+               Size:
+               <?php
+               echo $fetch_cart['product_size'] ?> <span>(
+                  <?php echo 'RM' . $fetch_cart['price'] . '' . ' X ' . $fetch_cart['quantity']; ?>)
+               </span>
+            </p>
+            <?php
+         }
+      } else {
+         echo '<p class="empty">your cart is empty</p>';
+      }
+      ?>
+      <div class="grand-total"> Total Payment: <span>RM
+            <?php echo $grand_total; ?>
+         </span> </div>
+
    </section>
 
    <section class="checkout">

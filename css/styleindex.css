@@ -790,8 +790,8 @@ margin:0 auto;
    }
    
    .shopping-cart .box-container .box{
-      width: 35rem; /* Fixed width */
-      height: 55rem; /* Fixed height */
+      width: 30rem; /* Fixed width */
+      height: 50rem; /* Fixed height */
       border: 0.5px solid;
       border-radius: 5px;
       box-shadow: var(--box-shadow);
