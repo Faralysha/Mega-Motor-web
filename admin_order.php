@@ -1,5 +1,4 @@
 <?php
-
 include 'config.php';
 
 session_start();
@@ -43,10 +42,12 @@ if (isset($_GET['delete'])) {
    <!-- custom admin css file link  -->
    <link rel="stylesheet" href="css/admin_style.css">
 
-
    <!-- Jquery link for AJAX -->
    <script src="https://code.jquery.com/jquery-3.6.4.min.js"
       integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+
+   <!-- External JavaScript library for tracking -->
+   <script src="//www.tracking.my/track-button.js"></script>
 
    <script>
       $(document).ready(function () {
@@ -54,8 +55,15 @@ if (isset($_GET['delete'])) {
             $("#container-displayorder").load("admin_reloaded.php", function () {
                alert("Data refreshed");
             });
-         })
-      })
+         });
+         
+         // Function to handle tracking number click
+         function linkTrack(num) {
+            TrackButton.track({
+               tracking_no: num
+            });
+         }
+      });
    </script>
 
 </head>
@@ -80,8 +88,6 @@ if (isset($_GET['delete'])) {
             // print out all the data
             while ($fetch_orders = mysqli_fetch_assoc($select_orders)) {
                if ($fetch_orders['status'] == 1) {
-                  // echo "this is to display item that has been reveiced with name: ";
-                  // echo $stats_ord['name'];
                   ?>
                   <div class="box">
                      <p>Order received by the customer</p>
@@ -118,7 +124,6 @@ if (isset($_GET['delete'])) {
                   </div>
                   <?php
                } else {
-                  // to display all order makde by the customer
                   ?>
                   <div class="box">
                      <p> user id : <span>
@@ -145,7 +150,7 @@ if (isset($_GET['delete'])) {
                      <p> total price : <span>RM
                            <?php echo $fetch_orders['total_price']; ?>
                         </span> </p>
-                        <p>Tracking number: <span style="color:blue">
+                     <p>Tracking number: <span style="color:blue">
                            <a onclick="linkTrack(this.innerText)">
                               <?php echo $fetch_orders['tracknum']; ?>
                            </a>
