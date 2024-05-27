@@ -29,7 +29,7 @@ if (isset($_POST['order_btn'])) {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $number = mysqli_real_escape_string($conn, $_POST['phone']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ' - ' . $_POST['pin_code']);
+    $address = mysqli_real_escape_string($conn, $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['state'] . ' - ' . $_POST['pin_code']);
     $placed_on = date('d-M-Y');
 
     // Initialize variables
@@ -235,11 +235,11 @@ if (isset($_POST['order_btn'])) {
             </div>
             <div class="inputBox">
                <span>city :</span>
-               <input type="text" name="city" required placeholder="e.g. mumbai">
+               <input type="text" name="city" required placeholder="e.g. Klang">
             </div>
             <div class="inputBox">
                <span>state :</span>
-               <input type="text" name="state" required placeholder="e.g. maharashtra">
+               <input type="text" name="state" required placeholder="e.g. Selangor">
             </div>
             <div class="inputBox">
                <span>pin code :</span>

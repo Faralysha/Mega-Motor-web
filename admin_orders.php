@@ -26,7 +26,6 @@ if (isset($_GET['delete'])) {
    mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed');
    header('location:admin_orders.php');
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -58,12 +57,7 @@ if (isset($_GET['delete'])) {
          })
       })
    </script>
-   <!-- auto refresh the specific div-content -->
-   <!-- <script>
-      setInterval(function () {
-         $('#container-displayorder').load("admin_reloaded.php");
-      }, 10000)
-   </script> -->
+
 </head>
 
 <body>
@@ -183,8 +177,6 @@ if (isset($_GET['delete'])) {
    <!-- custom admin js file link  -->
    <script src="js/admin_script.js"></script>
 
-   <!-- // $select_order_id = mysqli_query($conn, "SELECT * FROM `orders` WHERE id='$order_update_id'") or die('query failed');
-   // mysqli_query($conn, "INSERT INTO `orders` (tracknum) VALUES ('$track_number') WHERE id='$order_update_id'") or die('query failed');   -->
 </body>
 
 </html>
