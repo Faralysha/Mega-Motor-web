@@ -10,16 +10,6 @@ if (!isset($user_id)) {
     exit;
 }
 
-include 'config.php';
-session_start();
-
-$user_id = $_SESSION['user_id'];
-
-if (!isset($user_id)) {
-    header('location:index.php');
-    exit;
-}
-
 // Delete cart item
 if (isset($_GET['delete'])) {
     $delete_id = $_GET['delete'];
@@ -44,10 +34,10 @@ if (isset($_POST['order_btn'])) {
 
     $cart_total = 0;
     $cart_products = [];
-    $cart_query = mysqli_query($conn, "SELECT cart.*, products.price FROM `cart` INNER JOIN `products` ON cart.product_id = products.id WHERE cart.user_id = '$user_id'") or die('Query failed');
+    $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');
     if (mysqli_num_rows($cart_query) > 0) {
         while ($cart_item = mysqli_fetch_assoc($cart_query)) {
-            $cart_products[] = $cart_item['name'] . '[' . $cart_item['pro_size'] . ']' . '(' . $cart_item['quantity'] . ') ';
+            $cart_products[] = $cart_item['product_brand'] . ' ' . $cart_item['product_name'] . '[' . $cart_item['product_size'] . ']' . '(' . $cart_item['quantity'] . ') ';
             $sub_total = ($cart_item['price'] * $cart_item['quantity']);
             $cart_total += $sub_total;
         }
@@ -56,7 +46,6 @@ if (isset($_POST['order_btn'])) {
     $total_products = implode(', ', $cart_products);
 
     $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND number = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('Query failed');
-    $product_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');
     $userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id='$user_id' ");
     $get_useruser = mysqli_fetch_assoc($userdata);
 
@@ -70,7 +59,6 @@ if (isset($_POST['order_btn'])) {
             $message[] = 'Order placed successfully!';
 
             // Get user information
-            $get_useruser = mysqli_fetch_assoc($userdata);
             $bill_name = $get_useruser['name'];
             $bill_email = $get_useruser['email'];
             $bill_pnumber = $get_useruser['phone'];
@@ -174,24 +162,24 @@ if (isset($_POST['order_btn'])) {
             <?php
             // To display the items in the cart
             $grand_total = 0;
-            $select_cart = mysqli_query($conn, "SELECT cart.*, products.price, products.image FROM `cart` INNER JOIN `products` ON cart.product_id = products.id WHERE cart.user_id = '$user_id'") or die('Query failed');
+            $select_cart = mysqli_query($conn, "SELECT cart.*, products.price, products.image, products.brand, products.name FROM `cart` INNER JOIN `products` ON cart.product_id = products.id WHERE cart.user_id = '$user_id'") or die('Query failed');
             if (mysqli_num_rows($select_cart) > 0) {
                 while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
                     ?>
-                    <div class="box">
-                        <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times" onclick="return confirm('Delete this from cart?');"></a>
-                        <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" alt="">
-                        <div class="name">
-                        <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times" onclick="return confirm('Delete this from cart?');"></a>
-                        </div>
-                        <div class="price">RM <?php echo number_format($fetch_cart['price'], 2); ?></div>
-
-                        <div class="name">Size:
-                        <?php echo $fetch_cart['product_size']; ?> 
-                        </div>
-                        <div class="name">Quantity:
-                            <?php echo $fetch_cart['quantity']; ?>
-                        </div>
+                     <div class="box">
+                    <a href="cart.php?delete=<?php echo $fetch_cart['id']; ?>" class="fas fa-times" onclick="return confirm('Delete this from cart?');"></a>
+                    <img src="uploaded_img/<?php echo $fetch_cart['image']; ?>" alt="">
+                    
+                    <div class="brand-name">
+                    <?php echo $fetch_cart['product_brand'] . ' ' . $fetch_cart['product_name']; ?>
+                    </div>
+                    <div class="price">RM <?php echo number_format($fetch_cart['price'], 2); ?></div>
+                    <div class="size">Size:
+                        <?php echo $fetch_cart['product_size']; ?>  
+                    </div>
+                    <div class="quantity">Quantity:
+                    <?php echo $fetch_cart['quantity']; ?>
+                    </div>
                         <form action="" method="post">
                             <input type="hidden" name="cart_id" value="<?php echo $fetch_cart['id']; ?>">
                             <input type="number" min="1" name="cart_quantity" value="<?php echo $fetch_cart['quantity']; ?>">

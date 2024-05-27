@@ -51,6 +51,7 @@ foreach ($sizes_quantities as $size_quantity) {
 }
 
 if (isset($_POST['add_to_cart'])) {
+    $product_brand = $fetch_products['brand']; // Fetch the product brand
     $product_name = $fetch_products['name'];
     $product_price = $fetch_products['price'];
     $product_size = $_POST['product_size'];
@@ -69,12 +70,13 @@ if (isset($_POST['add_to_cart'])) {
         // Specific size is out of stock or quantity exceeds available quantity for that size
         $message[] = 'Product out of stock';
     } else {
-        // Insert the product into the cart
-        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_id, product_name, product_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($insert_cart, "iisssis", $user_id, $product_id, $product_name, $product_size, $product_price, $product_quantity, $product_image);
+        // Insert the product into the cart along with the product brand
+        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_id, product_brand, product_name, product_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($insert_cart, "iisssisd", $user_id, $product_id, $product_brand, $product_name, $product_size, $product_price, $product_quantity, $product_image);
         mysqli_stmt_execute($insert_cart);
         mysqli_stmt_close($insert_cart);
-        $message[] = 'Product added to cart';
+        $message[] = 'Product added to cart';        
+
     }
 }
 
@@ -362,6 +364,7 @@ if (isset($_POST['add_to_cart'])) {
                     <input type="number" min="1" name="product_quantity" placeholder="Enter Quantity" value="1" class="form-control form-control-lg">
                 </div>
                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
+                <input type="hidden" name="product_brand" value="<?php echo htmlspecialchars($fetch_products['brand'] ?? ''); ?>">
                 <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['name'] ?? ''); ?>">
                 <input type="hidden" name="product_size" id="selected-size" value="">
                 <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($fetch_products['price'] ?? ''); ?>">

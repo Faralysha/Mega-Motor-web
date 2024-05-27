@@ -240,6 +240,7 @@ if (isset($_POST['apply_filters'])) {
       <!-- Hidden Fields for Cart Processing -->
       <input type="hidden" name="product_quantity" value="1" class="form-control form-control-lg">
       <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+      <input type="hidden" name="product_brand" value="<?php echo $fetch_products['brand']; ?>">
       <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
       <input type="hidden" name="product_size" value="<?php echo $fetch_products['size']; ?>">
       <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">

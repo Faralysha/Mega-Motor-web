@@ -12,18 +12,16 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 $total_itemprice = 0;
-$grand_total = 0;
 $cart_products = [];
 
+// Fetch cart items and calculate the total price
 $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
 
 if (mysqli_num_rows($select_cart) > 0) {
     while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
         if (isset($fetch_cart['price'], $fetch_cart['quantity'])) {
             $total_price = ($fetch_cart['price'] * $fetch_cart['quantity']);
-            $grand_total += $total_price;
-            $total_Iprice = $total_price;
-            $total_itemprice += $total_Iprice;
+            $total_itemprice += $total_price;
         }
 
         if (isset($fetch_cart['name'], $fetch_cart['pro_size'], $fetch_cart['price'], $fetch_cart['quantity'])) {
@@ -35,7 +33,7 @@ if (mysqli_num_rows($select_cart) > 0) {
 if (isset($_POST['order_btn'])) {
     // Sanitize user input
     $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $number = mysqli_real_escape_string($conn, $_POST['number']);
+    $number = mysqli_real_escape_string($conn, $_POST['phone']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['country'] . ' - ' . $_POST['pin_code']);
     $placed_on = date('d-M-Y');
@@ -67,7 +65,7 @@ if (isset($_POST['order_btn'])) {
         } else {
             // Insert order details into orders table
             $tracknom = 0;
-            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, address, total_products, total_price, placed_on, tracknum) VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom')") or die('query failed');
+            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, phone, email, address, total_products, total_price, placed_on, tracknum) VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom')") or die('query failed');
 
             // Fetch newly inserted order ID
             $getidddd = mysqli_query($conn, "SELECT id FROM `orders` WHERE user_id = $user_id");
@@ -77,6 +75,7 @@ if (isset($_POST['order_btn'])) {
             }
 
             // Insert order history for each product
+            $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
             if (mysqli_num_rows($cart_query) > 0) {
                 while ($product_rating = mysqli_fetch_assoc($cart_query)) {
                     $product_userid_rate = $product_rating['user_id'];
@@ -116,8 +115,7 @@ if (isset($_POST['order_btn'])) {
                 'billSplitPayment' => 0,
                 'billSplitPaymentArgs' => '',
                 'billPaymentChannel' => '0',
-                'billContentEmail'
-                => 'Thank you for purchasing product from Berjaya Mega Motor!',
+                'billContentEmail' => 'Thank you for purchasing product from Berjaya Mega Motor!',
                 'billChargeToCustomer' => 1,
             );
 
@@ -187,83 +185,67 @@ if (isset($_POST['order_btn'])) {
 
       <?php
       
-$final_total_checkout = 0;
 $grand_total = 0;
 $select_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
 if (mysqli_num_rows($select_cart) > 0) {
     while ($fetch_cart = mysqli_fetch_assoc($select_cart)) {
         if (isset($fetch_cart['price'], $fetch_cart['quantity'])) {
             $sub_total = ($fetch_cart['price'] * $fetch_cart['quantity']);
-            $grand_total += $total_price;
-            $total_itemprice += $total_Iprice;
+            $grand_total += $sub_total;
         }
+    }
+} else {
+    echo '<p class="empty">your cart is empty</p>';
+}
 ?>
-        
-<?php
-
-         }
-      } else {
-         echo '<p class="empty">your cart is empty</p>';
-      }
-      ?>
-      <div class="grand-total"> Total Payment: <span>RM
-            <?php echo $total_itemprice; ?>
-         </span> </div>
-
+      <div class="grand-total"> Total Payment: <span>RM <?php echo $grand_total; ?></span> </div>
    </section>
 
    <section class="checkout">
-      <?php
-      $get_userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id = '$user_id'");
-      $get_data = mysqli_fetch_assoc($get_userdata);
-      ?>
+
       <form action="" method="post">
+
          <h3>place your order</h3>
-         <<div class="flex">
+
+         <div class="flex">
             <div class="inputBox">
-                <span>your name :</span>
-                <input type="text" name="name" required placeholder="enter your name">
+               <span>your name :</span>
+               <input type="text" name="name" required placeholder="enter your name">
             </div>
             <div class="inputBox">
-                <span>your number :</span>
-                <input type="text" name="number" required placeholder="enter your number">
+               <span>your number :</span>
+               <input type="number" name="phone" required placeholder="enter your number">
             </div>
             <div class="inputBox">
-                <span>your email :</span>
-                <input type="email" name="email" required placeholder="enter your email">
+               <span>your email :</span>
+               <input type="email" name="email" required placeholder="enter your email">
             </div>
             <div class="inputBox">
-               <span>address line 01 :</span>
-               <input type="text"  name="flat" required placeholder="e.g. flat no." value="">
+               <span>address line 1 :</span>
+               <input type="text" name="flat" required placeholder="e.g. flat no.">
             </div>
             <div class="inputBox">
-               <span>address line 02 :</span>
-               <input type="text" name="street" required placeholder="e.g. street name" value="">
+               <span>address line 2 :</span>
+               <input type="text" name="street" required placeholder="e.g. street name">
             </div>
             <div class="inputBox">
                <span>city :</span>
-               <input type="text" name="city" required placeholder="e.g. Batu pahat" value="">
+               <input type="text" name="city" required placeholder="e.g. mumbai">
             </div>
             <div class="inputBox">
                <span>state :</span>
-               <input type="text" name="state" required placeholder="e.g. johor" value="">
+               <input type="text" name="state" required placeholder="e.g. maharashtra">
             </div>
             <div class="inputBox">
-               <span>country :</span>
-               <input type="text" name="country" required placeholder="e.g. Malaysia" value="">
-            </div>
-            <div class="inputBox">
-               <span>postcode :</span>
-               <input type="number" name="postcode" required placeholder="e.g. 123456" value="">
+               <span>pin code :</span>
+               <input type="text" name="pin_code" required placeholder="e.g. 123456">
             </div>
          </div>
-        <form action="payment.php" method="post">
-        <input type="submit" value="order now" class="btn btn-primary btn-lg" name="order_btn">
+         <input type="submit" value="order now" class="btn" name="order_btn">
+
       </form>
 
    </section>
-
-   <?php include 'footer.php'; ?>
 
    <!-- custom js file link  -->
    <script src="js/script.js"></script>
