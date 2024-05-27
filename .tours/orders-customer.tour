@@ -1,0 +1,11 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Orders customer",
+  "steps": [
+    {
+      "file": "orders.php",
+      "description": "For display order thas has been approved",
+      "line": 56
+    }
+  ]
+}

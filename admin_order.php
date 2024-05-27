@@ -7,7 +7,7 @@ session_start();
 $admin_id = $_SESSION['admin_id'];
 
 if (!isset($admin_id)) {
-   header('location:login.php');
+   header('location:admin_login.php');
 }
 
 if (isset($_POST['update_order'])) {
@@ -24,7 +24,7 @@ if (isset($_POST['update_order'])) {
 if (isset($_GET['delete'])) {
    $delete_id = $_GET['delete'];
    mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed');
-   header('location:admin_orders.php');
+   header('location:admin_order.php');
 }
 ?>
 
@@ -145,20 +145,36 @@ if (isset($_GET['delete'])) {
                      <p> total price : <span>RM
                            <?php echo $fetch_orders['total_price']; ?>
                         </span> </p>
-                     <form action="" method="post">
+                        <p>Tracking number: <span style="color:blue">
+                           <a onclick="linkTrack(this.innerText)">
+                              <?php echo $fetch_orders['tracknum']; ?>
+                           </a>
+                           <button onclick="linkTrack('<?php echo $fetch_orders['tracknum']; ?>')">&nbsp- [TRACK]</button>
+                           <script src="//www.tracking.my/track-button.js"></script>
+                           <script>
+                              function linkTrack(num) {
+                                 TrackButton.track({
+                                    tracking_no: num
+                                 });
+                              }
+                           </script>
+
+                        </span>
+                     </p>
+                        <form action="" method="post">
                         <input type="hidden" name="order_id" value="<?php echo $fetch_orders['id']; ?>">
                         <select name="update_payment">
-                           <option value="" selected disabled>
-                              <?php echo $fetch_orders['payment_status']; ?>
-                           </option>
-                           <option value="pending">pending</option>
-                           <option value="Accepted">Accepted</option>
+                        <?php
+                        $payment_status = $fetch_orders['payment_status'];
+                        $selected_pending = $payment_status === 'pending' ? 'selected' : '';
+                        $selected_accepted = $payment_status === 'Accepted' ? 'selected' : '';
+                        ?>
+                        <option value="pending" <?php echo $selected_pending; ?>>pending</option>
+                        <option value="Accepted" <?php echo $selected_accepted; ?>>Accepted</option>
                         </select>
-                        <input type="text" name="track-order" placeholder="Tracking number"
-                           value="<?php echo $fetch_orders['tracknum']; ?>">
+                        <input type="text" name="track-order" placeholder="Tracking number" value="<?php echo $fetch_orders['tracknum']; ?>">
                         <input type="submit" value="Update track" name="update_order" class="option-btn">
-                        <a href="admin_orders.php?delete=<?php echo $fetch_orders['id']; ?>"
-                           onclick="return confirm('Cancel this order?');" class="delete-btn">Cancel order</a>
+                        <a href="admin_order.php?delete=<?php echo $fetch_orders['id']; ?>" onclick="return confirm('Cancel this order?');" class="delete-btn">Cancel order</a>
                      </form>
 
                   </div>
