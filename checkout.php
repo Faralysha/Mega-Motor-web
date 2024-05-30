@@ -73,7 +73,7 @@ if (isset($_POST['order_btn'])) {
          if (mysqli_num_rows($product_query) > 0) {
             while ($product_rating = mysqli_fetch_assoc($product_query)) {
                $product_userid_rate = $product_rating['user_id'];
-               $product_name_rate = $product_rating['name'];
+               $product_name_rate = $product_rating['product_rate'];
                $get_orderid = $id_order_new;
                mysqli_query($conn, "INSERT INTO `history`(user_id, order_id,product_name) VALUES('$product_userid_rate','$get_orderid' ,'$product_name_rate')") or die('query failed');
             }
@@ -88,10 +88,10 @@ if (isset($_POST['order_btn'])) {
             $get_useruser = mysqli_fetch_assoc($userdata);
             $bill_name = $get_useruser['name'];
             $bill_email = $get_useruser['email'];
-            $bill_pnumber = $get_useruser['phone'];
+            // $bill_pnumber = $get_useruser['phone'];
 
             echo $bill_email;
-            echo $bill_pnumber;
+            // echo $bill_pnumber;
             echo $bill_name;
    
             $some_data = array(
@@ -99,15 +99,15 @@ if (isset($_POST['order_btn'])) {
                 'categoryCode' => 'nrkbtcqd',
                 'billName' => $bill_name,
                 'billDescription' => $total_products,
-                'billPriceSetting' => 0,
+                'billPriceSetting' => 1,
                 'billPayorInfo' => 1,
                 'billAmount' => $final_price,
-                'billReturnUrl' => 'http://localhost:8080/afterpay.php',
-                'billCallbackUrl' => 'http://localhost:8080/cart.php',
+                'billReturnUrl' => 'http://localhost/MEGA MOTOR WEB_OLD/afterpay2.php',
+                'billCallbackUrl' => 'http://localhost/MEGA MOTOR WEB_OLD/cart.php',
                 'billExternalReferenceNo' => 'AFR341DFI',
                 'billTo' => 'Mega Motor Web',
                 'billEmail' => $bill_email,
-                'billPhone' => $bill_pnumber,
+                'billPhone' => '01176486',
                 'billSplitPayment' => 0,
                 'billSplitPaymentArgs' => '',
                 'billPaymentChannel' => '0',
