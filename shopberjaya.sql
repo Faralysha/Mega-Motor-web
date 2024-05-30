@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2024 at 07:43 PM
+-- Generation Time: May 30, 2024 at 04:33 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -45,7 +45,7 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`id`, `user_id`, `product_id`, `product_name`, `product_size`, `price`, `quantity`, `image`, `created_at`, `product_brand`) VALUES
-(19, 1, 34, 'GEOMAX', 'm', 1.00, 1, '0', '2024-05-27 10:02:01', 'GRACSHAW');
+(23, 1, 72, 'TSUNAMI', 'm', 1.00, 1, '0', '2024-05-30 12:44:58', 'GRACSHAW');
 
 -- --------------------------------------------------------
 
@@ -68,7 +68,7 @@ CREATE TABLE `history` (
 --
 
 INSERT INTO `history` (`id`, `user_id`, `order_id`, `product_id`, `product_size`, `product_name`, `product_rate`) VALUES
-(2, 1, 11, 0, '', '', NULL);
+(1, 1, 19, 0, '', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -110,7 +110,7 @@ CREATE TABLE `orders` (
   `total_price` decimal(10,2) NOT NULL,
   `placed_on` varchar(50) NOT NULL,
   `payment_status` varchar(20) NOT NULL DEFAULT 'pending',
-  `tracknum` varchar(50) NOT NULL DEFAULT 0,
+  `tracknum` varchar(50) NOT NULL DEFAULT '',
   `status` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -119,7 +119,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `user_id`, `name`, `phone`, `email`, `method`, `address`, `total_products`, `total_price`, `placed_on`, `payment_status`, `tracknum`, `status`) VALUES
-(11, 1, 'Eizrfan', '012255323', 'user01@gmail.com', '', 'LOT 71, JALAN HAJI JOHARI,, BUKIT CHERAKA MERU,, KLANG, SELANGOR - 41050', ', GEOMAX[m](1) ', 1.00, '27-May-2024', 'Accepted', 0, 0);
+(19, 1, 'Eizrfan', '0122552323', 'user01@gmail.com', '', 'LOT 71, JALAN HAJI JOHARI,, BUKIT CHERAKA MERU,, KLANG, SELANGOR - 41050', '- TSUNAMI[m](1) ', 1.00, '30-May-2024', 'Accepted', 'SPXMY035274699975', 1);
 
 -- --------------------------------------------------------
 
@@ -146,7 +146,6 @@ CREATE TABLE `products` (
   `name` varchar(100) NOT NULL,
   `category` varchar(50) NOT NULL,
   `brand` varchar(100) NOT NULL,
-  `size` varchar(100) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `image` varchar(100) NOT NULL,
   `quant` int(11) NOT NULL,
@@ -157,8 +156,8 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `category`, `brand`, `size`, `price`, `image`, `quant`, `pro_rates`) VALUES
-(34, 'GEOMAX', 'helemets&visor', 'GRACSHAW', '', 1.00, 'pro2.png', 7, 0);
+INSERT INTO `products` (`id`, `name`, `category`, `brand`, `price`, `image`, `quant`, `pro_rates`) VALUES
+(72, 'TSUNAMI', 'helemets&visor', 'GRACSHAW', 1.00, 'pro5.jpg', 5, 0);
 
 -- --------------------------------------------------------
 
@@ -170,8 +169,19 @@ CREATE TABLE `product_details` (
   `product_detail_id` int(100) NOT NULL,
   `product_id` int(100) NOT NULL,
   `serial_number` varchar(100) NOT NULL,
-  `status` varchar(20) NOT NULL DEFAULT 'Available'
+  `stock` varchar(20) NOT NULL DEFAULT 'Available'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_details`
+--
+
+INSERT INTO `product_details` (`product_detail_id`, `product_id`, `serial_number`, `stock`) VALUES
+(100, 72, '72-00000', 'Available'),
+(101, 72, '72-00000', 'Available'),
+(102, 72, '72-00000', 'Available'),
+(103, 72, '72-00000', 'Available'),
+(104, 72, '72-00000', 'Available');
 
 --
 -- Triggers `product_details`
@@ -201,8 +211,8 @@ CREATE TABLE `product_sizes` (
 --
 
 INSERT INTO `product_sizes` (`id`, `product_id`, `size`, `quantity`) VALUES
-(60, 34, 'm', 2),
-(61, 34, 's', 5);
+(108, 72, 'm', 2),
+(109, 72, 's', 3);
 
 -- --------------------------------------------------------
 
@@ -245,8 +255,8 @@ ALTER TABLE `cart`
 ALTER TABLE `history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `product_id` (`product_id`),
-  ADD KEY `history_ibfk_2` (`order_id`);
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `product_id` (`product_id`);
 
 --
 -- Indexes for table `message`
@@ -302,13 +312,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `message`
@@ -320,7 +330,7 @@ ALTER TABLE `message`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `order_items`
@@ -332,19 +342,19 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `product_details`
 --
 ALTER TABLE `product_details`
-  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT;
+  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `product_sizes`
 --
 ALTER TABLE `product_sizes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `users`
