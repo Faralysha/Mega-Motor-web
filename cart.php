@@ -45,7 +45,7 @@ if (isset($_POST['order_btn'])) {
 
     $total_products = implode(', ', $cart_products);
 
-    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND number = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('Query failed');
+    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND phone = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('Query failed');
     $userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id='$user_id' ");
     $get_useruser = mysqli_fetch_assoc($userdata);
 
@@ -55,7 +55,7 @@ if (isset($_POST['order_btn'])) {
         if (mysqli_num_rows($order_query) > 0) {
             $message[] = 'Order already placed!';
         } else {
-            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on')") or die('Query failed');
+            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, phone, email, address, total_products, total_price, placed_on) VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on')") or die('Query failed');
             $message[] = 'Order placed successfully!';
 
             // Get user information
