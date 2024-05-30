@@ -10,14 +10,12 @@ if (!isset($admin_id)) {
 }
 
 if (isset($_POST['update_order'])) {
-
    $order_update_id = $_POST['order_id'];
    $track_number = $_POST['track-order'];
    $update_payment = $_POST['update_payment'];
    //  update tracking number to the order 
    mysqli_query($conn, "UPDATE `orders` SET payment_status = '$update_payment', tracknum='$track_number' WHERE id = '$order_update_id'") or die('query failed');
    $message[] = 'payment status has been updated!';
-
 }
 
 if (isset($_GET['delete'])) {
@@ -56,14 +54,14 @@ if (isset($_GET['delete'])) {
                alert("Data refreshed");
             });
          });
-         
-         // Function to handle tracking number click
-         function linkTrack(num) {
-            TrackButton.track({
-               tracking_no: num
-            });
-         }
       });
+
+      // Function to handle tracking number click
+      function linkTrack(num) {
+         TrackButton.track({
+            tracking_no: num
+         });
+      }
    </script>
 
 </head>
@@ -78,12 +76,9 @@ if (isset($_GET['delete'])) {
 
       <div class="box-container" id="container-displayorder">
          <?php
-         // fetch all order
+         // fetch all orders
          $select_orders = mysqli_query($conn, "SELECT * FROM `orders`") or die('query failed');
-         // fetch order where status = received
-         $status_orders = mysqli_query($conn, "SELECT * FROM `orders` WHERE status = 1") or die('Query failed');
-         $stats_ord = mysqli_fetch_assoc($status_orders);
-         // detect if there is order in the database
+         // detect if there are orders in the database
          if (mysqli_num_rows($select_orders) > 0) {
             // print out all the data
             while ($fetch_orders = mysqli_fetch_assoc($select_orders)) {
@@ -91,82 +86,34 @@ if (isset($_GET['delete'])) {
                   ?>
                   <div class="box">
                      <p>Order received by the customer</p>
-                     <p> user id : <span>
-                           <?php echo $fetch_orders['user_id']; ?>
-                        </span> </p>
-                     <p> placed on : <span>
-                           <?php echo $fetch_orders['placed_on']; ?>
-                        </span> </p>
-                     <p> name : <span>
-                           <?php echo $fetch_orders['name']; ?>
-                        </span> </p>
-                     <p> number : <span>
-                           <?php echo $fetch_orders['phone']; ?>
-                        </span> </p>
-                     <p> email : <span>
-                           <?php echo $fetch_orders['email']; ?>
-                        </span> </p>
-                     <p> address : <span>
-                           <?php echo $fetch_orders['address']; ?>
-                        </span> </p>
-                     <p> total products : <span>
-                           <?php echo $fetch_orders['total_products']; ?>
-                        </span> </p>
-                     <p> total price : <span>RM
-                           <?php echo $fetch_orders['total_price']; ?>
-                        </span> </p>
-                     <p>
-                        Tracking number: <span>
-                           <?php echo $fetch_orders['tracknum']; ?>
-                        </span>
-                     </p>
-
+                     <p> user id : <span><?php echo $fetch_orders['user_id']; ?></span> </p>
+                     <p> placed on : <span><?php echo $fetch_orders['placed_on']; ?></span> </p>
+                     <p> name : <span><?php echo $fetch_orders['name']; ?></span> </p>
+                     <p> number : <span><?php echo $fetch_orders['phone']; ?></span> </p>
+                     <p> email : <span><?php echo $fetch_orders['email']; ?></span> </p>
+                     <p> address : <span><?php echo $fetch_orders['address']; ?></span> </p>
+                     <p> total products : <span><?php echo $fetch_orders['total_products']; ?></span> </p>
+                     <p> total price : <span>RM<?php echo $fetch_orders['total_price']; ?></span> </p>
+                     <p> Tracking number: <span><?php echo $fetch_orders['tracknum']; ?></span> </p>
                   </div>
                   <?php
                } else {
                   ?>
                   <div class="box">
-                     <p> user id : <span>
-                           <?php echo $fetch_orders['user_id']; ?>
-                        </span> </p>
-                     <p> placed on : <span>
-                           <?php echo $fetch_orders['placed_on']; ?>
-                        </span> </p>
-                     <p> name : <span>
-                           <?php echo $fetch_orders['name']; ?>
-                        </span> </p>
-                     <p> number : <span>
-                           <?php echo $fetch_orders['phone']; ?>
-                        </span> </p>
-                     <p> email : <span>
-                           <?php echo $fetch_orders['email']; ?>
-                        </span> </p>
-                     <p> address : <span>
-                           <?php echo $fetch_orders['address']; ?>
-                        </span> </p>
-                     <p> total products : <span>
-                           <?php echo $fetch_orders['total_products']; ?>
-                        </span> </p>
-                     <p> total price : <span>RM
-                           <?php echo $fetch_orders['total_price']; ?>
-                        </span> </p>
+                     <p> user id : <span><?php echo $fetch_orders['user_id']; ?></span> </p>
+                     <p> placed on : <span><?php echo $fetch_orders['placed_on']; ?></span> </p>
+                     <p> name : <span><?php echo $fetch_orders['name']; ?></span> </p>
+                     <p> number : <span><?php echo $fetch_orders['phone']; ?></span> </p>
+                     <p> email : <span><?php echo $fetch_orders['email']; ?></span> </p>
+                     <p> address : <span><?php echo $fetch_orders['address']; ?></span> </p>
+                     <p> total products : <span><?php echo $fetch_orders['total_products']; ?></span> </p>
+                     <p> total price : <span>RM<?php echo $fetch_orders['total_price']; ?></span> </p>
                      <p>Tracking number: <span style="color:blue">
-                           <a onclick="linkTrack(this.innerText)">
-                              <?php echo $fetch_orders['tracknum']; ?>
-                           </a>
+                           <a onclick="linkTrack(this.innerText)"><?php echo $fetch_orders['tracknum']; ?></a>
                            <button onclick="linkTrack('<?php echo $fetch_orders['tracknum']; ?>')">&nbsp- [TRACK]</button>
-                           <script src="//www.tracking.my/track-button.js"></script>
-                           <script>
-                              function linkTrack(num) {
-                                 TrackButton.track({
-                                    tracking_no: num
-                                 });
-                              }
-                           </script>
-
                         </span>
                      </p>
-                        <form action="" method="post">
+                     <form action="" method="post">
                         <input type="hidden" name="order_id" value="<?php echo $fetch_orders['id']; ?>">
                         <select name="update_payment">
                         <?php
@@ -181,7 +128,6 @@ if (isset($_GET['delete'])) {
                         <input type="submit" value="Update track" name="update_order" class="option-btn">
                         <a href="admin_order.php?delete=<?php echo $fetch_orders['id']; ?>" onclick="return confirm('Cancel this order?');" class="delete-btn">Cancel order</a>
                      </form>
-
                   </div>
                   <?php
                }
@@ -193,7 +139,6 @@ if (isset($_GET['delete'])) {
       </div>
 
    </section>
-
 
    <!-- custom admin js file link  -->
    <script src="js/admin_script.js"></script>
