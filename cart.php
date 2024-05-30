@@ -29,7 +29,7 @@ if (isset($_POST['order_btn'])) {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $number = $_POST['number'];
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['country'] . ' - ' . $_POST['pin_code']);
+    $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city']  . ' - ' . $_POST['pin_code']);
     $placed_on = date('d-M-Y');
 
     $cart_total = 0;
@@ -91,10 +91,9 @@ if (isset($_POST['order_btn'])) {
             curl_setopt($curl, CURLOPT_POST, 1);
             curl_setopt($curl, CURLOPT_URL, 'https://dev.toyyibpay.com/index.php/api/createBill');
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $some_data);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($some_data));
 
             $result = curl_exec($curl);
-            $info = curl_getinfo($curl);
 
             // Handle errors
             if ($result === false) {
@@ -106,6 +105,10 @@ if (isset($_POST['order_btn'])) {
                 // Check if bill code is received
                 if (isset($obj[0]['BillCode'])) {
                     $billcode = $obj[0]['BillCode'];
+
+                    // Empty the cart after successful order and bill creation
+                    mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');
+
                     // Redirect user to payment page
                     echo '<script type="text/javascript"> window.location.href = "https://dev.toyyibpay.com/' . $billcode . '"; </script>';
                 } else {
@@ -128,24 +131,23 @@ if (isset($_POST['order_btn'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-   
+
     <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/styleindex.css">
-<!-- bootstrap -->
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/styleindex.css">
 
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
-<style>   
 
-    .shopping-cart{
+<style>
+    .shopping-cart {
         background-color: var(--white);
         overflow: hidden; /* Ensure no overflow */
-
     }
-    </style>
+</style>
 
 <body>
 

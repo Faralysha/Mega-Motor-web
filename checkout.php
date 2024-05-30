@@ -6,7 +6,6 @@ session_start();
 
 if (!isset($_SESSION['user_id'])) {
     header('location:index.php');
-    exit(); // Terminate script after redirection
 }
 
 $user_id = $_SESSION['user_id'];
@@ -46,7 +45,7 @@ if (isset($_POST['order_btn'])) {
         }
     }
 
-    $total_products = implode(', ', $cart_products);
+    $total_products = implode('- ', $cart_products);
 
     // Check if order already exists
     $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND phone = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('query failed');
@@ -134,7 +133,7 @@ if (isset($_POST['order_btn'])) {
 
          <script type="text/javascript">
 
-            window.location.href = "https://dev.toyyibpay.com/e/143251052704195<?php echo $billcode; ?>"; 
+            window.location.href = "https://dev.toyyibpay.com/<?php echo $billcode; ?>"; 
          </script>
 
 <?php

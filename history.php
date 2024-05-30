@@ -117,7 +117,11 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
                $order_id = $order_row['order_id'];
 
                echo "<h2>Order ID: $order_id</h2>";
-               $select_products = mysqli_query($conn, "SELECT * FROM `history` WHERE user_id = '$user_id' AND order_id = '$order_id'") or die('query failed');
+               
+               $select_products = mysqli_query($conn, "SELECT h.*, products.name, products.price, products.rate
+               FROM `history` h 
+               INNER JOIN `products` ON h.product_id = products.id 
+               WHERE h.user_id = '$user_id'") or die('Query failed');
 
                if (mysqli_num_rows($select_products) > 0) {
                   while ($fetch_products = mysqli_fetch_assoc($select_products)) {
@@ -128,6 +132,11 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
                         <div class="name">
                            <h4>Product name:
                               <?php echo $fetch_products['product_name']; ?>
+                           </h4>
+                        </div>
+                        <div class="name">
+                           <h4>Product size:
+                              <?php echo $fetch_products['product_size']; ?>
                            </h4>
                         </div>
                         <div class="name">

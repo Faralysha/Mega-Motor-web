@@ -87,32 +87,31 @@ $temp_itemid = $_SESSION['idname'];
     <div class="centerdiv">
         <?php
         if ($status_idpayment == 1) {
-            // $message = 'Payment success';
+            $message = 'Payment success';
             $spec_quant = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
             if (mysqli_num_rows($spec_quant) > 0) {
                 while ($fetch_quant = mysqli_fetch_assoc($spec_quant)) {
                     $newiditem = $fetch_quant['name'];
-                    // $newquant=0;
                     $newquant = $fetch_quant['quantity'];
-                    // mysqli_query($conn, "SELECT quantity FROM cart WHERE user_id='$user_id'");
-                    mysqli_query($conn, "UPDATE products SET quant = quant- $newquant WHERE name= '$newiditem' ");
+        
+                    // Update product quantity in the database
+                    mysqli_query($conn, "UPDATE products SET quant = quant - $newquant WHERE name = '$newiditem'");
+        
+                    // Check if the product quantity has reached zero
+                    $product_check = mysqli_query($conn, "SELECT quant FROM products WHERE name = '$newiditem'") or die('query failed');
+                    $product_data = mysqli_fetch_assoc($product_check);
+                    if ($product_data['quant'] == 0) {
+                        // Update stock status to 'Sold'
+                        mysqli_query($conn, "UPDATE products SET stock = 'Sold' WHERE name = '$newiditem'") or die('query failed');
+                    }
                 }
             }
+        
+            // Clear the cart after updating quantities
             mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+        
             ?>
-            <div class="box">
-
-                <h1>Payment Success
-                    <p>--------------------------------------------------</p>
-                    <p>You will be redirected to order page 4 seconds</p>
-                    <?php echo "Order ID:", $temp_itemid; ?>
-                </h1>
-            </div>
-            <?php
-
-        } else {
-            // $message = 'Your payment is unsuccessful';
-            ?>
+            
             <div class="box">
 
                 <h1>Payment Unsuccessful

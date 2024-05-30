@@ -66,21 +66,41 @@ if (isset($_POST['add_product'])) {
     $stmt->close();
 
     // Prepare the statement for inserting sizes and quantities into the product_sizes table
-    $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
-    $stmt->bind_param("iss", $product_id, $size, $quantity);
+    $stmt_sizes = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
+    $stmt_sizes->bind_param("iss", $product_id, $size, $quantity);
 
-    // Loop through sizes and quantities and insert them into the database
+    //Prepare the product_details insertion statement
+    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
+    $stmt_details->bind_param("iss", $product_id, $serial_number, $stock);
+
+    //Loop through each size and quantity
     for ($i = 0; $i < count($sizes); $i++) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
-        $stmt->execute();
-    }
-    $stmt->close();
+        $stmt_sizes->execute();
+        // Reset serial counter for each size
+        $serial_counter = 0;
+        // Nested loop for serial numbers
+        for ($j = 1; $j <= $quantity; $j++) {
+            $serial_counter++; // Increment serial counter
+            $serial_number = $product_id . '-' . str_pad($serial_counter, 5, '0', STR_PAD_LEFT) . '-' . $size;            
+            $stock = 'Available';
+            $stmt_details->execute();
+        }
+    }    
+    $stmt_sizes->close();
+    $stmt_details->close();
 }
 
 // Delete product
 if (isset($_GET['delete'])) {
     $delete_id = $_GET['delete'];
+
+    // Delete related product details
+    $stmt = $conn->prepare("DELETE FROM `product_details` WHERE product_id = ?");
+    $stmt->bind_param("i", $delete_id);
+    $stmt->execute();
+    $stmt->close();
 
     // Delete related product sizes
     $stmt = $conn->prepare("DELETE FROM `product_sizes` WHERE product_id = ?");
@@ -104,6 +124,7 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
+
 // Update product
 if (isset($_POST['update_product'])) {
     $update_p_id = $_POST['update_p_id'];
@@ -124,15 +145,36 @@ if (isset($_POST['update_product'])) {
     $stmt->bind_param("i", $update_p_id);
     $stmt->execute();
 
+    // Delete existing product details for the product
+    $stmt = $conn->prepare("DELETE FROM `product_details` WHERE product_id = ?");
+    $stmt->bind_param("i", $update_p_id);
+    $stmt->execute();
+
     // Insert updated sizes and quantities into the product_sizes table
     $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
     $stmt->bind_param("iss", $update_p_id, $size, $quantity);
+    
+    //Prepare the product_details insertion statement
+    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
+    $stmt_details->bind_param("iss", $update_p_id, $serial_number, $stock);
+    
     for ($i = 0; $i < count($sizes); $i++) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
-        $stmt->execute();
-    }
-    $stmt->close();
+        $stmt_sizes->execute();
+        // Reset serial counter for each size
+        $serial_counter = 0;
+        // Nested loop for serial numbers
+        for ($j = 1; $j <= $quantity; $j++) {
+            $serial_counter++; // Increment serial counter
+            $serial_number = $product_id . '-' . str_pad($serial_counter, 5, '0', STR_PAD_LEFT) . '-' . $size;            
+            $stock = 'Available';
+            $stmt_details->execute();
+        }
+    }    
+
+    $stmt_sizes->close();
+    $stmt_details->close();
 
     if (!empty($_FILES['update_image']['name'])) {
         $update_image_upload = handleImageUpload($_FILES['update_image']);
@@ -169,6 +211,7 @@ if (isset($_POST['update_product'])) {
     header('Location: admin_products.php');
     exit;
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -268,7 +311,7 @@ if (isset($_POST['update_product'])) {
 
             <input type="text" name="sizes[]" class="box" placeholder="Enter product size" required>
                 
-            <input type="number" min="0" name="quantities[]" class="box" placeholder="Enter product quantity" required>
+            <input type="number" min="1" name="quantities[]" class="box" placeholder="Enter product quantity" required>
 
             <button type="button" id="addSizeQuantity" class="btn">Add Size & Quantity</button>
 
