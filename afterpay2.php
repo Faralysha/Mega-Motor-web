@@ -91,11 +91,15 @@ $temp_itemid = $_SESSION['idname'];
             $spec_quant = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
             if (mysqli_num_rows($spec_quant) > 0) {
                 while ($fetch_quant = mysqli_fetch_assoc($spec_quant)) {
-                    $newiditem = $fetch_quant['name'];
+                    $newiditem = $fetch_quant['product_name'];
                     $newquant = $fetch_quant['quantity'];
         
                     // Update product quantity in the database
                     mysqli_query($conn, "UPDATE products SET quant = quant - $newquant WHERE name = '$newiditem'");
+                    // Example update query after successful payment
+                    $stmt = $conn->prepare("UPDATE product_details SET stock = 'Sold' WHERE product_id = ? AND serial_number = ?");
+                    $stmt->bind_param("is", $product_id, $serial_number);
+                    $stmt->execute();
         
                     // Check if the product quantity has reached zero
                     $product_check = mysqli_query($conn, "SELECT quant FROM products WHERE name = '$newiditem'") or die('query failed');

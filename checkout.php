@@ -26,7 +26,7 @@ if (mysqli_num_rows($choose_cart) > 0) {
 if (isset($_POST['order_btn'])) {
     // Sanitize user input
     $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $number = mysqli_real_escape_string($conn, $_POST['phone']);
+    $number = mysqli_real_escape_string($conn, $_POST['number']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $address = mysqli_real_escape_string($conn, $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['state'] . ' - ' . $_POST['pin_code']);
     $placed_on = date('d-M-Y');
@@ -48,7 +48,7 @@ if (isset($_POST['order_btn'])) {
     $total_products = implode('- ', $cart_products);
 
     // Check if order already exists
-    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND phone = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('query failed');
+    $order_query = mysqli_query($conn, "SELECT * FROM `orders` WHERE name = '$name' AND number = '$number' AND email = '$email' AND address = '$address' AND total_products = '$total_products' AND total_price = '$cart_total'") or die('query failed');
     $product_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
     $userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id='$user_id' ");
     $get_useruser = mysqli_fetch_assoc($userdata);
@@ -62,7 +62,7 @@ if (isset($_POST['order_btn'])) {
 
             // Insert order details into orders table
             $tracknom = 0;
-            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, phone, email, address, total_products, total_price, placed_on, tracknum) 
+            mysqli_query($conn, "INSERT INTO `orders`(user_id, name, number, email, address, total_products, total_price, placed_on, tracknum) 
             VALUES('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom')") or die('query failed');
             $getidddd = mysqli_query($conn, "SELECT id FROM `orders` WHERE user_id = $user_id");
             while ($getid = mysqli_fetch_assoc($getidddd)) {
@@ -73,7 +73,7 @@ if (isset($_POST['order_btn'])) {
          if (mysqli_num_rows($product_query) > 0) {
             while ($product_rating = mysqli_fetch_assoc($product_query)) {
                $product_userid_rate = $product_rating['user_id'];
-               $product_name_rate = $product_rating['product_rate'];
+               $product_name_rate = $product_rating['product_name'];
                $get_orderid = $id_order_new;
                mysqli_query($conn, "INSERT INTO `history`(user_id, order_id,product_name) VALUES('$product_userid_rate','$get_orderid' ,'$product_name_rate')") or die('query failed');
             }
@@ -88,10 +88,10 @@ if (isset($_POST['order_btn'])) {
             $get_useruser = mysqli_fetch_assoc($userdata);
             $bill_name = $get_useruser['name'];
             $bill_email = $get_useruser['email'];
-            // $bill_pnumber = $get_useruser['phone'];
+            $bill_pnumber = $get_useruser['pnumber'];
 
             echo $bill_email;
-            // echo $bill_pnumber;
+            echo $bill_pnumber;
             echo $bill_name;
    
             $some_data = array(
@@ -107,7 +107,7 @@ if (isset($_POST['order_btn'])) {
                 'billExternalReferenceNo' => 'AFR341DFI',
                 'billTo' => 'Mega Motor Web',
                 'billEmail' => $bill_email,
-                'billPhone' => '01176486',
+                'billPhone' => $bill_pnumber,
                 'billSplitPayment' => 0,
                 'billSplitPaymentArgs' => '',
                 'billPaymentChannel' => '0',
@@ -207,46 +207,47 @@ if (isset($_POST['order_btn'])) {
 
    <section class="checkout">
 
-      <form action="" method="post">
-
+   <form action="" method="post">
          <h3>place your order</h3>
-
          <div class="flex">
             <div class="inputBox">
                <span>your name :</span>
-               <input type="text" name="name" required placeholder="enter your name">
+               <input type="text" name="name" required placeholder="enter your name"
+                  value="<?php echo $get_data['name']?> ">
             </div>
             <div class="inputBox">
                <span>your number :</span>
-               <input type="number" name="phone" required placeholder="enter your number">
+               <input type="number" name="number" required placeholder="enter your number"
+                  value="0<?php echo $get_data['pnumber']?>">
             </div>
             <div class="inputBox">
                <span>your email :</span>
-               <input type="email" name="email" required placeholder="enter your email">
+               <input type="email" name="email" required placeholder="enter your email"
+                  value="<?php echo $get_data['email']?>" readonly>
             </div>
             <div class="inputBox">
-               <span>address line 1 :</span>
-               <input type="text" name="flat" required placeholder="e.g. flat no.">
+               <span>address line 01 :</span>
+               <input type="text" name="flat" required placeholder="e.g. flat no." value="">
             </div>
             <div class="inputBox">
-               <span>address line 2 :</span>
-               <input type="text" name="street" required placeholder="e.g. street name">
+               <span>address line 01 :</span>
+               <input type="text" name="street" required placeholder="e.g. street name" value="">
             </div>
             <div class="inputBox">
                <span>city :</span>
-               <input type="text" name="city" required placeholder="e.g. Klang">
+               <input type="text" name="city" required placeholder="e.g. Klang" value="">
             </div>
             <div class="inputBox">
                <span>state :</span>
-               <input type="text" name="state" required placeholder="e.g. Selangor">
+               <input type="text" name="state" required placeholder="e.g. Selangor" value="">
             </div>
             <div class="inputBox">
                <span>pin code :</span>
-               <input type="text" name="pin_code" required placeholder="e.g. 123456">
+               <input type="number" min="0" name="pin_code" required placeholder="e.g. 123456" value="">
             </div>
          </div>
-         <input type="submit" value="order now" class="btn" name="order_btn">
-
+         <!-- <a href="payment.php">Payment </a> -->
+         <input type="submit" value="order now" class="btn btn-primary btn-lg" name="order_btn">
       </form>
 
    </section>

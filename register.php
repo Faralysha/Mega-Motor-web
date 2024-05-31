@@ -6,6 +6,7 @@ if (isset($_POST['submit'])) {
 
    $name = mysqli_real_escape_string($conn, $_POST['name']);
    $email = mysqli_real_escape_string($conn, $_POST['email']);
+   $pnumber = mysqli_real_escape_string($conn, $_POST['pnumber']);
    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
    $cpass = mysqli_real_escape_string($conn, md5($_POST['cpassword']));
    $user_type = $_POST['user_type'];
@@ -18,7 +19,7 @@ if (isset($_POST['submit'])) {
       if($pass != $cpass){
          $message[] = 'confirm password not matched!';
       }else{
-         mysqli_query($conn, "INSERT INTO `users`(name, email, password) VALUES('$name', '$email', '$cpass')") or die('query failed');
+         mysqli_query($conn, "INSERT INTO `users`(name, email, pnumber, password) VALUES('$name', '$email', '$pnumber', '$cpass')") or die('query failed');
          $message[] = 'registered successfully!';
          header('location:index.php');
       }
@@ -214,6 +215,7 @@ if (isset($_POST['submit'])) {
            
             <input type="name" name="name" required placeholder="Enter your name">
             <input type="email" name="email" required placeholder="Enter your email">
+            <input type="name" name="pnumber" required placeholder="Enter your phone numer">
             <input type="password" name="password" required placeholder="Enter your password">
             <input type="password" name="cpassword" required placeholder="Confirm your password">
             <input type="submit" name="submit" value="Register" class="form-btn">
