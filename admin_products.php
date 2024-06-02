@@ -34,6 +34,22 @@ if (isset($_POST['add_product'])) {
         exit; // Stop execution
     }
 
+    // Function to get the current counter for a product_id and size
+function getCurrentCounter($product_id, $size) {
+    global $conn;
+    $query = "SELECT COUNT(*) AS count FROM product_details WHERE product_id = '$product_id' AND serial_number LIKE '%-$size'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['count'];
+}
+
+// Function to generate a unique serial number
+function generateSerialNumber($product_id, $size) {
+    $counter = getCurrentCounter($product_id, $size) + 1;
+    return sprintf('%d-%05d-%s', $product_id, $counter, $size);
+}
+
+
     // Sanitize other fields as needed
     $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
     $category = filter_var($_POST['category'], FILTER_SANITIZE_STRING);
@@ -78,12 +94,9 @@ if (isset($_POST['add_product'])) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
         $stmt_sizes->execute();
-        // Reset serial counter for each size
-        $serial_counter = 0;
-        // Nested loop for serial numbers
+
         for ($j = 1; $j <= $quantity; $j++) {
-            $serial_counter++; // Increment serial counter
-            $serial_number = $product_id . '-' . str_pad($serial_counter, 5, '0', STR_PAD_LEFT) . '-' . $size;            
+            $serial_number = generateSerialNumber($product_id, $size);
             $stock = 'Available';
             $stmt_details->execute();
         }
@@ -162,12 +175,9 @@ if (isset($_POST['update_product'])) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
         $stmt_sizes->execute();
-        // Reset serial counter for each size
-        $serial_counter = 0;
-        // Nested loop for serial numbers
+
         for ($j = 1; $j <= $quantity; $j++) {
-            $serial_counter++; // Increment serial counter
-            $serial_number = $product_id . '-' . str_pad($serial_counter, 5, '0', STR_PAD_LEFT) . '-' . $size;            
+            $serial_number = generateSerialNumber($update_p_id, $size);
             $stock = 'Available';
             $stmt_details->execute();
         }

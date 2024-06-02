@@ -9,8 +9,8 @@ $user_id = $_SESSION['user_id'];
 $temp_itemid = $_SESSION['idname'];
 
 
-
 ?>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -18,8 +18,7 @@ $temp_itemid = $_SESSION['idname'];
         body {
             margin: 0;
             padding: 0;
-            /* background-image: url('css/images/loginback.jpg'); */
-            /* Replace 'background-image.jpg' with the actual path to your background image */
+            background-image: url('css/images/loginback.jpg');
             background-size: cover;
             background-position: center;
             font-family: Arial, sans-serif;
@@ -48,7 +47,6 @@ $temp_itemid = $_SESSION['idname'];
         }
 
         .centerdiv {
-            /* border: 5px solid; */
             position: absolute;
             top: 50%;
             left: 50%;
@@ -58,9 +56,7 @@ $temp_itemid = $_SESSION['idname'];
 
         .loader {
             border: 10px solid #f3f3f3;
-            /* Light grey */
             border-top: 10px solid #3498db;
-            /* Blue */
             border-radius: 50%;
             width: 120px;
             height: 120px;
@@ -76,10 +72,6 @@ $temp_itemid = $_SESSION['idname'];
                 transform: rotate(360deg);
             }
         }
-
-        .p {
-            font-style: ;
-        }
     </style>
 </head>
 
@@ -87,59 +79,51 @@ $temp_itemid = $_SESSION['idname'];
     <div class="centerdiv">
         <?php
         if ($status_idpayment == 1) {
-            $message = 'Payment success';
+            // Debug information
+            echo "Payment status is successful. Proceeding to update product quantities and clear the cart.<br>";
+
             $spec_quant = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
             if (mysqli_num_rows($spec_quant) > 0) {
                 while ($fetch_quant = mysqli_fetch_assoc($spec_quant)) {
                     $newiditem = $fetch_quant['product_name'];
                     $newquant = $fetch_quant['quantity'];
-        
-                    // Update product quantity in the database
-                    mysqli_query($conn, "UPDATE products SET quant = quant - $newquant WHERE name = '$newiditem'");
-                    // Example update query after successful payment
-                    $stmt = $conn->prepare("UPDATE product_details SET stock = 'Sold' WHERE product_id = ? AND serial_number = ?");
-                    $stmt->bind_param("is", $product_id, $serial_number);
-                    $stmt->execute();
-        
-                    // Check if the product quantity has reached zero
-                    $product_check = mysqli_query($conn, "SELECT quant FROM products WHERE name = '$newiditem'") or die('query failed');
-                    $product_data = mysqli_fetch_assoc($product_check);
-                    if ($product_data['quant'] == 0) {
-                        // Update stock status to 'Sold'
-                        mysqli_query($conn, "UPDATE products SET stock = 'Sold' WHERE name = '$newiditem'") or die('query failed');
-                    }
+                    mysqli_query($conn, "UPDATE products SET quant = quant - $newquant WHERE name = '$newiditem' ");
                 }
             }
-        
-            // Clear the cart after updating quantities
-            mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-        
-            ?>
-            
-            <div class="box">
 
-                <h1>Payment Unsuccessful
-                    <p>--------------------------------------------------</p>
-                    <p>You will be redirected to order page 4 seconds</p>
-                    <?php echo "Order ID:", $temp_itemid; ?>
-                </h1>
+            // Debug information
+            echo "Deleting cart items for user_id: $user_id<br>";
+
+            $delete_cart = mysqli_query($conn, "DELETE FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+            
+            if ($delete_cart) {
+                echo "Cart items deleted successfully.<br>";
+            } else {
+                echo "Failed to delete cart items.<br>";
+            }
+            ?>
+            <div class="box">
+                <h1>Payment Success</h1>
+                <p>--------------------------------------------------</p>
+                <p>You will be redirected to the order page in 4 seconds</p>
+                <p><?php echo "Order ID:", $temp_itemid; ?></p>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div class="box">
+                <h1>Payment Unsuccessful</h1>
+                <p>--------------------------------------------------</p>
+                <p>You will be redirected to the order page in 4 seconds</p>
+                <p><?php echo "Order ID:", $temp_itemid; ?></p>
             </div>
             <?php
             mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$temp_itemid'") or die('query failed');
         }
-        // echo $message;
-        ?><br />
-        <?php
-        // echo "Order ID:", $temp_itemid; ?></br>
-        <?php
-        // echo "--------------------------------------------------";
         ?>
-        
-
-        <!-- <div class="loader"></div> -->
         <script>
-            var timer = setTimeout(function () {
-                window.location = 'orders.php'
+            setTimeout(function () {
+                window.location.href = 'orders.php';
             }, 4000);
         </script>
     </div>

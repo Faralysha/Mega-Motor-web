@@ -4,11 +4,11 @@ include 'config.php';
 
 session_start();
 
+$user_id = $_SESSION['user_id'];
+
 if (!isset($_SESSION['user_id'])) {
     header('location:index.php');
 }
-
-$user_id = $_SESSION['user_id'];
 
 $total_itemprice = 0;
 $choose_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
@@ -206,19 +206,21 @@ if (isset($_POST['order_btn'])) {
    </section>
 
    <section class="checkout">
-
+   <?php
+      $get_userdata = mysqli_query($conn, "SELECT * FROM `users` WHERE id = '$user_id'");
+      $get_data = mysqli_fetch_assoc($get_userdata);
+      ?>
    <form action="" method="post">
          <h3>place your order</h3>
          <div class="flex">
-            <div class="inputBox">
+         <div class="inputBox">
                <span>your name :</span>
                <input type="text" name="name" required placeholder="enter your name"
                   value="<?php echo $get_data['name']?> ">
             </div>
             <div class="inputBox">
                <span>your number :</span>
-               <input type="number" name="number" required placeholder="enter your number"
-                  value="0<?php echo $get_data['pnumber']?>">
+               <input type="number" name="number" required placeholder="enter your number">
             </div>
             <div class="inputBox">
                <span>your email :</span>
@@ -230,7 +232,7 @@ if (isset($_POST['order_btn'])) {
                <input type="text" name="flat" required placeholder="e.g. flat no." value="">
             </div>
             <div class="inputBox">
-               <span>address line 01 :</span>
+               <span>address line 02 :</span>
                <input type="text" name="street" required placeholder="e.g. street name" value="">
             </div>
             <div class="inputBox">

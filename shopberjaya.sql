@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 30, 2024 at 04:33 PM
+-- Generation Time: Jun 02, 2024 at 08:41 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,13 +40,6 @@ CREATE TABLE `cart` (
   `product_brand` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `cart`
---
-
-INSERT INTO `cart` (`id`, `user_id`, `product_id`, `product_name`, `product_size`, `price`, `quantity`, `image`, `created_at`, `product_brand`) VALUES
-(23, 1, 72, 'TSUNAMI', 'm', 1.00, 1, '0', '2024-05-30 12:44:58', 'GRACSHAW');
-
 -- --------------------------------------------------------
 
 --
@@ -68,7 +61,7 @@ CREATE TABLE `history` (
 --
 
 INSERT INTO `history` (`id`, `user_id`, `order_id`, `product_id`, `product_size`, `product_name`, `product_rate`) VALUES
-(1, 1, 19, 0, '', '', NULL);
+(31, 1, 48, 0, '', 'GEOMAX', 5);
 
 -- --------------------------------------------------------
 
@@ -102,7 +95,7 @@ CREATE TABLE `orders` (
   `id` int(100) NOT NULL,
   `user_id` int(100) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `phone` varchar(12) NOT NULL,
+  `number` varchar(255) DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   `method` varchar(50) NOT NULL,
   `address` varchar(500) NOT NULL,
@@ -118,8 +111,8 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `name`, `phone`, `email`, `method`, `address`, `total_products`, `total_price`, `placed_on`, `payment_status`, `tracknum`, `status`) VALUES
-(19, 1, 'Eizrfan', '0122552323', 'user01@gmail.com', '', 'LOT 71, JALAN HAJI JOHARI,, BUKIT CHERAKA MERU,, KLANG, SELANGOR - 41050', '- TSUNAMI[m](1) ', 1.00, '30-May-2024', 'Accepted', 'SPXMY035274699975', 1);
+INSERT INTO `orders` (`id`, `user_id`, `name`, `number`, `email`, `method`, `address`, `total_products`, `total_price`, `placed_on`, `payment_status`, `tracknum`, `status`) VALUES
+(48, 1, 'Eizrfan ', '12343', 'user01@gmail.com', '', 'Lot 71, Jalan Haji Johari, Bukit Cheraka Meru, Klang, Selangor - 41050', '- GEOMAX[M](1) ', 1.00, '02-Jun-2024', 'Accepted', 'SPXMY035274699975', 1);
 
 -- --------------------------------------------------------
 
@@ -128,11 +121,12 @@ INSERT INTO `orders` (`id`, `user_id`, `name`, `phone`, `email`, `method`, `addr
 --
 
 CREATE TABLE `order_items` (
-  `order_item_id` int(100) NOT NULL,
-  `order_id` int(100) NOT NULL,
-  `product_detail_id` int(100) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `price` decimal(10,2) NOT NULL
+  `order_item_id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `product_detail_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -149,15 +143,16 @@ CREATE TABLE `products` (
   `price` decimal(10,2) NOT NULL,
   `image` varchar(100) NOT NULL,
   `quant` int(11) NOT NULL,
-  `pro_rates` float DEFAULT 0
+  `pro_rates` float DEFAULT 0,
+  `stock` varchar(50) DEFAULT 'In Stock'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `category`, `brand`, `price`, `image`, `quant`, `pro_rates`) VALUES
-(72, 'TSUNAMI', 'helemets&visor', 'GRACSHAW', 1.00, 'pro5.jpg', 5, 0);
+INSERT INTO `products` (`id`, `name`, `category`, `brand`, `price`, `image`, `quant`, `pro_rates`, `stock`) VALUES
+(73, 'GEOMAX', 'helemets&visor', 'GRACSHAW', 1.00, 'pro2.png', 0, 0, 'In Stock');
 
 -- --------------------------------------------------------
 
@@ -177,11 +172,11 @@ CREATE TABLE `product_details` (
 --
 
 INSERT INTO `product_details` (`product_detail_id`, `product_id`, `serial_number`, `stock`) VALUES
-(100, 72, '72-00000', 'Available'),
-(101, 72, '72-00000', 'Available'),
-(102, 72, '72-00000', 'Available'),
-(103, 72, '72-00000', 'Available'),
-(104, 72, '72-00000', 'Available');
+(105, 73, '73-00000', 'Available'),
+(106, 73, '73-00000', 'Available'),
+(107, 73, '73-00000', 'Available'),
+(108, 73, '73-00000', 'Available'),
+(109, 73, '73-00000', 'Available');
 
 --
 -- Triggers `product_details`
@@ -211,8 +206,8 @@ CREATE TABLE `product_sizes` (
 --
 
 INSERT INTO `product_sizes` (`id`, `product_id`, `size`, `quantity`) VALUES
-(108, 72, 'm', 2),
-(109, 72, 's', 3);
+(110, 73, 'M', 3),
+(111, 73, 'S', 2);
 
 -- --------------------------------------------------------
 
@@ -225,17 +220,18 @@ CREATE TABLE `users` (
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
-  `user_type` varchar(20) NOT NULL DEFAULT 'user'
+  `user_type` varchar(20) NOT NULL DEFAULT 'user',
+  `pnumber` varchar(15) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `user_type`) VALUES
-(1, 'Eizrfan', 'user01@gmail.com', 'd856cb5610edb80e3a666a7472013da1', 'user'),
-(6, 'Faralysha', 'nfaralysha@gmail.com', '78a292cb70eefdf9e05ba97656cdad3d', 'admin'),
-(7, 'staff1', 'staff1@gmail.com', 'f0dbeeeed1d08e5206350e3fdf8b9d07', 'staff');
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `user_type`, `pnumber`) VALUES
+(1, 'Eizrfan', 'user01@gmail.com', 'd856cb5610edb80e3a666a7472013da1', 'user', '0122552323'),
+(6, 'Faralysha', 'nfaralysha@gmail.com', '78a292cb70eefdf9e05ba97656cdad3d', 'admin', '01139909076'),
+(7, 'staff1', 'staff1@gmail.com', 'f0dbeeeed1d08e5206350e3fdf8b9d07', 'staff', '01128880910');
 
 --
 -- Indexes for dumped tables
@@ -275,8 +271,7 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `order_items`
   ADD PRIMARY KEY (`order_item_id`),
-  ADD KEY `order_id` (`order_id`),
-  ADD KEY `product_detail_id` (`product_detail_id`);
+  ADD KEY `order_id` (`order_id`);
 
 --
 -- Indexes for table `products`
@@ -312,13 +307,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `message`
@@ -330,31 +325,31 @@ ALTER TABLE `message`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(100) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT for table `product_details`
 --
 ALTER TABLE `product_details`
-  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `product_sizes`
 --
 ALTER TABLE `product_sizes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -383,13 +378,13 @@ ALTER TABLE `history`
 -- Constraints for table `order_items`
 --
 ALTER TABLE `order_items`
-  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
-  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_detail_id`) REFERENCES `product_details` (`product_detail_id`);
+  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`);
 
 --
 -- Constraints for table `product_details`
 --
 ALTER TABLE `product_details`
+  ADD CONSTRAINT `fk_product_id` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   ADD CONSTRAINT `product_details_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 COMMIT;
 

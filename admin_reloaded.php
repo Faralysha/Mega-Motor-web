@@ -29,7 +29,7 @@ if (mysqli_num_rows($select_orders) > 0) {
                         <?php echo $fetch_orders['name']; ?>
                     </span> </p>
                 <p> number : <span>
-                        <?php echo $fetch_orders['phone']; ?>
+                        <?php echo $fetch_orders['number']; ?>
                     </span> </p>
                 <p> email : <span>
                         <?php echo $fetch_orders['email']; ?>
@@ -65,7 +65,7 @@ if (mysqli_num_rows($select_orders) > 0) {
                         <?php echo $fetch_orders['name']; ?>
                     </span> </p>
                 <p> number : <span>
-                        <?php echo $fetch_orders['phone']; ?>
+                        <?php echo $fetch_orders['number']; ?>
                     </span> </p>
                 <p> email : <span>
                         <?php echo $fetch_orders['email']; ?>
