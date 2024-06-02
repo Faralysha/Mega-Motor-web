@@ -14,8 +14,7 @@ if (isset($_GET['receive'])) {
    mysqli_query($conn, "UPDATE `orders` SET status = 1 WHERE id = '$status_id'") or die('Error updating order status');
 
    // Update order items status
-   $update_order_items_query = "UPDATE `order_items` SET status = 1 WHERE order_id = '$status_id'";
-   mysqli_query($conn, $update_order_items_query) or die('Error updating order items status');
+   mysqli_query($conn, "UPDATE `order_items` SET status = 1 WHERE order_id = '$status_id'") or die('Error updating order items status');
    
    header('location:orders.php');
 }

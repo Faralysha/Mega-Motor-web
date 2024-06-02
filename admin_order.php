@@ -26,7 +26,13 @@ if (isset($_POST['update_order'])) {
 
 if (isset($_GET['delete'])) {
    $delete_id = $_GET['delete'];
-   mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed');
+
+   // Delete associated order items
+   mysqli_query($conn, "DELETE FROM `order_items` WHERE order_id = '$delete_id'") or die('query failed deleting order items');
+
+   // Delete the order
+   mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed deleting order');
+
    header('location:admin_order.php');
    exit();
 }

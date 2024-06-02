@@ -126,6 +126,11 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
 
                         <!-- Display your product details here -->
                         <div class="name">
+                                    <h4>Brand:
+                                        <?php echo $fetch_products['product_brand']; ?>
+                                    </h4>
+                                </div>
+                        <div class="name">
                            <h4>Product name:
                               <?php echo $fetch_products['product_name']; ?>
                            </h4>

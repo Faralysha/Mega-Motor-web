@@ -24,31 +24,37 @@ function handleImageUpload($file) {
     return ['error' => 'No image uploaded.'];
 }
 
-// Add product to the database
-if (isset($_POST['add_product'])) {
-    // Ensure that 'name' field is not empty
-    if (empty($_POST['name'])) {
-        // Handle the error, for example:
-        echo "Product name cannot be empty.";
-        // You can also redirect back to the form page or display an error message
-        exit; // Stop execution
-    }
-
-    // Function to get the current counter for a product_id and size
-function getCurrentCounter($product_id, $size) {
-    global $conn;
-    $query = "SELECT COUNT(*) AS count FROM product_details WHERE product_id = '$product_id' AND serial_number LIKE '%-$size'";
-    $result = mysqli_query($conn, $query);
-    $row = mysqli_fetch_assoc($result);
-    return $row['count'];
-}
-
 // Function to generate a unique serial number
 function generateSerialNumber($product_id, $size) {
-    $counter = getCurrentCounter($product_id, $size) + 1;
-    return sprintf('%d-%05d-%s', $product_id, $counter, $size);
+    global $conn;
+    $query = "SELECT MAX(serial_number) AS max_serial FROM product_details WHERE product_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $max_serial = $row['max_serial'];
+
+    // Extract the current counter from the maximum serial number
+    preg_match('/-(\d+)-/', $max_serial, $matches);
+    $counter = isset($matches[1]) ? intval($matches[1]) : 0;
+
+    // Increment the counter for the new serial number
+    $counter++;
+
+    // Generate the new serial number
+    $new_serial_number = sprintf('%d-%05d-%s', $product_id, $counter, $size);
+
+    return $new_serial_number;
 }
 
+// Add product to the database
+if (isset($_POST['add_product'])) {
+    // Validate input fields
+    if (empty($_POST['name'])) {
+        echo "Product name cannot be empty.";
+        exit;
+    }
 
     // Sanitize other fields as needed
     $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
@@ -60,9 +66,8 @@ function generateSerialNumber($product_id, $size) {
     // Handle image upload
     $image_upload = handleImageUpload($_FILES['image']);
     if (isset($image_upload['error'])) {
-        // Handle the error
         echo $image_upload['error'];
-        exit; // Stop execution
+        exit;
     } else {
         $image_path = $image_upload['success'];
     }
@@ -72,42 +77,50 @@ function generateSerialNumber($product_id, $size) {
     $quantities = $_POST['quantities'];
     $total_quantity = array_sum($quantities);
 
+    // Begin transaction
+    $conn->begin_transaction();
+
     // Insert product into the main products table
     $stmt = $conn->prepare("INSERT INTO `products` (name, category, brand, price, image, quant) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssi", $name, $category, $brand, $price, $image_path, $total_quantity);
-
-    // Execute the statement to insert the product
     $stmt->execute();
-    $product_id = $stmt->insert_id; // Get the ID of the inserted product
+    $product_id = $stmt->insert_id;
     $stmt->close();
 
-    // Prepare the statement for inserting sizes and quantities into the product_sizes table
+    // Insert sizes and quantities into the product_sizes table
     $stmt_sizes = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
     $stmt_sizes->bind_param("iss", $product_id, $size, $quantity);
-
-    //Prepare the product_details insertion statement
-    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
-    $stmt_details->bind_param("iss", $product_id, $serial_number, $stock);
-
-    //Loop through each size and quantity
     for ($i = 0; $i < count($sizes); $i++) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
         $stmt_sizes->execute();
+    }
+    $stmt_sizes->close();
 
+    // Generate and insert serial numbers into the product_details table
+    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
+    $stmt_details->bind_param("iss", $product_id, $serial_number, $stock);
+    for ($i = 0; $i < count($sizes); $i++) {
+        $size = $sizes[$i];
+        $quantity = $quantities[$i];
         for ($j = 1; $j <= $quantity; $j++) {
             $serial_number = generateSerialNumber($product_id, $size);
             $stock = 'Available';
             $stmt_details->execute();
         }
-    }    
-    $stmt_sizes->close();
+    }
     $stmt_details->close();
+
+    // Commit transaction
+    $conn->commit();
 }
 
 // Delete product
 if (isset($_GET['delete'])) {
     $delete_id = $_GET['delete'];
+
+    // Begin transaction
+    $conn->begin_transaction();
 
     // Delete related product details
     $stmt = $conn->prepare("DELETE FROM `product_details` WHERE product_id = ?");
@@ -133,10 +146,12 @@ if (isset($_GET['delete'])) {
     }
     $stmt->close();
 
+    // Commit transaction
+    $conn->commit();
+
     header('Location: admin_products.php');
     exit;
 }
-
 
 // Update product
 if (isset($_POST['update_product'])) {
@@ -149,6 +164,10 @@ if (isset($_POST['update_product'])) {
     $quantities = $_POST['quantities'];
     $total_quantity = array_sum($quantities);
 
+    // Begin transaction
+    $conn->begin_transaction();
+
+    // Update product information
     $stmt = $conn->prepare("UPDATE `products` SET name = ?, price = ?, quant = ? WHERE id = ?");
     $stmt->bind_param("sdii", $update_name, $update_price, $total_quantity, $update_p_id);
     $stmt->execute();
@@ -166,26 +185,27 @@ if (isset($_POST['update_product'])) {
     // Insert updated sizes and quantities into the product_sizes table
     $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
     $stmt->bind_param("iss", $update_p_id, $size, $quantity);
-    
-    //Prepare the product_details insertion statement
-    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
-    $stmt_details->bind_param("iss", $update_p_id, $serial_number, $stock);
-    
     for ($i = 0; $i < count($sizes); $i++) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
-        $stmt_sizes->execute();
+        $stmt->execute();
+    }
 
+    // Generate and insert serial numbers into the product_details table
+    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
+    $stmt_details->bind_param("iss", $update_p_id, $serial_number, $stock);
+    for ($i = 0; $i < count($sizes); $i++) {
+        $size = $sizes[$i];
+        $quantity = $quantities[$i];
         for ($j = 1; $j <= $quantity; $j++) {
             $serial_number = generateSerialNumber($update_p_id, $size);
             $stock = 'Available';
             $stmt_details->execute();
         }
-    }    
-
-    $stmt_sizes->close();
+    }
     $stmt_details->close();
 
+    // Handle image update
     if (!empty($_FILES['update_image']['name'])) {
         $update_image_upload = handleImageUpload($_FILES['update_image']);
 
@@ -217,13 +237,16 @@ if (isset($_POST['update_product'])) {
         }
     }
 
+    // Commit transaction
+    $conn->commit();
+
     $stmt->close();
     header('Location: admin_products.php');
     exit;
 }
 
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
