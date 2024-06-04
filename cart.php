@@ -32,6 +32,13 @@ if (isset($_POST['order_btn'])) {
     $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ', ' . $_POST['street'] . ', ' . $_POST['city']  . ' - ' . $_POST['pin_code']);
     $placed_on = date('d-M-Y');
 
+    // Fetch product detail ID based on the selected product ID and size
+    $product_id = $_POST['product_id']; // Assuming you have a hidden input field in your form to store the product ID
+    $product_size = $_POST['product_size']; // Assuming you have a select input field in your form to select the product size
+    $product_detail_query = mysqli_query($conn, "SELECT id FROM `product_details` WHERE product_id = '$product_id' AND size = '$product_size'") or die('Query failed');
+    $product_detail_row = mysqli_fetch_assoc($product_detail_query);
+    $product_detail_id = $product_detail_row['id'];
+
     $cart_total = 0;
     $cart_products = [];
     $cart_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('Query failed');

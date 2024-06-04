@@ -27,9 +27,9 @@ function handleImageUpload($file) {
 // Function to generate a unique serial number
 function generateSerialNumber($product_id, $size) {
     global $conn;
-    $query = "SELECT MAX(serial_number) AS max_serial FROM product_details WHERE product_id = ?";
+    $query = "SELECT MAX(serial_number) AS max_serial FROM product_details WHERE product_id = ? AND size = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $product_id);
+    $stmt->bind_param("is", $product_id, $size);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
@@ -94,22 +94,19 @@ if (isset($_POST['add_product'])) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
         $stmt_sizes->execute();
-    }
-    $stmt_sizes->close();
-
+    
     // Generate and insert serial numbers into the product_details table
-    $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, stock) VALUES (?, ?, ?)");
-    $stmt_details->bind_param("iss", $product_id, $serial_number, $stock);
-    for ($i = 0; $i < count($sizes); $i++) {
-        $size = $sizes[$i];
-        $quantity = $quantities[$i];
-        for ($j = 1; $j <= $quantity; $j++) {
-            $serial_number = generateSerialNumber($product_id, $size);
-            $stock = 'Available';
-            $stmt_details->execute();
-        }
+    for ($j = 1; $j <= $quantity; $j++) {
+        $serial_number = generateSerialNumber($product_id, $size);
+        $stock = 'Available';
+
+        $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, size, stock) VALUES (?, ?, ?, ?)");
+        $stmt_details->bind_param("isss", $product_id, $serial_number, $size, $stock);
+        $stmt_details->execute();
+        $stmt_details->close();
     }
-    $stmt_details->close();
+}
+$stmt_sizes->close();
 
     // Commit transaction
     $conn->commit();
@@ -196,7 +193,7 @@ if (isset($_POST['update_product'])) {
     $stmt_details->bind_param("iss", $update_p_id, $serial_number, $stock);
     for ($i = 0; $i < count($sizes); $i++) {
         $size = $sizes[$i];
-        $quantity = $quantities[$i];
+        $quantity = $quantities[$i]; 
         for ($j = 1; $j <= $quantity; $j++) {
             $serial_number = generateSerialNumber($update_p_id, $size);
             $stock = 'Available';
@@ -323,7 +320,7 @@ if (isset($_POST['update_product'])) {
             
             <select hidden name="category" class="box">
                <option value="helemets&visor">HELMETS & VISORS</option>
-               <option value="riding&gears">RIDING & GEARS</option>
+               <option value="riding&gears">RIDING GEARS</option>
                <option value="brakesystem">BRAKE SYSTEM</option>
                <option value="shocks&suspension">SHOCKS & SUSPENSIONS</option>
                <option value="tires">TIRES</option>
@@ -358,7 +355,6 @@ if (isset($_POST['update_product'])) {
     <!-- show products  -->
 
     <section class="show-products">
-        <h1 class="title">Shop Products</h1>
 
         <table class="product-table">
             <thead>

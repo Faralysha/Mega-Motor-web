@@ -313,77 +313,95 @@ section{
  }
 
  /*Header ------------------------------------------------------------------------------  */
-.header {
-   background-color: var(--white);
-   box-shadow: var(--box-shadow);
-   position: fixed; /* Keeps the header at the top */
-   top: 0; left: 0; right: 0;
-   z-index: 1000; /* Ensures it stays above other content */
-
-}
-
-/* .header .hedaer .flex.logoback{
-   padding:0px, 0px,0px, 10px;
-   margin:0px, 0px,0px, 10px;
-
-} */
-.header .active{
-   position: fixed;
+ .header{
+   position: sticky;
    top:0; left:0; right:0;
    z-index: 1000;
+   background-color: var(--white);
+   box-shadow: var(--box-shadow);
 }
 
 .header .flex{
-   padding:2rem;
    display: flex;
    align-items: center;
+   padding:2rem;
    justify-content: space-between;
+   position: relative;
    max-width: 1200px;
    margin:0 auto;
-   position: relative;
 }
-
+ 
 .header .flex .logo{
    font-size: 2.5rem;
-   color:#EA2525;
-   
-}
-
-.header .flex .navbar ul{
-   display: flex; /* Makes the list horizontal */
-   list-style-type: none; /* Removes bullet points from list */
-   padding: 0; /* Removes default padding */
-}
-
-.header .flex .navbar li {
-   margin-right: 20px; /* Adds some space between menu items */
-}
-
-/* Adjust padding and margin as per your design requirements */
-.header .flex {
-   padding: 1rem; /* Adjusted padding */
+   color:var(--black);
 }
 
 .header .flex .navbar a{
    margin:0 1rem;
    font-size: 2rem;
-   color:var(--light-color);
+   color:var(--black);
 }
 
 .header .flex .navbar a:hover{
-   color: var(--red);
-   text-decoration: underline;
-}
-
-.header .flex .icons > *{
-   font-size: 2.5rem;
-   color:var(--black);
-   cursor: pointer;
-   margin-left: 1.5rem;
-}
-
-.header .flex .icons > *:hover{
    color:var(--crimson);
+}
+
+.header .flex .icons div{
+   margin-left: 1.5rem;
+   font-size: 2.5rem;
+   cursor: pointer;
+   color:var(--black);
+}
+
+.header .flex .icons div:hover{
+   color:var(--crimson);
+}
+
+.header .flex .account-box{
+   position: absolute;
+   top:120%; right:2rem;
+   width: 30rem;
+   box-shadow: var(--box-shadow);
+   border-radius: .5rem;
+   padding:2rem;
+   text-align: center;
+   border-radius: .5rem;
+   border:var(--border);
+   background-color: var(--white);
+   display: none;
+   animation:fadeIn .2s linear;
+}
+
+.header .flex .account-box.active{
+   display: inline-block;
+}
+
+.header .flex .account-box p{
+   font-size: 2rem;
+   color:var(--light-color);
+   margin-bottom: 1.5rem;
+}
+
+.header .flex .account-box p span{
+   color:var(--crimson);
+}
+
+.header .flex .account-box .delete-btn{
+   margin-top: 0;
+}
+
+.header .flex .account-box div{
+   margin-top: 1.5rem;
+   font-size: 2rem;
+   color:var(--light-color);
+}
+
+.header .flex .account-box div a{
+   color:var(--orange);
+}
+
+.header .flex .account-box div a:hover{
+   text-decoration: underline;
 }
 
 #menu-btn{

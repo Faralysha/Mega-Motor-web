@@ -30,35 +30,6 @@ while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
     }
 }
 
-if (isset($_POST['add_to_cart'])) {
-   $product_id = mysqli_real_escape_string($conn, $_POST['product_id']);
-   $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
-   $product_category = mysqli_real_escape_string($conn, $_POST['product_category']);
-   $product_price = mysqli_real_escape_string($conn, $_POST['product_price']);
-   $product_size = mysqli_real_escape_string($conn, $_POST['product_size']);
-   $product_image = mysqli_real_escape_string($conn, $_POST['product_image']);
-   $product_quantity = intval($_POST['product_quantity']);
-
-   // Check if the product is already in the cart for the user
-   $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` WHERE product_name = '$product_name' AND user_id = '$user_id'") or die('Query failed: Check cart');
-
-   if (mysqli_num_rows($check_cart_numbers) > 0) {
-       $message[] = 'Already added to cart!';
-   } else {
-       // Compare the product quantity with available stock
-       $compare_quant = mysqli_query($conn, "SELECT quant FROM products WHERE id='$product_id'") or die('Query failed: Compare quantity');
-       $fetch_quantitem = mysqli_fetch_assoc($compare_quant);
-
-       if ($fetch_quantitem['quant'] > 0 && $product_quantity <= $fetch_quantitem['quant']) {
-           // Insert the product into the cart
-           mysqli_query($conn, "INSERT INTO `cart` (user_id, product_id, product_name, product_size, product_price, quantity, product_image) VALUES ('$user_id', '$product_id', '$product_name', '$product_size', '$product_price', '$product_quantity', '$product_image')") or die('Query failed: Add to cart');
-           $message[] = 'Product added to cart!';
-       } else {
-           $message[] = 'Product out of stock or exceeds available quantity';
-       }
-   }
-}
-
 
 ?>
 

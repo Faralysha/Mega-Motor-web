@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 02, 2024 at 08:41 AM
+-- Generation Time: Jun 03, 2024 at 10:13 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -37,7 +37,8 @@ CREATE TABLE `cart` (
   `quantity` int(11) NOT NULL,
   `image` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `product_brand` varchar(255) DEFAULT NULL
+  `product_brand` varchar(255) DEFAULT NULL,
+  `product_detail_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -53,15 +54,9 @@ CREATE TABLE `history` (
   `product_id` int(100) NOT NULL,
   `product_size` varchar(50) NOT NULL,
   `product_name` varchar(100) NOT NULL,
+  `product_brand` varchar(255) NOT NULL,
   `product_rate` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `history`
---
-
-INSERT INTO `history` (`id`, `user_id`, `order_id`, `product_id`, `product_size`, `product_name`, `product_rate`) VALUES
-(31, 1, 48, 0, '', 'GEOMAX', 5);
 
 -- --------------------------------------------------------
 
@@ -107,13 +102,6 @@ CREATE TABLE `orders` (
   `status` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`id`, `user_id`, `name`, `number`, `email`, `method`, `address`, `total_products`, `total_price`, `placed_on`, `payment_status`, `tracknum`, `status`) VALUES
-(48, 1, 'Eizrfan ', '12343', 'user01@gmail.com', '', 'Lot 71, Jalan Haji Johari, Bukit Cheraka Meru, Klang, Selangor - 41050', '- GEOMAX[M](1) ', 1.00, '02-Jun-2024', 'Accepted', 'SPXMY035274699975', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -143,7 +131,7 @@ CREATE TABLE `products` (
   `price` decimal(10,2) NOT NULL,
   `image` varchar(100) NOT NULL,
   `quant` int(11) NOT NULL,
-  `pro_rates` float DEFAULT 0,
+  `pro_rates` int(10) DEFAULT 0,
   `stock` varchar(50) DEFAULT 'In Stock'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -152,7 +140,9 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `category`, `brand`, `price`, `image`, `quant`, `pro_rates`, `stock`) VALUES
-(73, 'GEOMAX', 'helemets&visor', 'GRACSHAW', 1.00, 'pro2.png', 0, 0, 'In Stock');
+(77, 'BALACLAVA FULL FACE MASK', 'riding&gears', 'ALPINESTAR', 15.00, 'pro19.jpg', 4, 0, 'In Stock'),
+(78, 'TSUNAMI', 'helemets&visor', 'GRACSHAW', 150.00, 'pro5.jpg', 5, 0, 'In Stock'),
+(79, 'BRAKE CALIPER S-SERIES (ORANGE)', 'brakesystem', 'RCB', 148.50, 'pro35.jpeg', 5, 0, 'In Stock');
 
 -- --------------------------------------------------------
 
@@ -164,19 +154,29 @@ CREATE TABLE `product_details` (
   `product_detail_id` int(100) NOT NULL,
   `product_id` int(100) NOT NULL,
   `serial_number` varchar(100) NOT NULL,
-  `stock` varchar(20) NOT NULL DEFAULT 'Available'
+  `stock` varchar(20) NOT NULL DEFAULT 'Available',
+  `size` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product_details`
 --
 
-INSERT INTO `product_details` (`product_detail_id`, `product_id`, `serial_number`, `stock`) VALUES
-(105, 73, '73-00000', 'Available'),
-(106, 73, '73-00000', 'Available'),
-(107, 73, '73-00000', 'Available'),
-(108, 73, '73-00000', 'Available'),
-(109, 73, '73-00000', 'Available');
+INSERT INTO `product_details` (`product_detail_id`, `product_id`, `serial_number`, `stock`, `size`) VALUES
+(116, 77, '77-00000', 'Available', 'FREE SIZE'),
+(117, 77, '77-00000', 'Available', 'FREE SIZE'),
+(118, 77, '77-00000', 'Available', 'FREE SIZE'),
+(119, 77, '77-00000', 'Available', 'FREE SIZE'),
+(120, 78, '78-00000', 'Available', 'S'),
+(121, 78, '78-00000', 'Available', 'S'),
+(122, 78, '78-00000', 'Available', 'M'),
+(123, 78, '78-00000', 'Available', 'M'),
+(124, 78, '78-00000', 'Available', 'M'),
+(125, 79, '79-00000', 'Available', 'Y15ZR'),
+(126, 79, '79-00000', 'Available', 'Y15ZR'),
+(127, 79, '79-00000', 'Available', 'Y15ZR'),
+(128, 79, '79-00000', 'Available', 'NMAX'),
+(129, 79, '79-00000', 'Available', 'NMAX');
 
 --
 -- Triggers `product_details`
@@ -206,8 +206,11 @@ CREATE TABLE `product_sizes` (
 --
 
 INSERT INTO `product_sizes` (`id`, `product_id`, `size`, `quantity`) VALUES
-(110, 73, 'M', 3),
-(111, 73, 'S', 2);
+(117, 77, 'FREE SIZE', 4),
+(118, 78, 'S', 2),
+(119, 78, 'M', 3),
+(120, 79, 'Y15ZR', 3),
+(121, 79, 'NMAX', 2);
 
 -- --------------------------------------------------------
 
@@ -231,7 +234,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `user_type`, `pnumber`) VALUES
 (1, 'Eizrfan', 'user01@gmail.com', 'd856cb5610edb80e3a666a7472013da1', 'user', '0122552323'),
 (6, 'Faralysha', 'nfaralysha@gmail.com', '78a292cb70eefdf9e05ba97656cdad3d', 'admin', '01139909076'),
-(7, 'staff1', 'staff1@gmail.com', 'f0dbeeeed1d08e5206350e3fdf8b9d07', 'staff', '01128880910');
+(7, 'staff1', 'staff1@gmail.com', 'f0dbeeeed1d08e5206350e3fdf8b9d07', 'staff', '01128880910'),
+(8, 'staff2', 'staff2@gmail.com', '8bc01711b8163ec3f2aa0688d12cdf3b', 'staff', NULL);
 
 --
 -- Indexes for dumped tables
@@ -307,13 +311,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `message`
@@ -325,37 +329,37 @@ ALTER TABLE `message`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `product_details`
 --
 ALTER TABLE `product_details`
-  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `product_detail_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
 
 --
 -- AUTO_INCREMENT for table `product_sizes`
 --
 ALTER TABLE `product_sizes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables

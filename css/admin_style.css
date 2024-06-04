@@ -291,7 +291,7 @@ input[type=text], select {
    text-align: center;
    box-shadow: var(--box-shadow);
    border:var(--border);
-   max-width: 50rem;
+   max-width: 70rem;
    margin:0 auto;
 }
 

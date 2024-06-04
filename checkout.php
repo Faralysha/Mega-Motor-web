@@ -62,6 +62,9 @@ if (isset($_POST['order_btn'])) {
 
             $order_id = mysqli_insert_id($conn); // Get the last inserted order ID
 
+             // Store order_id in the session
+             $_SESSION['idname'] = $order_id;
+
             // Insert order items into order_items table
             $product_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
             if (mysqli_num_rows($product_query) > 0) {

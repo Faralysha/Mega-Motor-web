@@ -16,7 +16,7 @@ if(isset($message)){
 <header class="header">
 <div class="flex">
             <div class="logo">
-                <a href="home.php">Berjaya Mega Motor</a>
+            <a href="home.php" class="logo">Berjaya Mega Motor</a>
             </div>
           <!-- <img src ="images/logo.JPG" alt="Logo" width="50px"/> -->
         

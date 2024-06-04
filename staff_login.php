@@ -1,3 +1,4 @@
+
 <?php
 
 include 'config.php';
@@ -34,6 +35,7 @@ if(isset($_POST['submit'])){
          $_SESSION['user_email'] = $row['email'];
          $_SESSION['user_id'] = $row['id'];
          header('location:staff_page.php');
+      
       }else{
          $message[] = 'no user found!';
       }
@@ -76,7 +78,7 @@ body {
    border: none;
    text-decoration: none;
    /*background-image: url(https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR0AXMSadvBUS675dHWh0csxV_yyFZrd3afhPwwWGHGvP0chIia); */
-   background-image: url(black.png);
+   background-image: url(images/admincover.jpg);
    background-repeat: no-repeat;
    background-size: cover;
   }
@@ -207,11 +209,28 @@ body {
    font-size: 20px;
    padding:10px;
 }
+
+.containerlogin .logintitle{
+    /* border-bottom: 4px solid; */
+    display: flex;
+    font-size: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #ffff;
+    text-align: center;
+    justify-content: center;
+}
+
 </style>
 
 </head>
 <body>
-   
+
+<div class="containerlogin">
+            <h1 class="logintitle">
+                <b> Welcome Staff</b>
+</div>
+
 <div class="form-container">
 
    <form action="" method="post">
@@ -220,7 +239,6 @@ body {
       <input type="email" name="email" required placeholder="Enter your email">
       <input type="password" name="password" required placeholder="Enter your password">
       <input type="submit" name="submit" value="Login" class="form-btn">
-      <p>don't have an account? <a href="register.php">Register now</a></p>
    </form>
 
 </div>

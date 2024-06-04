@@ -5,11 +5,11 @@ include 'config.php';
 session_start();
 // recheck if the user login is admin or not
 // Check if the admin is login or not
-$admin_id = $_SESSION['admin_id'];
+$admin_id = $_SESSION['staff_id'];
 
-if (!isset($admin_id)) {
+if (!isset($staff_id)) {
    // IF no admin, then redirect to the LOGIN again
-   header('location:admin_login.php');
+   header('location:staff_login.php');
 }
 
 ?>
@@ -308,11 +308,11 @@ if (!isset($admin_id)) {
 
             <div class="box">
                <?php
-               $select_admins = mysqli_query($conn, "SELECT * FROM `users` WHERE user_type = 'admin'") or die('query failed');
-               $number_of_admins = mysqli_num_rows($select_admins);
+               $select_staff = mysqli_query($conn, "SELECT * FROM `users` WHERE user_type = 'staff'") or die('query failed');
+               $number_of_staff = mysqli_num_rows($select_staff);
                ?>
                <h3>
-                  <?php echo $number_of_admins; ?>
+                  <?php echo $number_of_staff; ?>
                </h3>
                <p>admin users</p>
             </div>
