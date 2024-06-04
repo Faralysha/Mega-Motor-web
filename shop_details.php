@@ -17,14 +17,17 @@ if (!$product_id) {
     die('Product ID is not set.');
 }
 
-// Fetch product details
-$get_idproduct = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$product_id'") or die('Query failed');
+// Fetch the product details
+$get_product_details = mysqli_prepare($conn, "SELECT * FROM `products` WHERE id = ?");
+mysqli_stmt_bind_param($get_product_details, "i", $product_id);
+mysqli_stmt_execute($get_product_details);
+$product_details_result = mysqli_stmt_get_result($get_product_details);
+$product_details = mysqli_fetch_assoc($product_details_result);
 
-if (mysqli_num_rows($get_idproduct) == 0) {
+// Check if product details exist
+if (!$product_details) {
     die('Product not found.');
 }
-
-$fetch_products = mysqli_fetch_assoc($get_idproduct);
 
 // Fetch sizes and quantities for the current product
 $get_sizes_quantities = mysqli_prepare($conn, "SELECT size, quantity FROM `product_sizes` WHERE product_id = ?");
@@ -34,17 +37,6 @@ $fetch_sizes_quantities = mysqli_stmt_get_result($get_sizes_quantities);
 $sizes_quantities = mysqli_fetch_all($fetch_sizes_quantities, MYSQLI_ASSOC);
 mysqli_stmt_close($get_sizes_quantities);
 
-// Check if sizes_quantities is an array
-if ($sizes_quantities !== false) {
-    // Sizes and quantities are available
-    foreach ($sizes_quantities as $size_quantity) {
-        // Process each size and quantity
-    }
-} else {
-    // No sizes available for this product
-    echo 'No sizes available for this product.';
-}
-
 // Calculate total quantity
 $total_quantity = 0;
 foreach ($sizes_quantities as $size_quantity) {
@@ -52,35 +44,51 @@ foreach ($sizes_quantities as $size_quantity) {
 }
 
 if (isset($_POST['add_to_cart'])) {
-    $product_brand = $fetch_products['brand']; // Fetch the product brand
-    $product_name = $fetch_products['name'];
-    $product_price = $fetch_products['price'];
-    $product_size = $_POST['product_size'];
-    $product_image = $fetch_products['image'];
+    $product_brand = $product_details['brand']; // Fetch the product brand
+    $product_name = $product_details['name'];
+    $product_price = $product_details['price'];
+    $product_size = $_POST['product_size'] ?? null;
+    $product_image = $product_details['image'];
     $product_quantity = intval($_POST['product_quantity']);
 
-    // Fetch the available quantity of the specific size from the product_sizes table
-    $compare_quant = mysqli_prepare($conn, "SELECT quantity FROM `product_sizes` WHERE product_id = ? AND size = ?");
-    mysqli_stmt_bind_param($compare_quant, "is", $product_id, $product_size);
-    mysqli_stmt_execute($compare_quant);
-    $fetch_quantitem = mysqli_stmt_get_result($compare_quant);
-    $size_stock = mysqli_fetch_assoc($fetch_quantitem);
-    mysqli_stmt_close($compare_quant);
-
-    if ($size_stock['quantity'] == 0 || $size_stock['quantity'] < 0 || $product_quantity > $size_stock['quantity']) {
-        // Specific size is out of stock or quantity exceeds available quantity for that size
-        $message[] = 'Product out of stock';
+    if (!$product_size) {
+        $message[] = 'Product size is not set.';
     } else {
-        // Insert the product into the cart along with the product brand
-        $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_id, product_brand, product_name, product_size, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($insert_cart, "iisssisd", $user_id, $product_id, $product_brand, $product_name, $product_size, $product_price, $product_quantity, $product_image);
-        mysqli_stmt_execute($insert_cart);
-        mysqli_stmt_close($insert_cart);
-        $message[] = 'Product added to cart';        
-
-    }
+        // Fetch the product detail ID for the selected size
+        $get_product_detail_id = mysqli_prepare($conn, "SELECT product_detail_id FROM `product_details` WHERE product_id = ? AND size = ?");
+        mysqli_stmt_bind_param($get_product_detail_id, "is", $product_id, $product_size);
+        mysqli_stmt_execute($get_product_detail_id);
+        $product_detail_id_result = mysqli_stmt_get_result($get_product_detail_id);
+        $product_detail_id_row = mysqli_fetch_assoc($product_detail_id_result);
+        $product_detail_id = $product_detail_id_row['product_detail_id'];
+    
+        // Check if product detail ID exists
+        if (!$product_detail_id) {
+            $message[] = 'Product detail ID not found.';
+        } else {
+            // Fetch the available quantity of the specific size from the product_sizes table
+            $compare_quant = mysqli_prepare($conn, "SELECT quantity FROM `product_sizes` WHERE product_id = ? AND size = ?");
+            mysqli_stmt_bind_param($compare_quant, "is", $product_id, $product_size);
+            mysqli_stmt_execute($compare_quant);
+            $fetch_quantitem = mysqli_stmt_get_result($compare_quant);
+            $size_stock = mysqli_fetch_assoc($fetch_quantitem);
+            mysqli_stmt_close($compare_quant);
+    
+            if ($size_stock['quantity'] <= 0 || $product_quantity > $size_stock['quantity']) {
+                // Specific size is out of stock or quantity exceeds available quantity for that size
+                $message[] = 'Product out of stock';
+            } else {
+                // Insert the product into the cart along with the product detail ID
+                $insert_cart = mysqli_prepare($conn, "INSERT INTO `cart` (user_id, product_id, product_detail_id, product_brand, product_name, product_size, price, quantity, image) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($insert_cart, "iiisssisd", $user_id, $product_id, $product_detail_id, $product_brand, $product_name, $product_size, $product_price, $product_quantity, $product_image);
+                mysqli_stmt_execute($insert_cart);
+                mysqli_stmt_close($insert_cart);
+                $message[] = 'Product added to cart';
+            }
+        }
+    }  
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -330,15 +338,15 @@ if (isset($_POST['add_to_cart'])) {
         <div class="left">
             <div class="main_image">
                 <div class="size_image">
-                    <img class="image" src="uploaded_img/<?php echo htmlspecialchars($fetch_products['image'] ?? ''); ?>" alt="Product Image">
+                    <img class="image" src="uploaded_img/<?php echo htmlspecialchars($product_details['image']); ?>" alt="Product Image">
                 </div>
             </div>
         </div>
         <div class="right">
             <div class="size-quantity-container">
                 <div class='product-details'>
-                    <div><strong>Category:</strong> <?php echo htmlspecialchars($fetch_products['category'] ?? 'N/A'); ?></div>
-                    <div><strong>Brand:</strong> <?php echo htmlspecialchars($fetch_products['brand'] ?? 'N/A'); ?></div>
+                    <div><strong>Category:</strong> <?php echo htmlspecialchars($product_details['category']); ?></div>
+                    <div><strong>Brand:</strong> <?php echo htmlspecialchars($product_details['brand']); ?></div>
 
                     <div class='size-quantity-details'>
                         <div><strong>Sizes:</strong></div>
@@ -355,7 +363,7 @@ if (isset($_POST['add_to_cart'])) {
                     </div>
 
                     <div class='size-quantity-details'>
-                        <div><strong>Price:</strong> RM <?php echo htmlspecialchars($fetch_products['price'] ?? 'N/A'); ?></div>
+                        <div><strong>Price:</strong> RM <?php echo htmlspecialchars($product_details['price']); ?></div>
                     </div>
                 </div>
             </div>
@@ -365,11 +373,11 @@ if (isset($_POST['add_to_cart'])) {
                     <input type="number" min="1" name="product_quantity" placeholder="Enter Quantity" value="1" class="form-control form-control-lg">
                 </div>
                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
-                <input type="hidden" name="product_brand" value="<?php echo htmlspecialchars($fetch_products['brand'] ?? ''); ?>">
-                <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($fetch_products['name'] ?? ''); ?>">
+                <input type="hidden" name="product_brand" value="<?php echo htmlspecialchars($product_details['brand']); ?>">
+                <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($product_details['name']); ?>">
                 <input type="hidden" name="product_size" id="selected-size" value="">
-                <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($fetch_products['price'] ?? ''); ?>">
-                <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($fetch_products['image'] ?? ''); ?>">
+                <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($product_details['price']); ?>">
+                <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($product_details['image']); ?>">
                 <input type="submit" value="Add to cart" class="btn btn-outline-primary btn-lg" name="add_to_cart">
             </form>
 
