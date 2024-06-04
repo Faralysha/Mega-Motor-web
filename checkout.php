@@ -1,7 +1,5 @@
 <?php
-
 include 'config.php';
-
 session_start();
 
 $user_id = $_SESSION['user_id'];
@@ -62,8 +60,11 @@ if (isset($_POST['order_btn'])) {
 
             $order_id = mysqli_insert_id($conn); // Get the last inserted order ID
 
-             // Store order_id in the session
-             $_SESSION['idname'] = $order_id;
+            // Store order_id in the session
+            $_SESSION['idname'] = $order_id;
+
+            // Initialize counter for serial number
+            $counter = 1;
 
             // Insert order items into order_items table
             $product_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
@@ -72,8 +73,19 @@ if (isset($_POST['order_btn'])) {
                     $product_detail_id = $product['product_detail_id'];
                     $quantity = $product['quantity'];
                     $price = $product['price'] * $quantity;
-                    mysqli_query($conn, "INSERT INTO `order_items` (order_id, product_detail_id, quantity, price) 
-                    VALUES ('$order_id', '$product_detail_id', '$quantity', '$price')") or die('query failed');
+
+                    // Generate serial number
+                    $serial_number = $product['product_id'] . '-' . $counter . '-' . $product['product_size'];
+
+                    // Update product status to 'Sold'
+                    mysqli_query($conn, "UPDATE `product_details` SET stock = 'Sold' WHERE product_detail_id = '$product_detail_id'") or die('query failed');
+
+                    // Insert order item with serial number
+                    mysqli_query($conn, "INSERT INTO `order_items` (order_id, product_detail_id, quantity, price, serial_number) 
+                    VALUES ('$order_id', '$product_detail_id', '$quantity', '$price', '$serial_number')") or die('query failed');
+
+                    // Increment counter
+                    $counter++;
                 }
             }
 
@@ -142,6 +154,7 @@ if (isset($_POST['order_btn'])) {
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
