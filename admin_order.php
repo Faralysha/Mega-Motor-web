@@ -17,7 +17,8 @@ if (isset($_POST['update_order'])) {
 
    if ($update_payment !== null) {
        // Update tracking number and payment status in the order
-       mysqli_query($conn, "UPDATE `orders` SET payment_status = '$update_payment', tracknum = '$track_number' WHERE id = '$order_update_id'") or die('query failed');
+       mysqli_query($conn, "UPDATE `orders` SET payment_status = '$update_payment', tracknum = '$track_number' 
+       WHERE id = '$order_update_id'") or die('query failed');
        $message[] = 'Payment status has been updated!';
    } else {
        $message[] = 'Please select a payment status.';

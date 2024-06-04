@@ -102,12 +102,11 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
 
    <!-- heading -->
    <div class="heading">
-      <h3>our shop</h3>
       <p> <a href="home.php">Home</a> / History </p>
    </div>
 
-   <h1 class="title">History purchase</h1>
    <section class="products">
+   <h1 class="title">History purchase</h1>
       <?php
       if (mysqli_num_rows($select_order_ids) > 0) {
          while ($order_row = mysqli_fetch_assoc($select_order_ids)) {

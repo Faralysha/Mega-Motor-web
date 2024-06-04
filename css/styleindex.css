@@ -346,6 +346,17 @@ section{
    color:var(--crimson);
 }
 
+.header .flex .icons a{
+   margin-left: 1.5rem;
+   font-size: 2.5rem;
+   cursor: pointer;
+   color:var(--black);
+}
+
+.header .flex .icons a:hover{
+   color:var(--crimson);
+}
+
 .header .flex .icons div{
    margin-left: 1.5rem;
    font-size: 2.5rem;
@@ -447,9 +458,10 @@ section{
    overflow: hidden; /* Ensure no overflow */
    }
 
-.products .title {
+.products .title{
 text-align: center ;
-font-size: 3rem;
+font-size: 4rem;
+font-weight: bold;
 text-transform: uppercase;
 color:var(--black);
 max-width: 60rem;

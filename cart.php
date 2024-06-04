@@ -9,7 +9,14 @@ if (!isset($user_id)) {
     header('location:index.php');
     exit;
 }
-
+// Update cart quantity by user
+if (isset($_POST['update_cart'])) {
+    $cart_id = $_POST['cart_id'];
+    $cart_quantity = $_POST['cart_quantity'];
+    mysqli_query($conn, "UPDATE `cart` SET quantity = '$cart_quantity' WHERE id = '$cart_id'") or die('query failed');
+    $message[] = 'cart quantity updated!';
+ }
+ 
 // Delete cart item
 if (isset($_GET['delete'])) {
     $delete_id = $_GET['delete'];

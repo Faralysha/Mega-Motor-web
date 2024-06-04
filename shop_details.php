@@ -61,7 +61,7 @@ if (isset($_POST['add_to_cart'])) {
         $product_detail_id_result = mysqli_stmt_get_result($get_product_detail_id);
         $product_detail_id_row = mysqli_fetch_assoc($product_detail_id_result);
         $product_detail_id = $product_detail_id_row['product_detail_id'];
-    
+
         // Check if product detail ID exists
         if (!$product_detail_id) {
             $message[] = 'Product detail ID not found.';
@@ -73,7 +73,7 @@ if (isset($_POST['add_to_cart'])) {
             $fetch_quantitem = mysqli_stmt_get_result($compare_quant);
             $size_stock = mysqli_fetch_assoc($fetch_quantitem);
             mysqli_stmt_close($compare_quant);
-    
+
             if ($size_stock['quantity'] <= 0 || $product_quantity > $size_stock['quantity']) {
                 // Specific size is out of stock or quantity exceeds available quantity for that size
                 $message[] = 'Product out of stock';
@@ -87,7 +87,7 @@ if (isset($_POST['add_to_cart'])) {
                 $message[] = 'Product added to cart';
             }
         }
-    }  
+    }
 }
 ?>
 
@@ -345,9 +345,11 @@ if (isset($_POST['add_to_cart'])) {
         <div class="right">
             <div class="size-quantity-container">
                 <div class='product-details'>
-                    <div><strong>Category:</strong> <?php echo htmlspecialchars($product_details['category']); ?></div>
+                    <div><strong>Product Name:</strong> <?php echo htmlspecialchars($product_details['name']); ?></div>
                     <div><strong>Brand:</strong> <?php echo htmlspecialchars($product_details['brand']); ?></div>
-
+                    <div><strong>Category:</strong> <?php echo htmlspecialchars($product_details['category']); ?></div>
+                    <div><strong>Description:</strong> <?php echo nl2br(htmlspecialchars($product_details['description'])); ?></div>
+                    
                     <div class='size-quantity-details'>
                         <div><strong>Sizes:</strong></div>
                         <?php foreach ($sizes_quantities as $size_quantity) { ?>
@@ -382,10 +384,10 @@ if (isset($_POST['add_to_cart'])) {
             </form>
 
             <?php if (!empty($message)): ?>
-                <div class="alert alert-info mt-3">
-                    <?php foreach ($message as $msg): ?>
-                        <p><?php echo $msg; ?></p>
-                    <?php endforeach; ?>
+                    <div class="alert alert-info mt-3">
+                        <?php foreach ($message as $msg): ?>
+                            <p><?php echo $msg; ?></p>
+                        <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>

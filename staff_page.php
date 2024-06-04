@@ -5,7 +5,7 @@ include 'config.php';
 session_start();
 // recheck if the user login is admin or not
 // Check if the admin is login or not
-$admin_id = $_SESSION['staff_id'];
+$staff_id = $_SESSION['staff_id'];
 
 if (!isset($staff_id)) {
    // IF no admin, then redirect to the LOGIN again
