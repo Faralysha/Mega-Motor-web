@@ -1,11 +1,13 @@
 <?php
+
 include 'config.php';
 
 session_start();
 
-if (!isset($_SESSION['admin_id'])) {
-    header('Location: admin_login.php');
-    exit;
+$user_id = $_SESSION['user_id']; // Assuming user_id is the session variable set during login
+
+if (!isset($user_id)) {
+   header('location:index.php');
 }
 
 function handleImageUpload($file) {
@@ -139,7 +141,7 @@ if (isset($_GET['delete'])) {
     // Commit transaction
     $conn->commit();
 
-    header('Location: admin_products.php');
+    header('Location: staff_products.php');
     exit;
 }
 
@@ -226,7 +228,7 @@ if (isset($_POST['update_product'])) {
 
     $conn->commit();
     $stmt->close();
-    header('Location: admin_products.php');
+    header('Location: staff_products.php');
     exit;
 }
 
@@ -293,7 +295,7 @@ if (isset($_POST['update_product'])) {
 <body>
 
 <?php
-include 'admin_header.php';
+include 'staff_header.php';
 ?>
     <!-- ----------------------------------------------------------------------------------------- -->
     <!--  -->
@@ -411,8 +413,8 @@ include 'admin_header.php';
                 echo "<td>RM {$fetch_products['price']}</td>";
                 echo "<td><a href=\"#\" onclick=\"openImagePopup('uploaded_img/{$fetch_products['image']}')\">uploaded_img/{$fetch_products['image']}</a></td>";
                 echo "<td class=\"btn-container\">";
-                echo "<a href=\"admin_products.php?update={$fetch_products['id']}\" class=\"option-btn small-btn\">Update</a>";
-                echo "<a href=\"admin_products.php?delete={$fetch_products['id']}\" class=\"delete-btn small-btn\" onclick=\"return confirm('Delete this product?');\">Delete</a>";
+                echo "<a href=\"staff_products.php?update={$fetch_products['id']}\" class=\"option-btn small-btn\">Update</a>";
+                echo "<a href=\"staff_products.php?delete={$fetch_products['id']}\" class=\"delete-btn small-btn\" onclick=\"return confirm('Delete this product?');\">Delete</a>";
                 echo "</td>";
                 echo "</tr>";
             }

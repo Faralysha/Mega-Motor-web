@@ -1,4 +1,14 @@
 <?php
+
+if (isset($_SESSION['user_id'])) {
+   $user_id = $_SESSION['user_id'];
+} else {
+   // Redirect the user or handle the error as needed
+   // For example, you can redirect them to the login page
+   header('Location: index.php');
+   exit();
+}
+
 if(isset($message)){
    foreach($message as $message){
       echo '

@@ -18,10 +18,10 @@ if(isset($message)){
       <a href="admin_page.php" class="logo">Berjaya Mega Motor<span>Staff</span></a>
 
       <nav class="navbar">
-         <a href="admin_page.php">home</a>
-         <a href="admin_products.php">products</a>
-         <a href="admin_order.php">orders</a>
-         <a href="admin_contacts.php">messages</a>
+         <a href="staff_page.php">home</a>
+         <a href="staff_products.php">products</a>
+         <a href="staff_order.php">orders</a>
+         <a href="staff_contacts.php">messages</a>
       </nav>
 
       <div class="icons">

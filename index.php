@@ -1,4 +1,8 @@
 <?php
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 include 'config.php';
 session_start();
@@ -12,6 +16,10 @@ if (isset($_POST['submit'])) {
     if (mysqli_num_rows($select_users) > 0) {
         $row = mysqli_fetch_assoc($select_users);
         
+        // Debug: Print user details
+        echo "User ID: " . $row['id'] . "<br>";
+        echo "User Type: " . $row['user_type'] . "<br>";
+
         $_SESSION['user_name'] = $row['name'];
         $_SESSION['user_email'] = $row['email'];
         $_SESSION['user_id'] = $row['id'];
@@ -24,7 +32,7 @@ if (isset($_POST['submit'])) {
             header('location: home.php');
             exit();
         } elseif ($row['user_type'] == 'staff') {
-            header('location: admin_page.php');
+            header('location: staff_page.php');
             exit();
         } else {
             $message[] = 'No user found!';
@@ -33,8 +41,8 @@ if (isset($_POST['submit'])) {
         $message[] = 'Incorrect email or password!';
     }
 }
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

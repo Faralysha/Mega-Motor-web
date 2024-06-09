@@ -1,11 +1,13 @@
 <?php
+
 include 'config.php';
 
 session_start();
 
-if (!isset($_SESSION['admin_id'])) {
-    header('Location: admin_login.php');
-    exit;
+$user_id = $_SESSION['user_id']; // Assuming user_id is the session variable set during login
+
+if (!isset($user_id)) {
+   header('location:index.php');
 }
 
 // Fetch contacts or messages
@@ -32,7 +34,7 @@ $result = mysqli_query($conn, $query) or die('query failed');
 <body>
    
 <?php
-include 'admin_header.php';
+include 'staff_header.php';
 ?>
 
 <section class="messages">
@@ -52,7 +54,7 @@ include 'admin_header.php';
       <p> Phone : <span><?php echo $fetch_message['pnumber']; ?></span> </p>
       <p> email : <span><?php echo $fetch_message['email']; ?></span> </p>
       <p> message : <span><?php echo $fetch_message['message']; ?></span> </p>
-      <a href="admin_contacts.php?delete=<?php echo $fetch_message['id']; ?>" onclick="return confirm('delete this message?');" class="delete-btn">delete message</a>
+      <a href="staff_contacts.php?delete=<?php echo $fetch_message['id']; ?>" onclick="return confirm('delete this message?');" class="delete-btn">delete message</a>
    </div>
    <?php
       };

@@ -3,13 +3,11 @@
 include 'config.php';
 
 session_start();
-// recheck if the user login is admin or not
-// Check if the admin is login or not
-$admin_id = $_SESSION['admin_id'];
 
-if (!isset($admin_id)) {
-   // IF no admin, then redirect to the LOGIN again
-   header('location:admin_login.php');
+$user_id = $_SESSION['user_id']; // Assuming user_id is the session variable set during login
+
+if (!isset($user_id)) {
+   header('location:index.php');
 }
 
 ?>
@@ -21,7 +19,7 @@ if (!isset($admin_id)) {
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>admin panel</title>
+   <title>Staff panel</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -213,7 +211,7 @@ if (!isset($admin_id)) {
 
 <body>
 
-   <?php include 'admin_header.php'; ?>
+   <?php include 'staff_header.php'; ?>
 
    <!-- admin dashboard section starts  -->
 

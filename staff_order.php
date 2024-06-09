@@ -1,13 +1,13 @@
 <?php
+
 include 'config.php';
 
 session_start();
 
-$admin_id = $_SESSION['admin_id'];
+$user_id = $_SESSION['user_id']; // Assuming user_id is the session variable set during login
 
-if (!isset($admin_id)) {
-   header('location:admin_login.php');
-   exit();
+if (!isset($user_id)) {
+   header('location:index.php');
 }
 
 if (isset($_POST['update_order'])) {
@@ -34,7 +34,7 @@ if (isset($_GET['delete'])) {
    // Delete the order
    mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed deleting order');
 
-   header('location:admin_order.php');
+   header('location:staff_order.php');
    exit();
 }
 ?>
@@ -81,7 +81,7 @@ if (isset($_GET['delete'])) {
 
 <body>
 
-   <?php include 'admin_header.php'; ?>
+   <?php include 'staff_header.php'; ?>
    
    <section class="orders" id="orders">
       <h1 class="title">Placed Orders</h1>
