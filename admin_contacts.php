@@ -1,21 +1,18 @@
 <?php
-
+// Include the configuration file
 include 'config.php';
 
+// Start the session
 session_start();
 
-$admin_id = $_SESSION['admin_id'];
-
-if(!isset($admin_id)){
-   header('location:admin_login.php');
-};
-
-if(isset($_GET['delete'])){
-   $delete_id = $_GET['delete'];
-   mysqli_query($conn, "DELETE FROM `message` WHERE id = '$delete_id'") or die('query failed');
-   header('location:admin_contacts.php');
+// Check if the user is logged in and is a staff member
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'staff') {
+    // Include the staff header if the user is a staff member
+    include 'staff_header.php';
+} else {
+    // Include the admin header if the user is not a staff member (admin or other)
+    include 'admin_header.php';
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +32,14 @@ if(isset($_GET['delete'])){
 </head>
 <body>
    
-<?php include 'admin_header.php'; ?>
+<?php
+// Include the appropriate header file based on the user's role
+if (isset($_SESSION['admin_id'])) {
+    include 'admin_header.php';
+} elseif (isset($_SESSION['staff_id'])) {
+    include 'staff_header.php';
+}
+?>
 
 <section class="messages">
 

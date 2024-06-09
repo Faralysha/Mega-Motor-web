@@ -1,51 +1,32 @@
-
 <?php
-
 include 'config.php';
 session_start();
-// using post to submit any data to *$_SESSION* and make sure that system know what it(Account) that use the system
-if(isset($_POST['submit'])){
 
-   $email = mysqli_real_escape_string($conn, $_POST['email']);
-   $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
+if (isset($_POST['submit'])) {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
 
-   $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
+    $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
 
-   if(mysqli_num_rows($select_users) > 0){
+    if (mysqli_num_rows($select_users) > 0) {
+        $row = mysqli_fetch_assoc($select_users);
 
-      $row = mysqli_fetch_assoc($select_users);
+        // Set session variables based on user type
+        if ($row['user_type'] == 'admin') {
+            $_SESSION['admin_id'] = $row['id'];
+            // Set other admin-related session variables if needed
+        } elseif ($row['user_type'] == 'staff') {
+            $_SESSION['staff_id'] = $row['id'];
+            // Set other staff-related session variables if needed
+        }
 
-      if($row['user_type'] == 'admin'){
-
-         $_SESSION['admin_name'] = $row['name'];
-         $_SESSION['admin_email'] = $row['email'];
-         $_SESSION['admin_id'] = $row['id'];
-         header('location:admin_page.php');
-
-      }elseif($row['user_type'] == 'user'){
-
-         $_SESSION['user_name'] = $row['name'];
-         $_SESSION['user_email'] = $row['email'];
-         $_SESSION['user_id'] = $row['id'];
-         header('location:home.php');
-
-      }elseif($row['user_type'] == 'staff'){
-
-         $_SESSION['user_name'] = $row['name'];
-         $_SESSION['user_email'] = $row['email'];
-         $_SESSION['user_id'] = $row['id'];
-         header('location:staff_page.php');
-      
-      }else{
-         $message[] = 'no user found!';
-      }
-
-      }else{
-      $message[] = 'incorrect email or password!';
-   }
-
+        // Redirect to admin_page.php after successful login
+        header('location: admin_page.php');
+        exit();
+    } else {
+        $message[] = 'Incorrect email or password!';
+    }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -54,12 +35,9 @@ if(isset($_POST['submit'])){
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>login form</title>
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/styleindex.css">
-
-<style>
+   <title>Login Form</title>
+   <link rel="stylesheet" href="css/adminstyle.css">
+   <style>
 
 *{
    font-family: 'Poppins', sans-serif;
@@ -77,11 +55,10 @@ body {
    outline: none;
    border: none;
    text-decoration: none;
-   /*background-image: url(https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR0AXMSadvBUS675dHWh0csxV_yyFZrd3afhPwwWGHGvP0chIia); */
    background-image: url(images/admincover.jpg);
    background-repeat: no-repeat;
    background-size: cover;
-  }
+}
 
 .container{
    min-height: 100vh;
@@ -211,7 +188,6 @@ body {
 }
 
 .containerlogin .logintitle{
-    /* border-bottom: 4px solid; */
     display: flex;
     font-size: 40px;
     text-align: center;
@@ -222,27 +198,23 @@ body {
 }
 
 </style>
-
 </head>
 <body>
+   <div class="containerlogin">
+      <h1 class="logintitle">
+          <b> Welcome Admin</b>
+      </h1>
+   </div>
 
-<div class="containerlogin">
-            <h1 class="logintitle">
-                <b> Welcome Admin</b>
-</div>
-
-<div class="form-container">
-
-   <form action="" method="post">
-      <h3>login now</h3>
-     
-      <input type="email" name="email" required placeholder="Enter your email">
-      <input type="password" name="password" required placeholder="Enter your password">
-      <input type="submit" name="submit" value="Login" class="form-btn">
-      <p>Do you want to add new staff? <a href="admin_register.php">Add new staff</a></p>
-   </form>
-
-</div>
-
+   <div class="form-container">
+      <form action="" method="post">
+         <h3>Login now</h3>
+         <input type="email" name="email" required placeholder="Enter your email">
+         <input type="password" name="password" required placeholder="Enter your password">
+         <input type="submit" name="submit" value="Login" class="form-btn">
+         <!-- Link to register new staff -->
+         <p>Do you want to add new staff? <a href="admin_register.php">Add new staff</a></p>
+      </form>
+   </div>
 </body>
 </html>

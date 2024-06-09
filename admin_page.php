@@ -3,16 +3,32 @@
 include 'config.php';
 
 session_start();
-// recheck if the user login is admin or not
-// Check if the admin is login or not
-$admin_id = $_SESSION['admin_id'];
 
-if (!isset($admin_id)) {
-   // IF no admin, then redirect to the LOGIN again
-   header('location:admin_login.php');
+// Check if any user is logged in
+if (!isset($_SESSION['user_id'])) {
+   // If no user is logged in, redirect to the login page
+   header('location: login.php');
+   exit(); // Add this to stop further execution of the script
+}
+
+// Check if the logged-in user is an admin or staff
+$user_id = $_SESSION['user_id'];
+$user_type = $_SESSION['user_type'];
+
+if ($user_type == 'admin') {
+   // If admin is logged in, proceed
+   $admin_id = $user_id;
+} elseif ($user_type == 'staff') {
+   // If staff is logged in, proceed
+   $staff_id = $user_id;
+} else {
+   // If neither admin nor staff is logged in, redirect to the login page
+   header('location: login.php');
+   exit(); // Add this to stop further execution of the script
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -213,7 +229,7 @@ if (!isset($admin_id)) {
 
 <body>
 
-   <?php include 'admin_header.php'; ?>
+   <?php include 'staff_header.php'; ?>
 
    <!-- admin dashboard section starts  -->
 

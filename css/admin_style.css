@@ -405,27 +405,28 @@ input[type=text], select {
    display: flex;
    flex-direction: row;
    justify-content: space-between;
-   width: 60rem;
+   width: 80rem;
    padding:2rem;
    text-align: center;
    border-radius: .5rem;
    background-color: var(--white);
 }
-.edit-product-form form .set-image{
+
+.edit-product-form .set-image{
    margin-right: 30px;
    transition: transform 0.2s;
 }
-.edit-product-form form .set-image:hover{
+.edit-product-form .set-image:hover{
    transform: scale(1.02);
 }
-.edit-product-form form img{
+.edit-product-form img{
    border: 0.8px solid black;
    border-radius: 7px;
    height: 25rem;
    margin-bottom: 1rem;
 }
 
-.edit-product-form form .box{
+.edit-product-form .box{
    margin:1rem 0;
    padding:1.2rem 1.4rem;
    border:var(--border);
@@ -434,6 +435,42 @@ input[type=text], select {
    font-size: 1.8rem;
    color:var(--black);
    width: 100%;
+}
+
+.edit-product-form .set-form {
+   flex-grow: 1; /* Allow the form to grow to fill available space */
+   display: flex;
+   flex-direction: column;
+}
+
+.edit-product-form .size-quantity {
+   display: flex;
+   flex-direction: column;
+   margin-top: 1rem;
+}
+
+.edit-product-form .size-quantity input[type="text"],
+.edit-product-form .size-quantity input[type="number"] {
+   margin-bottom: 0.5rem;
+}
+
+.edit-product-form .button-container {
+   display: flex;
+   justify-content: flex-end;
+   margin-top: 2rem;
+}
+
+.edit-product-form .button-container input[type="submit"],
+.edit-product-form .button-container input[type="reset"] {
+   margin-left: 1rem;
+}
+
+.size-label,
+.quantity-label {
+    font-size: 1.8rem; /* Adjust the font size as needed */
+    font-weight: bold;
+    color: #333; /* Adjust the color as needed */
+    margin-right: 10px; /* Add spacing between Size and Left Quantity */
 }
 
 .orders .box-container{

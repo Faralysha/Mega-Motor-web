@@ -2,46 +2,36 @@
 
 include 'config.php';
 session_start();
-// using post to submit any data to *$_SESSION* and make sure that system know what it(Account) that use the system
-if(isset($_POST['submit'])){
 
-   $email = mysqli_real_escape_string($conn, $_POST['email']);
-   $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
+if (isset($_POST['submit'])) {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
 
-   $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
+    $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
 
-   if(mysqli_num_rows($select_users) > 0){
+    if (mysqli_num_rows($select_users) > 0) {
+        $row = mysqli_fetch_assoc($select_users);
+        
+        $_SESSION['user_name'] = $row['name'];
+        $_SESSION['user_email'] = $row['email'];
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['user_type'] = $row['user_type'];
 
-      $row = mysqli_fetch_assoc($select_users);
-
-      if($row['user_type'] == 'admin'){
-
-         $_SESSION['admin_name'] = $row['name'];
-         $_SESSION['admin_email'] = $row['email'];
-         $_SESSION['admin_id'] = $row['id'];
-         header('location:admin_page.php');
-
-      }elseif($row['user_type'] == 'user'){
-
-         $_SESSION['user_name'] = $row['name'];
-         $_SESSION['user_email'] = $row['email'];
-         $_SESSION['user_id'] = $row['id'];
-         header('location:home.php');
-
-      }elseif($row['user_type'] == 'staff'){
-
-         $_SESSION['user_name'] = $row['name'];
-         $_SESSION['user_email'] = $row['email'];
-         $_SESSION['user_id'] = $row['id'];
-         header('location:staff_page.php');
-      }else{
-         $message[] = 'no user found!';
-      }
-
-      }else{
-      $message[] = 'incorrect email or password!';
-   }
-
+        if ($row['user_type'] == 'admin') {
+            header('location: admin_page.php');
+            exit();
+        } elseif ($row['user_type'] == 'user') {
+            header('location: home.php');
+            exit();
+        } elseif ($row['user_type'] == 'staff') {
+            header('location: admin_page.php');
+            exit();
+        } else {
+            $message[] = 'No user found!';
+        }
+    } else {
+        $message[] = 'Incorrect email or password!';
+    }
 }
 
 ?>

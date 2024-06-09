@@ -1,65 +1,23 @@
 <?php
 include 'config.php';
-
 session_start();
 
-$admin_id = $_SESSION['admin_id'];
-
-if (!isset($admin_id)) {
-   header('location:admin_login.php');
-   exit();
-}
-
-if (isset($_POST['update_order'])) {
-   $order_update_id = $_POST['order_id'];
-   $track_number = $_POST['track-order'];
-   $update_payment = isset($_POST['update_payment']) ? $_POST['update_payment'] : null;
-
-   if ($update_payment !== null) {
-       // Update tracking number and payment status in the order
-       mysqli_query($conn, "UPDATE `orders` SET payment_status = '$update_payment', tracknum = '$track_number' 
-       WHERE id = '$order_update_id'") or die('query failed');
-       $message[] = 'Payment status has been updated!';
-   } else {
-       $message[] = 'Please select a payment status.';
-   }
-}
-
-if (isset($_GET['delete'])) {
-   $delete_id = $_GET['delete'];
-
-   // Delete associated order items
-   mysqli_query($conn, "DELETE FROM `order_items` WHERE order_id = '$delete_id'") or die('query failed deleting order items');
-
-   // Delete the order
-   mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed deleting order');
-
-   header('location:admin_order.php');
-   exit();
+if (!isset($_SESSION['user_type'])) {
+    die('Unauthorized access!');
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Admin Orders</title>
-
-   <!-- Font Awesome CDN Link -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- Custom Admin CSS File Link -->
    <link rel="stylesheet" href="css/admin_style.css">
-
-   <!-- jQuery Link for AJAX -->
    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
-
-   <!-- External JavaScript Library for Tracking -->
    <script src="//www.tracking.my/track-button.js"></script>
-
    <script>
       $(document).ready(function () {
          $("#refresh-btn").click(function () {
@@ -69,31 +27,58 @@ if (isset($_GET['delete'])) {
          });
       });
 
-      // Function to handle tracking number click
       function linkTrack(num) {
          TrackButton.track({
             tracking_no: num
          });
       }
    </script>
-
 </head>
-
 <body>
 
-   <?php include 'admin_header.php'; ?>
+<?php
+// Include the appropriate header file based on the user's role
+if ($_SESSION['user_type'] === 'admin') {
+    include 'admin_header.php';
+} elseif ($_SESSION['user_type'] === 'staff') {
+    include 'staff_header.php';
+} else {
+    die('Unauthorized access!');
+}
+
+// Handling form submissions for updating order payment status
+if (isset($_POST['update_order'])) {
+    $order_update_id = $_POST['order_id'];
+    $track_number = $_POST['track-order'];
+    $update_payment = isset($_POST['update_payment']) ? $_POST['update_payment'] : null;
+
+    if ($update_payment !== null) {
+        mysqli_query($conn, "UPDATE `orders` SET payment_status = '$update_payment', tracknum = '$track_number' WHERE id = '$order_update_id'") or die('query failed');
+        $message[] = 'Payment status has been updated!';
+    } else {
+        $message[] = 'Please select a payment status.';
+    }
+}
+
+// Handling order deletion
+if (isset($_GET['delete'])) {
+    $delete_id = $_GET['delete'];
+    mysqli_query($conn, "DELETE FROM `order_items` WHERE order_id = '$delete_id'") or die('query failed deleting order items');
+    mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$delete_id'") or die('query failed deleting order');
+    header('location:admin_order.php');
+    exit();
+}
+?>
+
    <section class="orders" id="orders">
       <h1 class="title">Placed Orders</h1>
       <button id="refresh-btn" class="btn btn-outline-primary">Refresh Orders</button>
 
       <div class="box-container" id="container-displayorder">
          <?php
-         // Fetch all orders
          $select_orders = mysqli_query($conn, "SELECT * FROM `orders`") or die('query failed');
 
-         // Detect if there are orders in the database
          if (mysqli_num_rows($select_orders) > 0) {
-            // Print out all the data
             while ($fetch_orders = mysqli_fetch_assoc($select_orders)) {
                if ($fetch_orders['status'] == 1) {
                   ?>
@@ -157,5 +142,4 @@ if (isset($_GET['delete'])) {
    <script src="js/admin_script.js"></script>
 
 </body>
-
 </html>

@@ -1,35 +1,33 @@
 <?php
 
 include 'config.php';
-
 session_start();
 
-$user_id = $_SESSION['user_id'];
+if (isset($_POST['submit'])) {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
 
-if(!isset($user_id)){
-   header('location:index.php');
-}
+    $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
 
-// Calculate the total rating from product and history
-$get_productrating = mysqli_query($conn, "SELECT * FROM `products`") or die('Query failed: Get product rating');
-while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
-    $get_nameproducts = $productrating_get['name'];
+    if (mysqli_num_rows($select_users) > 0) {
+        $row = mysqli_fetch_assoc($select_users);
+        
+        $_SESSION['user_name'] = $row['name'];
+        $_SESSION['user_email'] = $row['email'];
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['user_type'] = $row['user_type'];
 
-    $get_historyrating = mysqli_query($conn, "SELECT * FROM `history` WHERE product_name = '$get_nameproducts'") or die('Query failed: Get history rating');
-    $totalRate = 0;
-    $rateCount = 0;
-
-    while ($historyrating_get = mysqli_fetch_assoc($get_historyrating)) {
-        $totalRate += $historyrating_get['product_rate'];
-        $rateCount++;
+        if ($row['user_type'] == 'admin' || $row['user_type'] == 'staff') {
+            header('location: admin_page.php'); // Redirect admins and staff to admin_page.php
+            exit();
+        } elseif ($row['user_type'] == 'user') {
+            header('location: home.php'); // Redirect regular users to home.php
+            exit();
+        }
+    } else {
+        $message[] = 'Incorrect email or password!';
     }
-
-    if ($rateCount > 0) {
-        $averageRating = $totalRate / $rateCount;
-        mysqli_query($conn, "UPDATE `products` SET pro_rates ='$averageRating' WHERE name = '$get_nameproducts'") or die('Query failed: Update product rating');
-    }
 }
-
 
 ?>
 
@@ -191,28 +189,31 @@ while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
 </section>
 
 <section class="products">
-
    <h1 class="title">Recommendation Product</h1>
-
    <div class="box-container">
-
       <?php  
-         $select_products = mysqli_query($conn, "SELECT * FROM `products` LIMIT 6") or die('query failed');
-         if(mysqli_num_rows($select_products) > 0){
-            while($fetch_products = mysqli_fetch_assoc($select_products)){
+         $select_recommendation = mysqli_query($conn, "SELECT p.*, COUNT(h.product_id) AS purchase_count
+         FROM products p
+         LEFT JOIN history h ON p.id = h.product_id
+         GROUP BY p.id
+         ORDER BY purchase_count DESC
+         LIMIT 3") or die('Query failed: Get recommendation products');
+         
+         if(mysqli_num_rows($select_recommendation) > 0){
+            while($fetch_recommendation = mysqli_fetch_assoc($select_recommendation)){
       ?>
      <form action="" method="post" class="box">
       <!-- Product Image -->
-      <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="Product Image">
+      <img class="image" src="uploaded_img/<?php echo $fetch_recommendation['image']; ?>" alt="Product Image">
       
-      <div class="brand-name"><?php echo $fetch_products['brand'] .' '. $fetch_products['name']; ?></div>
-      <div class="category"><?php echo $fetch_products['category'];?></div> 
-      <div class="price">RM <?php echo $fetch_products['price'];?></div> 
+      <div class="brand-name"><?php echo $fetch_recommendation['brand'] .' '. $fetch_recommendation['name']; ?></div>
+      <div class="category"><?php echo $fetch_recommendation['category'];?></div> 
+      <div class="price">RM <?php echo $fetch_recommendation['price'];?></div> 
       
       <!-- Product Ratings -->
       <div class="pro_rates">
          <?php
-         $rating = $fetch_products['pro_rates'];
+         $rating = $fetch_recommendation['pro_rates'];
          for ($i = 1; $i <= 5; $i++) {
             if ($i <= $rating) {
                echo '<i class="fa fa-star text-primary" style="margin-right: 5px;"></i>';
@@ -225,25 +226,20 @@ while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
       
       <!-- Hidden Fields for Cart Processing -->
       <input type="hidden" name="product_quantity" value="1" class="form-control form-control-lg">
-      <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-      <input type="hidden" name="product_brand" value="<?php echo $fetch_products['brand']; ?>">
-      <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
-      <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-      <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">      
-      <a href="shop_details.php?id=<?php echo $fetch_products['id']; ?>" class="btn btn-primary btn-lg">View</a>
+      <input type="hidden" name="product_id" value="<?php echo $fetch_recommendation['id']; ?>">
+      <input type="hidden" name="product_brand" value="<?php echo $fetch_recommendation['brand']; ?>">
+      <input type="hidden" name="product_name" value="<?php echo $fetch_recommendation['name']; ?>">
+      <input type="hidden" name="product_price" value="<?php echo $fetch_recommendation['price']; ?>">
+      <input type="hidden" name="product_image" value="<?php echo $fetch_recommendation['image']; ?>">      
+      <a href="shop_details.php?id=<?php echo $fetch_recommendation['id']; ?>" class="btn btn-primary btn-lg">View</a>
                      </form>   
                      <?php
                   }
-               }else{
-                  echo '<p class="empty">no products added yet!</p>';
+               } else {
+                  echo '<p class="empty">No recommendation products yet!</p>';
                }
-               ?>
-               </div>
-               
-   <div class="load-more" style="margin-top: 2rem; text-align:center">
-      <a href="shop.php" class="option-btn">Load More</a>
+      ?>
    </div>
-
 </section>
 
 

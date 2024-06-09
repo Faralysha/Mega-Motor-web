@@ -1,40 +1,47 @@
 <?php
-// Include the configuration file
 include 'config.php';
-
-// Start the session
 session_start();
 
-// Check if the user is logged in and is a staff member
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'staff') {
-    // Include the staff header if the user is a staff member
-    include 'staff_header.php';
-} else {
-    // Include the admin header if the user is not a staff member (admin or other)
-    include 'admin_header.php';
+$admin_id = $_SESSION['admin_id'];
+if (!isset($admin_id)) {
+    header('location:admin_login.php');
+    exit;
 }
 
 function handleImageUpload($file) {
     if ($file['error'] == UPLOAD_ERR_OK) {
         $image_name = basename($file['name']);
         $image_size = $file['size'];
+        $image_temp = $file['tmp_name'];
+        $image_ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (!in_array($image_ext, $allowed_extensions)) {
+            return ['error' => 'Invalid image format.'];
+        }
 
         if ($image_size > 2000000) {
             return ['error' => 'Image size is too large.'];
         }
 
-        return ['success' => $image_name];
+        $upload_dir = 'uploaded_img/';
+        $upload_path = $upload_dir . $image_name;
+
+        if (move_uploaded_file($image_temp, $upload_path)) {
+            return ['success' => $image_name];
+        } else {
+            return ['error' => 'Image upload failed.'];
+        }
     }
 
     return ['error' => 'No image uploaded.'];
 }
 
-// Function to generate a unique serial number
 function generateSerialNumber($product_id, $size) {
     global $conn;
-    $query = "SELECT MAX(serial_number) AS max_serial FROM product_details WHERE product_id = ?";
+    $query = "SELECT MAX(serial_number) AS max_serial FROM product_details WHERE product_id = ? AND size = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $product_id);
+    $stmt->bind_param("is", $product_id, $size);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
@@ -44,27 +51,23 @@ function generateSerialNumber($product_id, $size) {
     $counter = isset($matches[1]) ? intval($matches[1]) : 0;
 
     $counter++;
-    $new_serial_number = sprintf('%d-%d-%s', $product_id, $counter, $size);
+    $new_serial_number = sprintf('%d-%05d-%s', $product_id, $counter, $size);
 
     return $new_serial_number;
 }
 
-
-// Add product to the database
 if (isset($_POST['add_product'])) {
     if (empty($_POST['name'])) {
         echo "Product name cannot be empty.";
         exit;
     }
 
-    // Sanitize other fields as needed
     $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
     $category = filter_var($_POST['category'], FILTER_SANITIZE_STRING);
     $brand = filter_var($_POST['brand'], FILTER_SANITIZE_STRING);
     $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
     $description = filter_var($_POST['description'], FILTER_SANITIZE_STRING);
 
-    // Handle image upload
     $image_upload = handleImageUpload($_FILES['image']);
     if (isset($image_upload['error'])) {
         echo $image_upload['error'];
@@ -73,64 +76,54 @@ if (isset($_POST['add_product'])) {
         $image_path = $image_upload['success'];
     }
 
-    // Calculate total quantity
     $sizes = $_POST['sizes'];
     $quantities = $_POST['quantities'];
     $total_quantity = array_sum($quantities);
 
-    // Begin transaction
     $conn->begin_transaction();
 
-    // Insert product into the main products table
     $stmt = $conn->prepare("INSERT INTO `products` (name, category, brand, price, image, quant) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssi", $name, $category, $brand, $price, $image_path, $total_quantity);
     $stmt->execute();
     $product_id = $stmt->insert_id;
     $stmt->close();
 
-    // Insert sizes and quantities into the product_sizes table
     $stmt_sizes = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
     $stmt_sizes->bind_param("iss", $product_id, $size, $quantity);
     for ($i = 0; $i < count($sizes); $i++) {
         $size = $sizes[$i];
         $quantity = $quantities[$i];
         $stmt_sizes->execute();
-    
-    // Generate and insert serial numbers into the product_details table
-    for ($j = 1; $j <= $quantity; $j++) {
-        $serial_number = generateSerialNumber($product_id, $size);
-        $stock = 'Available';
 
-        $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, size, stock) VALUES (?, ?, ?, ?)");
-        $stmt_details->bind_param("isss", $product_id, $serial_number, $size, $stock);
-        $stmt_details->execute();
-        $stmt_details->close();
+        for ($j = 1; $j <= $quantity; $j++) {
+            $serial_number = generateSerialNumber($product_id, $size);
+            $stock = 'Available';
+
+            $stmt_details = $conn->prepare("INSERT INTO `product_details` (product_id, serial_number, size, stock) VALUES (?, ?, ?, ?)");
+            $stmt_details->bind_param("isss", $product_id, $serial_number, $size, $stock);
+            $stmt_details->execute();
+            $stmt_details->close();
+        }
     }
-}
-$stmt_sizes->close();
-$conn->commit();
+    $stmt_sizes->close();
+    $conn->commit();
 }
 
-// Delete product
 if (isset($_GET['delete'])) {
     $delete_id = $_GET['delete'];
 
-    // Begin transaction
     $conn->begin_transaction();
 
-    // Delete related product details
     $stmt = $conn->prepare("DELETE FROM `product_details` WHERE product_id = ?");
     $stmt->bind_param("i", $delete_id);
     $stmt->execute();
     $stmt->close();
 
-    // Delete related product sizes
     $stmt = $conn->prepare("DELETE FROM `product_sizes` WHERE product_id = ?");
     $stmt->bind_param("i", $delete_id);
     $stmt->execute();
     $stmt->close();
 
-    // Delete the product
     $stmt = $conn->prepare("DELETE FROM `products` WHERE id = ?");
     $stmt->bind_param("i", $delete_id);
     $stmt->execute();
@@ -141,44 +134,35 @@ if (isset($_GET['delete'])) {
         $message[] = 'Product could not be deleted!';
     }
     $stmt->close();
-
-    // Commit transaction
     $conn->commit();
 
     header('Location: admin_products.php');
     exit;
 }
 
-// Update product
 if (isset($_POST['update_product'])) {
     $update_p_id = $_POST['update_p_id'];
     $update_name = filter_var($_POST['update_name'], FILTER_SANITIZE_STRING);
     $update_price = filter_var($_POST['update_price'], FILTER_VALIDATE_FLOAT);
 
-    // Calculate total quantity
     $sizes = $_POST['sizes'];
     $quantities = $_POST['quantities'];
     $total_quantity = array_sum($quantities);
 
-    // Begin transaction
     $conn->begin_transaction();
 
-    // Update product information
     $stmt = $conn->prepare("UPDATE `products` SET name = ?, price = ?, quant = ? WHERE id = ?");
     $stmt->bind_param("sdii", $update_name, $update_price, $total_quantity, $update_p_id);
     $stmt->execute();
 
-    // Delete existing sizes and quantities for the product
     $stmt = $conn->prepare("DELETE FROM `product_sizes` WHERE product_id = ?");
     $stmt->bind_param("i", $update_p_id);
     $stmt->execute();
 
-    // Delete existing product details for the product
     $stmt = $conn->prepare("DELETE FROM `product_details` WHERE product_id = ?");
     $stmt->bind_param("i", $update_p_id);
     $stmt->execute();
 
-    // Insert updated sizes and quantities into the product_sizes table
     $stmt = $conn->prepare("INSERT INTO `product_sizes` (product_id, size, quantity) VALUES (?, ?, ?)");
     $stmt->bind_param("iss", $update_p_id, $size, $quantity);
     for ($i = 0; $i < count($sizes); $i++) {
@@ -197,8 +181,6 @@ if (isset($_POST['update_product'])) {
     }
     $stmt_details->close();
 
-
-    // Handle image update
     if (!empty($_FILES['update_image']['name'])) {
         $update_image_upload = handleImageUpload($_FILES['update_image']);
 
@@ -235,7 +217,6 @@ if (isset($_POST['update_product'])) {
     header('Location: admin_products.php');
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -298,14 +279,7 @@ if (isset($_POST['update_product'])) {
 
 <body>
 
-<?php
-// Include the appropriate header file based on the user's role
-if (isset($_SESSION['admin_id'])) {
-    include 'admin_header.php';
-} elseif (isset($_SESSION['staff_id'])) {
-    include 'staff_header.php';
-}
-?>
+    <?php include 'admin_header.php'; ?>
     <!-- ----------------------------------------------------------------------------------------- -->
     <!--  -->
 
@@ -313,65 +287,66 @@ if (isset($_SESSION['admin_id'])) {
     <!-- Display item from database -->
     <section class="add-products">
 
-        <h1 class="title">shop products</h1>
+    <h1 class="title">shop products</h1>
 
-        <form action="" method="post" enctype="multipart/form-data">
-            <h3>add product</h3>
-            <input type="text" name="name" class="box" placeholder="enter product name" required>
+    <form action="" method="post" enctype="multipart/form-data">
+        <h3>add product</h3>
+        <input type="text" name="name" class="box" placeholder="enter product name" required>
+        
+        <select hidden name="category" class="box">
+           <option value="helemets&visor">HELMETS & VISORS</option>
+           <option value="riding&gears">RIDING GEARS</option>
+           <option value="brakesystem">BRAKE SYSTEM</option>
+           <option value="shocks&suspension">SHOCKS & SUSPENSIONS</option>
+           <option value="tires">TIRES</option>
+           <option value="exhaust">EXHAUST</option>
+           <option value="racking">RACKING</option>
+           <option value="others">OTHERS</option>
+        </select>
+
+        <input type="text" name="brand" class="box" placeholder="enter product brand" required>
+
+        <input type="number" min="0" step="0.01" name="price" id="price" class="box" placeholder="Enter product price" required>
+    
+        <textarea name="description" id="description" class="box" rows="4" placeholder="Enter product description" required></textarea>
+    
+        <input type="file" name="image" id="image" class="box" accept="image/*" required>
+
+        <!-- This is where you should place the size and quantity fields -->
+        <div id="sizeQuantityFields"></div>
+
+        <input type="text" name="sizes[]" class="box" placeholder="Enter product size" required>
             
-            <select hidden name="category" class="box">
-               <option value="helemets&visor">HELMETS & VISORS</option>
-               <option value="riding&gears">RIDING GEARS</option>
-               <option value="brakesystem">BRAKE SYSTEM</option>
-               <option value="shocks&suspension">SHOCKS & SUSPENSIONS</option>
-               <option value="tires">TIRES</option>
-               <option value="exhaust">EXHAUST</option>
-               <option value="racking">RACKING</option>
-               <option value="others">OTHERS</option>
-            </select>
+        <input type="number" min="1" name="quantities[]" class="box" placeholder="Enter product quantity" required>
 
-            <input type="text" name="brand" class="box" placeholder="enter product brand" required>
-
-            <input type="number" min="0" step="0.01" name="price" id="price" class="box" placeholder="Enter product price" required>
-        
-            <textarea name="description" id="description" class="box" rows="4" placeholder="Enter product description" required></textarea>
-        
-            <input type="file" name="image" id="image" class="box" accept="image/*" required>
-
-            <div id="sizeQuantityFields"></div>
-
-            <input type="text" name="sizes[]" class="box" placeholder="Enter product size" required>
-                
-            <input type="number" min="1" name="quantities[]" class="box" placeholder="Enter product quantity" required>
-
-            <button type="button" id="addSizeQuantity" class="btn">Add Size & Quantity</button>
+        <button type="button" id="addSizeQuantity" class="btn">Add Size & Quantity</button>
 
         <button type="submit" name="add_product" class="btn">Add Product</button>
     </form>
 
-    </section>
+</section>
+
 
     <!-- product CRUD section ends -->
 
     <!-- show products  -->
 
     <section class="show-products">
-
     <table class="product-table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Brand</th>
-            <th>Size</th>
-            <th>Quantity</th>
-            <th>Available</th>
-            <th>Price</th>
-            <th>Image URL</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Size</th>
+                <th>Quantity</th>
+                <th>Available</th>
+                <th>Price</th>
+                <th>Image URL</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
         <?php  
         $select_products = mysqli_query($conn, "SELECT * FROM `products`") or die('Query failed');
         if(mysqli_num_rows($select_products) > 0){
@@ -383,7 +358,7 @@ if (isset($_SESSION['admin_id'])) {
 
                 // Retrieve sizes and quantities for the current product
                 $stmt = $conn->prepare("SELECT size, quantity FROM `product_sizes` WHERE product_id = ?");
-                $stmt->bind_param("i", $fetch_products['id']);
+                $stmt->bind_param("i", $fetch_products['id']); // Use "i" for integer parameter
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $sizes_quantities = $result->fetch_all(MYSQLI_ASSOC);
@@ -409,7 +384,7 @@ if (isset($_SESSION['admin_id'])) {
                     $quantity = $size_quantity['quantity'];
 
                     $stmt = $conn->prepare("SELECT COUNT(*) AS available FROM `product_details` WHERE product_id = ? AND size = ? AND stock = 'Available'");
-                    $stmt->bind_param("is", $fetch_products['id'], $size);
+                    $stmt->bind_param("is", $fetch_products['id'], $size); // Use "is" for integer and string parameters
                     $stmt->execute();
                     $result = $stmt->get_result();
                     $available = $result->fetch_assoc()['available'];
@@ -431,36 +406,32 @@ if (isset($_SESSION['admin_id'])) {
             echo '<tr><td colspan="9">No products added yet!</td></tr>';
         }
         ?>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</section>
 
-    </section>
 
 
     <section class="edit-product-form">
-
         <?php
-      if (isset($_GET['update'])) {
-         $update_id = $_GET['update'];
-         $update_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$update_id'") or die('query failed');
-         if (mysqli_num_rows($update_query) > 0) {
-            while ($fetch_update = mysqli_fetch_assoc($update_query)) {
-         ?>
+        if (isset($_GET['update'])) {
+            $update_id = $_GET['update'];
+            $select_products = $conn->prepare("SELECT * FROM `products` WHERE id = ?");
+            $select_products->bind_param("i", $update_id);
+            $select_products->execute();
+            $result_products = $select_products->get_result();
 
-         <form action="" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="update_p_id" value="<?php echo $fetch_update['id']; ?>">
-            <input type="hidden" name="update_old_image" value="<?php echo $fetch_update['image']; ?>">
-            <div class="set-image">
-               <img src="uploaded_img/<?php echo $fetch_update['image']; ?>" alt="">
-            </div>
-            <div class="set-form">
-               <label for="update_name">Name:</label>
-               <input type="text" name="update_name" value="<?php echo $fetch_update['name']; ?>" class="box" required placeholder="Update new product name">
-               
-               <label for="update_price">Price:</label>
-               <input type="text" name="update_price" value="<?php echo $fetch_update['price']; ?>" min="0" class="box" required placeholder="Update new product price">
-               
-               <div class="size-quantity">
+            if ($result_products->num_rows > 0) {
+                while ($fetch_products = $result_products->fetch_assoc()) {
+        ?>
+                    <form action="" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="update_p_id" value="<?php echo $fetch_products['id']; ?>">
+                        <input type="hidden" name="update_old_image" value="<?php echo $fetch_products['image']; ?>">
+                        <img src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
+                        <input type="text" name="update_name" value="<?php echo $fetch_products['name']; ?>" class="box" required placeholder="enter product name">
+                        <input type="number" min="0" name="update_price" value="<?php echo $fetch_products['price']; ?>" class="box" required placeholder="enter product price">
+                        
+                        <div class="size-quantity">
                             <?php
                             $product_id = $fetch_products['id'];
                             $stmt_sizes = $conn->prepare("SELECT size, quantity FROM `product_sizes` WHERE product_id = ?");
@@ -479,22 +450,16 @@ if (isset($_SESSION['admin_id'])) {
                         </div>
 
                         <button type="button" class="add-size">Add More Size</button>
-               
-               <div class="button-container">
-                     <input type="submit" value="Update" name="update_product" class="option-btn"> <!-- Added name attribute -->
-                     <input type="reset" value="Cancel" id="close-update" class="option-btn">
-               </div>
-            </div>
-         </form>
-
+                        <input type="file" name="update_image" class="box" accept="image/jpg, image/jpeg, image/png, image/gif">
+                        <input type="submit" value="update" name="update_product" class="btn">
+                        <input type="reset" value="cancel" id="close-update" class="option-btn">
+                    </form>
         <?php
+                }
             }
-         }
-      } else {
-         echo '<script>document.querySelector(".edit-product-form").style.display = "none";</script>';
-      }
-      ?>
-
+            $select_products->close();
+        }
+        ?>
     </section>
 
 
@@ -510,10 +475,9 @@ if (isset($_SESSION['admin_id'])) {
     document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM Loaded");
     document.getElementById('addSizeQuantity').addEventListener('click', function() {
-        console.log("Add Size & Quantity button clicked");
-        var sizeQuantityContainer = document.getElementById('sizeQuantityFields');
-        var sizeQuantityField = document.createElement('div');
-        sizeQuantityField.classList.add('size-quantity-field');
+    console.log("Add Size & Quantity button clicked");
+    var sizeQuantityContainer = document.getElementById('sizeQuantityFields');
+    console.log("Size Quantity Container:", sizeQuantityContainer);
 
         var sizeInput = document.createElement('input');
         sizeInput.type = 'text';
@@ -541,3 +505,14 @@ if (isset($_SESSION['admin_id'])) {
 </body>
 
 </html>
+
+.edit-product-form form{
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   width: 60rem;
+   padding:2rem;
+   text-align: center;
+   border-radius: .5rem;
+   background-color: var(--white);
+}
