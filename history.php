@@ -6,7 +6,7 @@ $user_id = $_SESSION['user_id'];
 if (empty($user_id)) {
     header('location:index.php');
     exit(); // Stop executing further code
- }
+}
 
 if (isset($_POST['submit_rate'])) {
    $product_id = $_POST['product_id'];
@@ -18,6 +18,9 @@ if (isset($_POST['submit_rate'])) {
 
 // Retrieve distinct order_ids from the database
 $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history` WHERE user_id = '$user_id'") or die('query failed');
+
+// Initialize variable to keep track of previous order ID
+$prev_order_id = null;
 
 ?>
 
@@ -48,7 +51,7 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
       }
     
       .box-cont {
-          border: 2px grey solid;
+         border: 2px grey solid;
          max-width: 450px;
          margin: 0 auto;
          display: grid;
@@ -56,16 +59,7 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
          align-items: flex-start;
          gap: 1.5rem;
          justify-content: center;       
-     
       }
-
-      /* .products {
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: flex-start;
-   align-items: flex-start;
-   gap: 10px;
-} */
 
       .rating {
          display: flex;
@@ -89,6 +83,10 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
       .rating input[type="radio"]:checked~label {
          color: orange;
       }
+
+      .invoice-button {
+         margin-top: 20px; /* Adjust this value as needed */
+      }
    </style>
    <!-- Custom google -->
    <link rel="stylesheet"
@@ -96,7 +94,6 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
 </head>
 
 <body>
-   <!-- Your HTML code here -->
    <!-- Header -->
    <?php include 'header.php'; ?>
 
@@ -106,84 +103,79 @@ $select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history`
    </div>
 
    <section class="products">
-   <h1 class="title">History purchase</h1>
+      <h1 class="title">History purchase</h1>
       <?php
       if (mysqli_num_rows($select_order_ids) > 0) {
          while ($order_row = mysqli_fetch_assoc($select_order_ids)) {
-            ?>
-            <div class="box-cont">
-               <?php
-               $order_id = $order_row['order_id'];
-
-               echo "<h2>Order ID: $order_id</h2>";
-               $select_products = mysqli_query($conn, "SELECT * FROM `history` WHERE user_id = '$user_id' AND order_id = '$order_id'") or die('query failed');
-
-               if (mysqli_num_rows($select_products) > 0) {
-                  while ($fetch_products = mysqli_fetch_assoc($select_products)) {
-                     ?>
-                     <form action="" method="post" class="box">
-
-                        <!-- Display your product details here -->
-                        <div class="name">
-                                    <h4>Brand:
-                                        <?php echo $fetch_products['product_brand']; ?>
-                                    </h4>
-                                </div>
-                        <div class="name">
-                           <h4>Product name:
-                              <?php echo $fetch_products['product_name']; ?>
-                           </h4>
-                        </div>
-                        <div class="name">
-                           <h4>Product size:
-                              <?php echo $fetch_products['product_size']; ?>
-                           </h4>
-                        </div>
-                        <div class="name">
-                           <h4>On Order Id:
-                              <?php echo $fetch_products['order_id']; ?>
-                           </h4>
-                        <h5>Rating:</h5>
-                        </div>
-                        <div class="rating" >
-                           <input type="radio" name="product_rate" id="star5-<?php echo $fetch_products['id']; ?>" value="5" <?php if ($fetch_products['product_rate'] == 5)
-                                 echo 'checked'; ?>>
-                           <label for="star5-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                           <input type="radio" name="product_rate" id="star4-<?php echo $fetch_products['id']; ?>" value="4" <?php if ($fetch_products['product_rate'] == 4)
-                                 echo 'checked'; ?>>
-                           <label for="star4-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                           <input type="radio" name="product_rate" id="star3-<?php echo $fetch_products['id']; ?>" value="3" <?php if ($fetch_products['product_rate'] == 3)
-                                 echo 'checked'; ?>>
-                           <label for="star3-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                           <input type="radio" name="product_rate" id="star2-<?php echo $fetch_products['id']; ?>" value="2" <?php if ($fetch_products['product_rate'] == 2)
-                                 echo 'checked'; ?>>
-                           <label for="star2-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                           <input type="radio" name="product_rate" id="star1-<?php echo $fetch_products['id']; ?>" value="1" <?php if ($fetch_products['product_rate'] == 1)
-                                 echo 'checked'; ?>>
-                           <label for="star1-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                        </div>
-
-                        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                        <input type="hidden" name="product_name" value="<?php echo $fetch_products['product_name']; ?>">
-                        <input type="submit" class="btn btn-primary btn-lg" value="Submit rating" name="submit_rate">
-
-                     </form>
-                     <?php
-                  }
-                  ?></br>
-               <?php
-               } else {
-                  echo '<p class="empty">No products added yet for this order ID!</p>';
-               }
+            $order_id = $order_row['order_id'];
+            
+            // Only display the "View Invoice" button if it's a new order ID
+            if ($order_id != $prev_order_id) {
                ?>
-            </div>
-            </br>
-            <?php
+               <div class="box-cont">
+                  <h2>Order ID: <?php echo $order_id; ?></h2>
+                  <?php
+                  $select_products = mysqli_query($conn, "SELECT * FROM `history` WHERE user_id = '$user_id' AND order_id = '$order_id'") or die('query failed');
+
+                  if (mysqli_num_rows($select_products) > 0) {
+                     while ($fetch_products = mysqli_fetch_assoc($select_products)) {
+                        ?>
+                        <form action="" method="post" class="box">
+                           <!-- Display your product details here -->
+                           <div class="name">
+                              <h4>Brand: <?php echo $fetch_products['product_brand']; ?></h4>
+                           </div>
+                           <div class="name">
+                              <h4>Product name: <?php echo $fetch_products['product_name']; ?></h4>
+                           </div>
+                           <div class="name">
+                              <h4>Product size: <?php echo $fetch_products['product_size']; ?></h4>
+                           </div>
+                           <div class="name">
+                              <h4>On Order Id: <?php echo $fetch_products['order_id']; ?></h4>
+                           </div>
+                           <!-- Add the rating section -->
+                           <h5>Rating:</h5>
+                           <div class="rating">
+                              <input type="radio" name="product_rate" id="star5-<?php echo $fetch_products['id']; ?>" value="5" <?php if ($fetch_products['product_rate'] == 5) echo 'checked'; ?>>
+                              <label for="star5-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                              <input type="radio" name="product_rate" id="star4-<?php echo $fetch_products['id']; ?>" value="4" <?php if ($fetch_products['product_rate'] == 4) echo 'checked'; ?>>
+                              <label for="star4-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                              <input type="radio" name="product_rate" id="star3-<?php echo $fetch_products['id']; ?>" value="3" <?php if ($fetch_products['product_rate'] == 3) echo 'checked'; ?>>
+                              <label for="star3-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                              <input type="radio" name="product_rate" id="star2-<?php echo $fetch_products['id']; ?>" value="2" <?php if ($fetch_products['product_rate'] == 2) echo 'checked'; ?>>
+                              <label for="star2-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                              <input type="radio" name="product_rate" id="star1-<?php echo $fetch_products['id']; ?>" value="1" <?php if ($fetch_products['product_rate'] == 1) echo 'checked'; ?>>
+                              <label for="star1-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                           </div>
+                           <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">                        
+                           <input type="hidden" name="product_name" value="<?php echo $fetch_products['product_name']; ?>">
+                           <input type="submit" class="btn btn-primary btn-lg" value="Submit rating" name="submit_rate">
+                        </form>
+                        <!-- View Invoice button -->
+                        <div class="invoice-button">
+                               <form action="invoice.php" method="GET">
+                                   <input type="hidden" name="invoice_number" value="<?php echo $fetch_products['invoice_number']; ?>">
+                                   <button type="submit" class="btn btn-primary">View Invoice</button>
+                               </form>
+                           </div>
+                           <!-- End View Invoice button -->
+                        <?php
+                     }
+                  } else {
+                     echo '<p class="empty">No products added yet for this order ID!</p>';
+                  }
+                  ?>
+               </div>
+               <br>
+               <?php
+            }
+            // Update the previous order ID
+            $prev_order_id = $order_id;
          }
       } else {
          echo '<p class="empty">No orders found!</p>';
       }
-
       ?>
    </section>
 

@@ -30,17 +30,38 @@ if(!isset($user_id)){
 
 </head>
 <style>
+   
 .heading {
    display: flex;
    flex-flow: column;
    align-items: center;
    justify-content: center;
-   background-image: url('heading.png');
    gap: 10rem;
+   background-image: url('heading.png');
    background-repeat: no-repeat;
    background-position: center;
    text-align: center;
    min-height: 30vh;
+}
+
+.heading h3{
+   font-size: 5rem;
+   color:var(--white);
+   text-transform: uppercase;
+   text-align: center;
+}
+
+.heading p{
+   font-size: 2.5rem;
+   color:var(--light-white);
+}
+
+.heading p a{
+   color:var(--crimson);
+}
+
+.heading p a:hover{
+   text-decoration: underline;
 }
 
 </style>

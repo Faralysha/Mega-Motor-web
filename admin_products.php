@@ -427,106 +427,93 @@ include 'admin_header.php';
 
 
     <section class="edit-product-form">
-
-        <?php
-      if (isset($_GET['update'])) {
-         $update_id = $_GET['update'];
-         $update_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$update_id'") or die('query failed');
-         if (mysqli_num_rows($update_query) > 0) {
+    <?php
+    if (isset($_GET['update'])) {
+        $update_id = $_GET['update'];
+        $update_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = '$update_id'") or die('query failed');
+        if (mysqli_num_rows($update_query) > 0) {
             while ($fetch_update = mysqli_fetch_assoc($update_query)) {
-         ?>
+    ?>
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="update_p_id" value="<?php echo $fetch_update['id']; ?>">
+                    <input type="hidden" name="update_old_image" value="<?php echo $fetch_update['image']; ?>">
+                    <div class="set-image">
+                        <img src="uploaded_img/<?php echo $fetch_update['image']; ?>" alt="">
+                    </div>
+                    <div class="set-form">
+                        <label for="update_name">Name:</label>
+                        <input type="text" name="update_name" value="<?php echo $fetch_update['name']; ?>" class="box" required placeholder="Update new product name">
 
-         <form action="" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="update_p_id" value="<?php echo $fetch_update['id']; ?>">
-            <input type="hidden" name="update_old_image" value="<?php echo $fetch_update['image']; ?>">
-            <div class="set-image">
-               <img src="uploaded_img/<?php echo $fetch_update['image']; ?>" alt="">
-            </div>
-            <div class="set-form">
-               <label for="update_name">Name:</label>
-               <input type="text" name="update_name" value="<?php echo $fetch_update['name']; ?>" class="box" required placeholder="Update new product name">
-               
-               <label for="update_price">Price:</label>
-               <input type="text" name="update_price" value="<?php echo $fetch_update['price']; ?>" min="0" class="box" required placeholder="Update new product price">
-               
-               <div class="size-quantity">
+                        <label for="update_price">Price:</label>
+                        <input type="number" min="0" step="0.01" name="update_price" value="<?php echo $fetch_update['price']; ?>" class="box" required placeholder="Update new product price">
+
+                        <div class="size-quantity">
                             <?php
-                            $product_id = $fetch_products['id'];
+                            // Retrieve existing sizes and quantities for the product
                             $stmt_sizes = $conn->prepare("SELECT size, quantity FROM `product_sizes` WHERE product_id = ?");
-                            $stmt_sizes->bind_param("i", $product_id);
+                            $stmt_sizes->bind_param("i", $fetch_update['id']);
                             $stmt_sizes->execute();
                             $result_sizes = $stmt_sizes->get_result();
 
                             while ($row_sizes = $result_sizes->fetch_assoc()) {
                                 $size = $row_sizes['size'];
                                 $quantity = $row_sizes['quantity'];
-                                echo "<input type='text' name='sizes[]' value='$size' class='box' required placeholder='enter size (e.g., S, M, L, XL)'>";
-                                echo "<input type='number' min='0' name='quantities[]' value='$quantity' class='box' required placeholder='enter quantity'>";
-                            }
-                            $stmt_sizes->close();
                             ?>
+                                <div class="size-quantity-field">
+                                    <input type="text" name="sizes[]" value="<?php echo $size; ?>" class="box size-field" required placeholder="Enter product size">
+                                    <input type="number" min="0" name="quantities[]" value="<?php echo $quantity; ?>" class="box quantity-field" required placeholder="Enter product quantity">
+                                </div>
+                            <?php } ?>
                         </div>
 
                         <button type="button" class="add-size">Add More Size</button>
-               
-               <div class="button-container">
-                     <input type="submit" value="Update" name="update_product" class="option-btn"> <!-- Added name attribute -->
-                     <input type="reset" value="Cancel" id="close-update" class="option-btn">
-               </div>
-            </div>
-         </form>
 
-        <?php
+                        <div class="button-container">
+                            <input type="submit" value="Update" name="update_product" class="option-btn"> <!-- Added name attribute -->
+                            <input type="reset" value="Cancel" id="close-update" class="option-btn">
+                        </div>
+                    </div>
+                </form>
+    <?php
             }
-         }
-      } else {
-         echo '<script>document.querySelector(".edit-product-form").style.display = "none";</script>';
-      }
-      ?>
-
-    </section>
-
-
-
-    <!-- custom admin js file link  -->
-    <script src="js/admin_script.js"></script>
-    <script>
-    function openImagePopup(imageUrl) {
-        // You can implement your logic for displaying the image popup here
-        alert("Image URL: " + imageUrl);
+        }
+    } else {
+        echo '<script>document.querySelector(".edit-product-form").style.display = "none";</script>';
     }
+    ?>
+</section>
 
+<script>
     document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM Loaded");
-    document.getElementById('addSizeQuantity').addEventListener('click', function() {
-        console.log("Add Size & Quantity button clicked");
-        var sizeQuantityContainer = document.getElementById('sizeQuantityFields');
-        var sizeQuantityField = document.createElement('div');
-        sizeQuantityField.classList.add('size-quantity-field');
+        console.log("DOM Loaded");
+        document.querySelector('.add-size').addEventListener('click', function() {
+            console.log("Add Size & Quantity button clicked");
+            var sizeQuantityContainer = document.querySelector('.size-quantity');
+            var sizeQuantityField = document.createElement('div');
+            sizeQuantityField.classList.add('size-quantity-field');
 
-        var sizeInput = document.createElement('input');
-        sizeInput.type = 'text';
-        sizeInput.name = 'sizes[]';
-        sizeInput.classList.add('box', 'size-field');
-        sizeInput.placeholder = 'Enter product size';
-        sizeInput.required = true;
+            var sizeInput = document.createElement('input');
+            sizeInput.type = 'text';
+            sizeInput.name = 'sizes[]';
+            sizeInput.classList.add('box', 'size-field');
+            sizeInput.placeholder = 'Enter product size';
+            sizeInput.required = true;
 
-        var quantityInput = document.createElement('input');
-        quantityInput.type = 'number';
-        quantityInput.min = '0';
-        quantityInput.name = 'quantities[]';
-        quantityInput.classList.add('box', 'quantity-field');
-        quantityInput.placeholder = 'Enter product quantity';
-        quantityInput.required = true;
+            var quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.min = '0';
+            quantityInput.name = 'quantities[]';
+            quantityInput.classList.add('box', 'quantity-field');
+            quantityInput.placeholder = 'Enter product quantity';
+            quantityInput.required = true;
 
-        sizeQuantityField.appendChild(sizeInput);
-        sizeQuantityField.appendChild(quantityInput);
-        sizeQuantityContainer.appendChild(sizeQuantityField);
+            sizeQuantityField.appendChild(sizeInput);
+            sizeQuantityField.appendChild(quantityInput);
+            sizeQuantityContainer.appendChild(sizeQuantityField);
+        });
     });
-});
+</script>
 
-
-    </script>
 </body>
 
 </html>

@@ -116,7 +116,7 @@ if (isset($_POST['order_btn'])) {
                 'billPriceSetting' => 1,
                 'billPayorInfo' => 1,
                 'billAmount' => $final_price,
-                'billReturnUrl' => 'http://localhost/MEGA MOTOR WEB_OLD/afterpay2.php',
+                'billReturnUrl' => 'http://localhost/MEGA MOTOR WEB_OLD/afterpay.php',
                 'billCallbackUrl' => 'http://localhost/MEGA MOTOR WEB_OLD/cart.php',
                 'billExternalReferenceNo' => 'AFR341DFI',
                 'billTo' => 'Mega Motor Web',
@@ -208,9 +208,9 @@ if (isset($_POST['order_btn'])) {
          echo '<p class="empty">your cart is empty</p>';
       }
       ?>
-      <div class="grand-total"> Total Payment: <span>RM
-            <?php echo $grand_total; ?>
-         </span> </div>
+      <div class="grand-total"> Total Payment (including shipping fee): <span>RM <?php echo $grand_total + 5; ?>
+   </span> </div>
+
 
    </section>
 
