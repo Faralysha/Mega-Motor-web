@@ -3,8 +3,6 @@
 if (isset($_SESSION['user_id'])) {
    $user_id = $_SESSION['user_id'];
 } else {
-   // Redirect the user or handle the error as needed
-   // For example, you can redirect them to the login page
    header('Location: index.php');
    exit();
 }
@@ -28,7 +26,6 @@ if(isset($message)){
             <div class="logo">
             <a href="home.php" class="logo">Berjaya Mega Motor</a>
             </div>
-          <!-- <img src ="images/logo.JPG" alt="Logo" width="50px"/> -->
         
          <nav class="navbar">
          <a href="home.php">Home</a>

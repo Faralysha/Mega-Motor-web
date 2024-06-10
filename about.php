@@ -29,17 +29,19 @@ if(!isset($user_id)){
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
 </head>
-<style>        
-   .about{
-      background-color: var(--white);
-      overflow: hidden; /* Ensure no overflow */
-   }
-   
-   .authors{
-      background-color: var(--white);
-      overflow: hidden; /* Ensure no overflow */
-   }
-   
+<style>
+.heading {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+   justify-content: center;
+   background-image: url('heading.png');
+   gap: 10rem;
+   background-repeat: no-repeat;
+   background-position: center;
+   text-align: center;
+   min-height: 30vh;
+}
 
 </style>
 <body>
@@ -56,7 +58,7 @@ if(!isset($user_id)){
    <div class="flex">
 
       <div class="image">
-         <img src="images/helmet.JPG" alt="">
+         <img src="images/aboutitem.jpg" alt="">
       </div>
 
       <div class="content">
@@ -123,8 +125,19 @@ if(!isset($user_id)){
 
    <div class="box-container">
 
+   <div class="box">
+         <img src="images/salesdepartment.jpg" alt="">
+         <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+            <a href="#" class="fab fa-twitter"></a>
+            <a href="#" class="fab fa-instagram"></a>
+            <a href="#" class="fab fa-linkedin"></a>
+         </div>
+         <h3>Sales Department</h3>
+      </div>
+
       <div class="box">
-         <img src="images/department.jpg" alt="">
+         <img src="images/sparepartdepartment.jpg" alt="">
          <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
             <a href="#" class="fab fa-twitter"></a>
@@ -135,7 +148,7 @@ if(!isset($user_id)){
       </div>
 
       <div class="box">
-         <img src="images/department.jpg" alt="">
+         <img src="images/admindepartment.jpg" alt="">
          <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
             <a href="#" class="fab fa-twitter"></a>
@@ -146,7 +159,7 @@ if(!isset($user_id)){
       </div>
 
       <div class="box">
-         <img src="images/department.jpg" alt="">
+         <img src="images/mechanicdepartment.jpg" alt="">
          <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
             <a href="#" class="fab fa-twitter"></a>

@@ -132,17 +132,17 @@ section{
 }
 
 
-.heading{
+.heading {
    display: flex;
    flex-flow: column;
    align-items: center;
    justify-content: center;
-   gap:10rem;
-   background: url(heading.webp) no-repeat;
+   gap: 10rem;
+   background-image: url('heading.png');
+   background-repeat: no-repeat;
    background-position: center;
    text-align: center;
    min-height: 30vh;
-   
 }
 
 .heading h3{
@@ -180,7 +180,6 @@ section{
     outline: none;
     border: none;
     text-decoration: none;
-    background-image: url(black.png);
     background-repeat: no-repeat;
     background-size: cover;
    }

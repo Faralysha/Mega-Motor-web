@@ -1,33 +1,35 @@
 <?php
 
 include 'config.php';
+
 session_start();
 
-if (isset($_POST['submit'])) {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $pass = mysqli_real_escape_string($conn, md5($_POST['password']));
+$user_id = $_SESSION['user_id'];
 
-    $select_users = mysqli_query($conn, "SELECT * FROM `users` WHERE email = '$email' AND password = '$pass'") or die('query failed');
+if(!isset($user_id)){
+   header('location:index.php');
+}
 
-    if (mysqli_num_rows($select_users) > 0) {
-        $row = mysqli_fetch_assoc($select_users);
-        
-        $_SESSION['user_name'] = $row['name'];
-        $_SESSION['user_email'] = $row['email'];
-        $_SESSION['user_id'] = $row['id'];
-        $_SESSION['user_type'] = $row['user_type'];
+// Calculate the total rating from product and history
+$get_productrating = mysqli_query($conn, "SELECT * FROM `products`") or die('Query failed: Get product rating');
+while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
+    $get_nameproducts = $productrating_get['name'];
 
-        if ($row['user_type'] == 'admin' || $row['user_type'] == 'staff') {
-            header('location: admin_page.php'); // Redirect admins and staff to admin_page.php
-            exit();
-        } elseif ($row['user_type'] == 'user') {
-            header('location: home.php'); // Redirect regular users to home.php
-            exit();
-        }
-    } else {
-        $message[] = 'Incorrect email or password!';
+    $get_historyrating = mysqli_query($conn, "SELECT * FROM `history` WHERE product_name = '$get_nameproducts'") or die('Query failed: Get history rating');
+    $totalRate = 0;
+    $rateCount = 0;
+
+    while ($historyrating_get = mysqli_fetch_assoc($get_historyrating)) {
+        $totalRate += $historyrating_get['product_rate'];
+        $rateCount++;
+    }
+
+    if ($rateCount > 0) {
+        $averageRating = $totalRate / $rateCount;
+        mysqli_query($conn, "UPDATE `products` SET pro_rates ='$averageRating' WHERE name = '$get_nameproducts'") or die('Query failed: Update product rating');
     }
 }
+
 
 ?>
 
@@ -48,27 +50,31 @@ if (isset($_POST['submit'])) {
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-   .home .background-container{
-   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(biker.png) no-repeat;
-   background-size: cover;
-   background-position: center;
-   min-height: 100vh;
-   position: relative;
+   .home {
+      min-height: 70vh;
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(biker.png) no-repeat;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative; /* Add relative positioning */
    }
 
    .home .background-overlay {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   background: rgba(0, 0, 0, 0.3); /* 30% opacity black layer */
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
-   align-items: center;
-   color: white;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%; /* Set height to cover entire parent (home) */
+      width: 100%; /* Cover entire parent (home) */
+      background: rgba(0, 0, 0, 0.3); /* 30% opacity black layer */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
    }
 
    .home .background-overlay h1 {
@@ -125,7 +131,7 @@ if (isset($_POST['submit'])) {
 <div class="background-container">
    <div class="background-overlay">
    <h1>Stay Ahead of the Curve with Our Latest Collection</h1>
-   <h4>Gear up for epic journeys with new helmets and accessories. Explore today and ride the future!</h4>
+   <h4>Gear up for epic journeys with new helmets and accessories.<br><span>Explore today and ride the future!</span></h4>
       <a href="about.php" class="discover-button">Discover More</a>
    </div>
 </div>
