@@ -6,10 +6,22 @@ $user_id = $_SESSION['user_id'];
 
 if (!isset($_SESSION['user_id'])) {
     header('location:index.php');
+    exit();
+}
+
+// Function to generate a unique invoice number
+function generateInvoiceNumber() {
+    // Get current date and time
+    $currentDateTime = date('YmdHis');
+    // Generate a random 4-digit number
+    $randomNumber = sprintf("%04d", mt_rand(1, 9999));
+    // Combine date/time and random number to create the invoice number
+    $invoiceNumber = $currentDateTime . $randomNumber;
+    return $invoiceNumber;
 }
 
 $total_itemprice = 0;
-$choose_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed select cart');
+$choose_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
 if (mysqli_num_rows($choose_cart) > 0) {
     while ($fetch_cart = mysqli_fetch_assoc($choose_cart)) {
         $total_Iprice = ($fetch_cart['price'] * $fetch_cart['quantity']);
@@ -53,10 +65,14 @@ if (isset($_POST['order_btn'])) {
         if (mysqli_num_rows($order_query) > 0) {
             $message[] = 'Order already placed!';
         } else {
+            // Generate invoice number
+            $invoice_number = generateInvoiceNumber();
+            $invoice_date = date('Y-m-d');
+
             // Insert order details into orders table
             $tracknom = 0;
-            mysqli_query($conn, "INSERT INTO `orders` (user_id, name, number, email, address, total_products, total_price, placed_on, tracknum) 
-            VALUES ('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom')") or die('query failed');
+            mysqli_query($conn, "INSERT INTO `orders` (user_id, name, number, email, address, total_products, total_price, placed_on, tracknum, invoice_number) 
+            VALUES ('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom', '$invoice_number')") or die('query failed');
 
             $order_id = mysqli_insert_id($conn); // Get the last inserted order ID
 
@@ -98,9 +114,8 @@ if (isset($_POST['order_btn'])) {
                 $product_name_rate = $history['product_name'];
                 $product_id_rate = $history['product_id'];
                 $product_size_rate = $history['product_size'];
-                mysqli_query($conn, "INSERT INTO `history` (user_id, order_id, product_brand, product_name, product_id, product_size) VALUES ('$product_userid_rate', '$get_orderid', '$product_brand_rate', '$product_name_rate', '$product_id_rate', '$product_size_rate')") or die('query failed');
+                mysqli_query($conn, "INSERT INTO `history` (user_id, order_id, product_brand, product_name, product_id, product_size, invoice_number) VALUES ('$product_userid_rate', '$get_orderid', '$product_brand_rate', '$product_name_rate', '$product_id_rate', '$product_size_rate', '$invoice_number')") or die('query failed');
             }
-
             $message[] = 'Order placed successfully!';
 
             // Generate bill and redirect to payment page

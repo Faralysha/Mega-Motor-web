@@ -274,7 +274,7 @@ if (isset($_POST['add_to_cart'])) {
                             <div><strong>Sizes:</strong></div>
                             <?php if (is_array($sizes_quantities) && !empty($sizes_quantities)) { ?>
                                 <?php foreach ($sizes_quantities as $size_quantity) { ?>
-                                    <div class="size-box" data-size="<?php echo htmlspecialchars($size_quantity['size']); ?>" onclick="selectSize(this)">
+                                    <div class="size-box <?php echo $size_quantity['quantity'] <= 0 ? 'out-of-stock' : ''; ?>" data-size="<?php echo htmlspecialchars($size_quantity['size']); ?>" data-quantity="<?php echo htmlspecialchars($size_quantity['quantity']); ?>" onclick="selectSize(this)">
                                         <?php echo htmlspecialchars($size_quantity['size']); ?>
                                     </div>
                                 <?php } ?>
@@ -321,15 +321,7 @@ if (isset($_POST['add_to_cart'])) {
                 element.classList.add('selected');
                 document.getElementById('selected-size').value = element.getAttribute('data-size');
 
-                var selectedSize = element.getAttribute('data-size');
-                var quantities = <?php echo json_encode($sizes_quantities); ?>;
-                var availableQuantity = 0
-                for (var i = 0; i < quantities.length; i++) {
-                    if (quantities[i].size === selectedSize) {
-                        availableQuantity = quantities[i].quantity;
-                        break;
-                    }
-                }
+                var availableQuantity = element.getAttribute('data-quantity');
                 document.getElementById('available-quantity').textContent = availableQuantity;
             }
         }

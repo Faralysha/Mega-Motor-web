@@ -52,7 +52,6 @@ if(isset($message)){
             <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p>
             <a href="logout.php" class="delete-btn">logout</a>
          </div>
-      </div>
    </div>
 
 </header>

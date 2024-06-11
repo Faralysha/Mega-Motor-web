@@ -122,10 +122,14 @@ $temp_itemid = $_SESSION['idname'];
             mysqli_query($conn, "DELETE FROM `orders` WHERE id = '$temp_itemid'") or die('query failed');
         }
         ?>
+        <button onclick="page()">order</button>
         <script>
-            setTimeout(function () {
+            // setTimeout(function () {
+            //     window.location.href = 'orders.php';
+            // }, 4000);
+            function page(){
                 window.location.href = 'orders.php';
-            }, 4000);
+            }
         </script>
     </div>
 </body>

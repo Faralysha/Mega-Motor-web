@@ -152,20 +152,21 @@ $prev_order_id = null;
                            <input type="hidden" name="product_name" value="<?php echo $fetch_products['product_name']; ?>">
                            <input type="submit" class="btn btn-primary btn-lg" value="Submit rating" name="submit_rate">
                         </form>
-                        <!-- View Invoice button -->
-                        <div class="invoice-button">
-                               <form action="invoice.php" method="GET">
-                                   <input type="hidden" name="invoice_number" value="<?php echo $fetch_products['invoice_number']; ?>">
-                                   <button type="submit" class="btn btn-primary">View Invoice</button>
-                               </form>
-                           </div>
-                           <!-- End View Invoice button -->
                         <?php
+                        $_SESSION['invoice_number']=$fetch_products['invoice_number'];
                      }
                   } else {
                      echo '<p class="empty">No products added yet for this order ID!</p>';
                   }
                   ?>
+                  <!-- View Invoice button -->
+                  <div class="invoice-button">
+                  <form action="invoice.php" method="GET">
+                            <input type="hidden" name="invoice_number" value="<?php echo $_SESSION['invoice_number']; ?>">
+                            <button type="submit" class="btn btn-primary">View Invoice</button>
+                        </form>
+                  </div>
+                  <!-- End View Invoice button -->
                </div>
                <br>
                <?php

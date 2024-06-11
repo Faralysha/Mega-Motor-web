@@ -27,45 +27,24 @@ if(!isset($user_id)){
 
    <!-- bootstrap -->
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
-</head>
 <style>
-   
-.heading {
+   .heading{
+   min-height: 30vh;
    display: flex;
    flex-flow: column;
    align-items: center;
    justify-content: center;
-   gap: 10rem;
-   background-image: url('heading.png');
-   background-repeat: no-repeat;
+   gap:1rem;
+   background: url(../images/heading.png) no-repeat;
+   background:linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url(../images/heading.png) no-repeat;
+   background-size: cover;
    background-position: center;
    text-align: center;
-   min-height: 30vh;
 }
-
-.heading h3{
-   font-size: 5rem;
-   color:var(--white);
-   text-transform: uppercase;
-   text-align: center;
-}
-
-.heading p{
-   font-size: 2.5rem;
-   color:var(--light-white);
-}
-
-.heading p a{
-   color:var(--crimson);
-}
-
-.heading p a:hover{
-   text-decoration: underline;
-}
-
 </style>
+</head>
 <body>
+
 
 <?php include 'header.php'; ?>
 
