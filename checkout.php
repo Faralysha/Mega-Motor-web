@@ -243,7 +243,7 @@ if (isset($_POST['order_btn'])) {
                   value="<?php echo $get_data['name'] ?>">
             </div>
             <div class="inputBox">
-               <span>your number :</span>
+               <span>your phone number :</span>
                <input type="number" name="number" required placeholder="enter your number">
             </div>
             <div class="inputBox">
@@ -268,7 +268,7 @@ if (isset($_POST['order_btn'])) {
                <input type="text" name="state" required placeholder="e.g. Selangor" value="">
             </div>
             <div class="inputBox">
-               <span>pin code :</span>
+               <span>postcode :</span>
                <input type="number" min="0" name="pin_code" required placeholder="e.g. 123456" value="">
             </div>
          </div>
