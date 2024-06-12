@@ -20,6 +20,8 @@ if(isset($message)){
 }
 
 ?>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="css/styleindex.css">
 
 <header class="header">
 <div class="flex">

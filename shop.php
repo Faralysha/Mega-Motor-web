@@ -160,6 +160,7 @@ if (isset($_POST['apply_filters'])) {
     <?php include 'header.php'; ?>
 
     <div class="heading">
+    <h3>Shop</h3>
         <p><a href="home.php">Home</a> / Shop</p>
     </div>
 

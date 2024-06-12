@@ -49,7 +49,7 @@ in both admin and customer.
    <?php include 'header.php'; ?>
 
    <div class="heading">
-      <h3>your orders</h3>
+      <h3>Orders</h3>
       <p> <a href="home.php">Home</a> / Orders </p>
    </div>
 
