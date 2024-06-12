@@ -100,15 +100,27 @@ if (isset($_POST['add_to_cart'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <style>
-        * {
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-        }
         body {
             font-family: sans-serif;
             background: #C1908B;
         }
+
+                .btn,
+        .option-btn,
+        .delete-btn,
+        .white-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 1rem 3rem;
+            cursor: pointer;
+            color: var(--white);
+            font-size: 1.8rem;
+            border-radius: .5rem;
+            text-transform: capitalize;
+            background-color: var(--red) !important;
+            border: var(--border);
+        }
+
         .container {
             max-width: 100%;
             margin: auto;

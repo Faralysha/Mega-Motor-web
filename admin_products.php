@@ -256,37 +256,52 @@ if (isset($_POST['update_product'])) {
     }
 
     .product-table {
-           width: 80%; /* Adjust width as needed */
-           margin: 0 auto; /* Center the table */
-           border-collapse: collapse;
-           border: 1px solid var(--black); /* Black thin border */
-        }
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    border: 1px solid var(--black);
+    font-size: 16px; /* Increase font size */
+}
 
-        .product-table th,
-        .product-table td {
-           padding: 1rem; /* Add padding to table cells */
-           border: 1px solid var(--black); /* Black thin border for each cell */
-           background-color: var(--white); /* White background for cells */
-        }
+.product-table th,
+.product-table td {
+    padding: 1rem;
+    border: 1px solid var(--black);
+    background-color: var(--white);
+    text-align: left;
+}
 
-        .product-table th {
-           background-color: #ccc; /* Grey header */
-           text-align: left;
-        }
+.product-table th {
+    background-color: #ccc;
+}
 
-        .product-table tr:nth-child(even) {
-           background-color: #f5f5f5; /* Set background color for even rows */
-        }
+.product-table tr:nth-child(even) {
+    background-color: #f5f5f5;
+}
 
-        .product-table img {
-           max-width: 100px;
-           max-height: 100px;
-        }
+.product-table img {
+    max-width: 100px;
+    max-height: 100px;
+}
 
-        .product-table .btn-container {
-           display: flex;
-           justify-content: space-between;
-        }
+.product-table .btn-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 768px) {
+    .product-table {
+        font-size: 14px; /* Decrease font size for smaller screens */
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    .product-table th,
+    .product-table td {
+        padding: 0.5rem; /* Decrease padding for smaller screens */
+    }
+}
     </style>
 </head>
 

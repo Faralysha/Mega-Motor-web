@@ -21,8 +21,6 @@ if(isset($message)){
 
 ?>
 
-<link rel="stylesheet" href="css/styleindex.css"/>
-
 <header class="header">
 <div class="flex">
             <div class="logo">
@@ -50,8 +48,8 @@ if(isset($message)){
          </div>
 
          <div class="account-box">
-         <!-- <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>
-         <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p> -->
+         <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>
+         <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p>
          <a href="logout.php" class="delete-btn">logout</a>
       </div>
    </div>
