@@ -314,46 +314,73 @@ include 'admin_header.php';
     <!--  -->
 
     <!-- product CRUD section starts  -->
-    <!-- Display item from database -->
-    <section class="add-products">
-
-        <h1 class="title">shop products</h1>
-
-        <form action="" method="post" enctype="multipart/form-data">
-            <h3>add product</h3>
-            <input type="text" name="name" class="box" placeholder="enter product name" required>
-            
-            <select hidden name="category" class="box">
-               <option value="helemets&visor">HELMETS & VISORS</option>
-               <option value="riding&gears">RIDING GEARS</option>
-               <option value="brakesystem">BRAKE SYSTEM</option>
-               <option value="shocks&suspension">SHOCKS & SUSPENSIONS</option>
-               <option value="tires">TIRES</option>
-               <option value="exhaust">EXHAUST</option>
-               <option value="racking">RACKING</option>
-               <option value="others">OTHERS</option>
-            </select>
-
-            <input type="text" name="brand" class="box" placeholder="enter product brand" required>
-
-            <input type="number" min="0" step="0.01" name="price" id="price" class="box" placeholder="Enter product price" required>
+    <!-- Add Product Form -->
+<section class="add-products">
+    <h1 class="title">shop products</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        <h3>add product</h3>
+        <input type="text" name="name" class="box" placeholder="enter product name" required>
         
-            <textarea name="description" id="description" class="box" rows="4" placeholder="Enter product description" required></textarea>
-        
-            <input type="file" name="image" id="image" class="box" accept="image/*" required>
+        <select hidden name="category" class="box">
+           <option value="helemets&visor">HELMETS & VISORS</option>
+           <option value="riding&gears">RIDING GEARS</option>
+           <option value="brakesystem">BRAKE SYSTEM</option>
+           <option value="shocks&suspension">SHOCKS & SUSPENSIONS</option>
+           <option value="tires">TIRES</option>
+           <option value="exhaust">EXHAUST</option>
+           <option value="racking">RACKING</option>
+           <option value="others">OTHERS</option>
+        </select>
 
-            <div id="sizeQuantityFields"></div>
+        <input type="text" name="brand" class="box" placeholder="enter product brand" required>
 
-            <input type="text" name="sizes[]" class="box" placeholder="Enter product size" required>
-                
-            <input type="number" min="1" name="quantities[]" class="box" placeholder="Enter product quantity" required>
+        <input type="number" min="0" step="0.01" name="price" id="price" class="box" placeholder="Enter product price" required>
+    
+        <textarea name="description" id="description" class="box" rows="4" placeholder="Enter product description" required></textarea>
+    
+        <input type="file" name="image" id="image" class="box" accept="image/*" required>
 
-            <button type="button" id="addSizeQuantity" class="btn">Add Size & Quantity</button>
+        <div id="sizeQuantityFields">
+            <div class="size-quantity-field">
+                <input type="text" name="sizes[]" class="box" placeholder="Enter product size" required>
+                <input type="number" min="1" name="quantities[]" class="box" placeholder="Enter product quantity" required>
+            </div>
+        </div>
 
+        <button type="button" id="addSizeQuantity" class="btn">Add Size & Quantity</button>
         <button type="submit" name="add_product" class="btn">Add Product</button>
     </form>
+</section>
 
-    </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('addSizeQuantity').addEventListener('click', function() {
+            var sizeQuantityContainer = document.getElementById('sizeQuantityFields');
+            var sizeQuantityField = document.createElement('div');
+            sizeQuantityField.classList.add('size-quantity-field');
+
+            var sizeInput = document.createElement('input');
+            sizeInput.type = 'text';
+            sizeInput.name = 'sizes[]';
+            sizeInput.classList.add('box');
+            sizeInput.placeholder = 'Enter product size';
+            sizeInput.required = true;
+
+            var quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.min = '1';
+            quantityInput.name = 'quantities[]';
+            quantityInput.classList.add('box');
+            quantityInput.placeholder = 'Enter product quantity';
+            quantityInput.required = true;
+
+            sizeQuantityField.appendChild(sizeInput);
+            sizeQuantityField.appendChild(quantityInput);
+            sizeQuantityContainer.appendChild(sizeQuantityField);
+        });
+    });
+</script>
+
 
     <!-- product CRUD section ends -->
 
@@ -441,7 +468,8 @@ include 'admin_header.php';
     </section>
 
 
-    <section class="edit-product-form">
+    <!-- Edit Product Form -->
+<section class="edit-product-form">
     <?php
     if (isset($_GET['update'])) {
         $update_id = $_GET['update'];
@@ -500,9 +528,7 @@ include 'admin_header.php';
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM Loaded");
         document.querySelector('.add-size').addEventListener('click', function() {
-            console.log("Add Size & Quantity button clicked");
             var sizeQuantityContainer = document.querySelector('.size-quantity');
             var sizeQuantityField = document.createElement('div');
             sizeQuantityField.classList.add('size-quantity-field');
@@ -528,6 +554,7 @@ include 'admin_header.php';
         });
     });
 </script>
+
 
 </body>
 
