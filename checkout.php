@@ -30,6 +30,10 @@ if (mysqli_num_rows($choose_cart) > 0) {
     $final_price = $total_itemprice * 100;
 }
 
+// Add shipping fee if applicable
+$shipping_fee = 5; // Example shipping fee
+$total_payment = $total_itemprice + $shipping_fee;
+
 if (isset($_POST['order_btn'])) {
     // Sanitize user input
     $name = mysqli_real_escape_string($conn, $_POST['name']);
@@ -167,9 +171,7 @@ if (isset($_POST['order_btn'])) {
         }
     }
 }
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
