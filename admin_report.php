@@ -9,7 +9,7 @@ $random = 0;
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Invoice</title>
+    <title>Sales Report</title>
     <style media="screen">
         body {
             font-family: 'Segoe UI', 'Microsoft Sans Serif', sans-serif;
@@ -293,7 +293,7 @@ $random = 0;
             </div>
             <div class="invoiceNbr">
                 <?php $random = rand(1, 10); ?>
-                Invoice
+                Sales Report
                 <?php echo $random ?>
                 <br />
                 <?php echo $today_report ?>
@@ -454,7 +454,12 @@ $random = 0;
             ?>
 
         </section>
-    </div>
+ 
+ <!-- Print button -->
+ <button class="btn" onclick="print()">
+         <span class="material-symbols-outlined">
+            print </span></button>  
+        </div>
 </body>
 
 </html>

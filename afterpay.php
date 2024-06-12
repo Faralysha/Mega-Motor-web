@@ -124,12 +124,12 @@ $temp_itemid = $_SESSION['idname'];
         ?>
         <button onclick="page()">order</button>
         <script>
-            // setTimeout(function () {
-            //     window.location.href = 'orders.php';
-            // }, 4000);
-            function page(){
+            setTimeout(function () {
                 window.location.href = 'orders.php';
-            }
+            }, 4000);
+            // function page(){
+            //     window.location.href = 'orders.php';
+            // }
         </script>
     </div>
 </body>

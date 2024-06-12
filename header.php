@@ -1,3 +1,4 @@
+
 <?php
 
 if (isset($_SESSION['user_id'])) {
@@ -17,6 +18,7 @@ if(isset($message)){
       ';
    }
 }
+
 ?>
 
 <link rel="stylesheet" href="css/styleindex.css"/>
@@ -47,11 +49,11 @@ if(isset($message)){
             <a href="cart.php"> <i class="fas fa-shopping-cart"></i> <span>(<?php echo $cart_rows_number; ?>)</span> </a>
          </div>
 
-         <div class="user-box">
-            <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>
-            <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p>
-            <a href="logout.php" class="delete-btn">logout</a>
-         </div>
+         <div class="account-box">
+         <!-- <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>
+         <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p> -->
+         <a href="logout.php" class="delete-btn">logout</a>
+      </div>
    </div>
 
 </header>

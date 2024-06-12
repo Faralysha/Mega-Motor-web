@@ -11,23 +11,36 @@ if (isset($_POST['submit'])) {
     if (mysqli_num_rows($select_users) > 0) {
         $row = mysqli_fetch_assoc($select_users);
 
-        // Set session variables based on user type
+        // Check the user type
         if ($row['user_type'] == 'admin') {
+            // Set session variables for admin
             $_SESSION['admin_id'] = $row['id'];
-            // Set other admin-related session variables if needed
-        } elseif ($row['user_type'] == 'staff') {
-            $_SESSION['staff_id'] = $row['id'];
-            // Set other staff-related session variables if needed
-        }
+            $_SESSION['admin_name'] = $row['name']; // Assuming the admin's name is stored in the 'name' column
+            $_SESSION['admin_email'] = $row['email']; // Assuming the admin's email is stored in the 'email' column
 
-        // Redirect to admin_page.php after successful login
-        header('location: admin_page.php');
-        exit();
+            // Redirect to admin_page.php after successful login
+            header('location: admin_page.php');
+            exit();
+        } elseif ($row['user_type'] == 'staff') {
+            // Set session variables for staff
+            $_SESSION['staff_id'] = $row['id'];
+            $_SESSION['staff_name'] = $row['name']; // Assuming the staff's name is stored in the 'name' column
+            $_SESSION['staff_email'] = $row['email']; // Assuming the staff's email is stored in the 'email' column
+
+            // Redirect to staff_page.php after successful login
+            header('location: staff_page.php');
+            exit();
+        } else {
+            // If the user type is neither admin nor staff, handle other cases or show an error message
+            $message[] = 'You are not authorized to access this panel!';
+        }
     } else {
+        // Handle incorrect email or password
         $message[] = 'Incorrect email or password!';
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

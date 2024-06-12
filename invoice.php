@@ -65,6 +65,23 @@ $order = mysqli_fetch_assoc($order_query);
         .text-right {
             text-align: right;
         }
+
+        .btn-print {
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: #dc143c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-print:hover {
+            background-color: #c0392b;
+        }
+
     </style>
 </head>
 
@@ -123,7 +140,7 @@ $order = mysqli_fetch_assoc($order_query);
                 </table>
             </div>
         </div>
-        <!-- Add more sections for totals, payment information, etc. -->
+        <button class="btn-print" onclick="window.print()">Print</button>
     </div>
 </body>
 

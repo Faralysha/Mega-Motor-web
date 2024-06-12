@@ -223,7 +223,7 @@ if (isset($_POST['order_btn'])) {
          echo '<p class="empty">your cart is empty</p>';
       }
       ?>
-      <div class="grand-total"> Total Payment (including shipping fee): <span>RM <?php echo $grand_total + 5; ?>
+ <div class="grand-total"> Total Payment (including shipping fee): <span>RM <?php echo number_format($total_payment, 2); ?>
    </span> </div>
 
 

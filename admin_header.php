@@ -1,4 +1,12 @@
 <?php
+
+if (isset($_SESSION['admin_id'])) {
+   $user_id = $_SESSION['admin_id'];
+} else {
+   header('Location: admin_login.php');
+   exit();
+}
+
 if(isset($message)){
    foreach($message as $message){
       echo '
@@ -9,6 +17,7 @@ if(isset($message)){
       ';
    }
 }
+
 ?>
 
 <header class="header">
@@ -32,8 +41,8 @@ if(isset($message)){
       </div>
 
       <div class="account-box">
-         <p>username : <span><?php echo $_SESSION['admin_name']; ?></span></p>
-         <p>email : <span><?php echo $_SESSION['admin_email']; ?></span></p>
+         <!-- <p>username : <span><?php echo $_SESSION['admin_name']; ?></span></p>
+         <p>email : <span><?php echo $_SESSION['admin_email']; ?></span></p> -->
          <a href="admin_logout.php" class="delete-btn">logout</a>
          <!-- <div>new <a href="login.php">login</a> | <a href="register.php">register</a></div> -->
       </div>
