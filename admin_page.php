@@ -238,7 +238,8 @@ if (!isset($admin_id)) {
             <div class="box">
                <?php
                $total_pendings = 0;
-               $select_pending = mysqli_query($conn, "SELECT total_price FROM `orders` WHERE payment_status = 'pending'") or die('query failed');
+               $select_pending = mysqli_query($conn, "SELECT total_price FROM `orders` 
+               WHERE payment_status = 'pending'") or die('query failed');
                if (mysqli_num_rows($select_pending) > 0) {
                   while ($fetch_pendings = mysqli_fetch_assoc($select_pending)) {
                      $total_price = $fetch_pendings['total_price'];

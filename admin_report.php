@@ -289,7 +289,7 @@ $random = 0;
 
         <header>
             <div class="logo">
-                <img src="images/logo.JPG" alt=" business logo" height="181" width="167" id="logoborder" />
+                <img src="images/bmmroundlogo.png" alt=" business logo" height="181" width="167" id="logoborder" />
             </div>
             <div class="invoiceNbr">
                 <?php $random = rand(1, 10); ?>
@@ -303,7 +303,7 @@ $random = 0;
         <div class="fromto from">
             <div class="panel">FROM:</div>
             <div class="fromtocontent">
-                <span>Deezek.co</span><br />
+                <span>Mega Motor Web</span><br />
                 <span>UTHM</span><br />
                 <span>Parit Raja, Johor</span><br />
             </div>
@@ -311,9 +311,9 @@ $random = 0;
         <div class="fromto to">
             <div class="panel">TO:</div>
             <div class="fromtocontent">
-                <span>Dinie Zikry[Deezekco]</span><br />
-                <span>Parit Kassan</span><br />
-                <span>Bukit Gambir, Johor</span>
+                <span>Berjaya Mega Motor</span><br />
+                <span>Kapar</span><br />
+                <span>Klang, Selangor</span>
             </div>
         </div>
 

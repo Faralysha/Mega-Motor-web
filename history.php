@@ -12,12 +12,14 @@ if (isset($_POST['submit_rate'])) {
    $product_id = $_POST['product_id'];
    $product_rate = $_POST['product_rate'];
 
-   mysqli_query($conn, "UPDATE `history` SET product_rate = '$product_rate' WHERE id = '$product_id'") or die('query failed');
+   mysqli_query($conn, "UPDATE `history` SET product_rate = '$product_rate' 
+   WHERE id = '$product_id'") or die('query failed');
    $message[] = 'Rating submitted';
 }
 
 // Retrieve distinct order_ids from the database
-$select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history` WHERE user_id = '$user_id'") or die('query failed');
+$select_order_ids = mysqli_query($conn, "SELECT DISTINCT order_id FROM `history` 
+WHERE user_id = '$user_id'") or die('query failed');
 
 // Initialize variable to keep track of previous order ID
 $prev_order_id = null;
