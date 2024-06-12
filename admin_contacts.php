@@ -8,6 +8,20 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+// Handle message deletion
+if(isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    $message_id = $_GET['delete'];
+    $delete_query = "DELETE FROM `message` WHERE id = $message_id";
+    $delete_result = mysqli_query($conn, $delete_query);
+    if($delete_result) {
+        header("Location: admin_contacts.php");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+        // Handle error condition, if necessary
+    }
+}
+
 // Fetch contacts or messages
 $query = "SELECT * FROM `message`";
 $result = mysqli_query($conn, $query) or die('query failed');
@@ -41,15 +55,14 @@ include 'admin_header.php';
 
    <div class="box-container">
    <?php
-      $select_message = mysqli_query($conn, "SELECT * FROM `message`") or die('query failed');
-      if(mysqli_num_rows($select_message) > 0){
-         while($fetch_message = mysqli_fetch_assoc($select_message)){
+      if(mysqli_num_rows($result) > 0){
+         while($fetch_message = mysqli_fetch_assoc($result)){
       
    ?>
    <div class="box">
       <p> user id : <span><?php echo $fetch_message['user_id']; ?></span> </p>
       <p> name : <span><?php echo $fetch_message['name']; ?></span> </p>
-      <p> Phone : <span><?php echo $fetch_message['pnumber']; ?></span> </p>
+      <p> Phone : <span><?php echo $fetch_message['phone']; ?></span> </p>
       <p> email : <span><?php echo $fetch_message['email']; ?></span> </p>
       <p> message : <span><?php echo $fetch_message['message']; ?></span> </p>
       <a href="admin_contacts.php?delete=<?php echo $fetch_message['id']; ?>" onclick="return confirm('delete this message?');" class="delete-btn">delete message</a>
