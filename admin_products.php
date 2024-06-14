@@ -289,6 +289,27 @@ if (isset($_POST['update_product'])) {
     justify-content: space-between;
 }
 
+/* Add more size button for edit product form */
+.edit-product-form .add-size {
+   background-color: #dc3545; /* Crimson color */
+   border: none;
+   color: white;
+   padding: 10px 20px;
+   text-align: center;
+   text-decoration: none;
+   display: inline-block;
+   font-size: 16px;
+   margin: 10px 2px;
+   cursor: pointer;
+   border-radius: 5px;
+   transition: background-color 0.3s ease;
+}
+
+.edit-product-form .add-size:hover {
+   background-color: #c82333; /* Darker red */
+}
+
+
 /* Responsive styles */
 @media only screen and (max-width: 768px) {
     .product-table {

@@ -195,7 +195,7 @@ while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
 </section>
 
 <section class="products">
-   <h1 class="title">Recommendation Product</h1>
+   <h1 class="title">Recommended Product</h1>
    <div class="box-container">
       <?php  
          $select_recommendation = mysqli_query($conn, "SELECT p.*, COUNT(h.product_id) AS purchase_count
