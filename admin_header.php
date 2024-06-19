@@ -1,12 +1,4 @@
 <?php
-
-if (isset($_SESSION['admin_id'])) {
-   $user_id = $_SESSION['admin_id'];
-} else {
-   header('Location: admin_login.php');
-   exit();
-}
-
 if(isset($message)){
    foreach($message as $message){
       echo '

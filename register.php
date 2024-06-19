@@ -218,6 +218,7 @@ if (isset($_POST['submit'])) {
             <input type="name" name="pnumber" required placeholder="Enter your phone numer">
             <input type="password" name="password" required placeholder="Enter your password">
             <input type="password" name="cpassword" required placeholder="Confirm your password">
+            <input type="pnumber" name="pnumber" placeholder="Phone Number" required class="box">
             <input type="submit" name="submit" value="Register" class="form-btn">
             <p>Already have an account? <a href="index.php">Login now</a></p>
          </form>

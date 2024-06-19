@@ -1192,7 +1192,7 @@ margin:0 auto;
 
 
 
- /* media queries  */
+/* media queries  */
 
 @media (max-width:991px){
 
@@ -1208,7 +1208,7 @@ margin:0 auto;
       display: inline-block;
    }
 
-   .header .flex .navbar{
+   .header .header-2 .flex .navbar{
       position: absolute;
       top:99%; left:0; right:0;
       background-color: var(--white);
@@ -1217,11 +1217,11 @@ margin:0 auto;
       clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
    }
 
-   .header .flex .navbar.active{
+   .header .header-2 .flex .navbar.active{
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
    }
 
-   .header .flex .navbar a{
+   .header .header-2 .flex .navbar a{
       display: block;
       font-size: 2.5rem;
       margin:2rem;
@@ -1248,4 +1248,3 @@ margin:0 auto;
    }
 
 }
-

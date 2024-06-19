@@ -73,6 +73,7 @@ in both admin and customer.
                      <p> address : <span><?php echo $fetch_orders['address']; ?></span> </p>
                      <p> your orders : <span><?php echo $fetch_orders['total_products']; ?></span> </p>
                      <p> total price : <span>RM<?php echo $fetch_orders['total_price']; ?>/-</span> </p>
+                     <p> total payment :<span>RM<?php echo $fetch_orders['total_payment']; ?>/-</span> </p>
                      <p> payment status : <span style="color:<?php echo ($fetch_orders['payment_status'] == 'pending') ? 'red' : 'green'; ?>;"><?php echo $fetch_orders['payment_status']; ?></span> </p>
                      <p>Tracking number: <span style="color:blue">
                         <?php if (!empty($fetch_orders['tracknum'])): ?>
@@ -103,6 +104,7 @@ in both admin and customer.
                      <p> phone number : <span><?php echo $fetch_orders['number']; ?></span> </p>
                      <p> your orders : <span><?php echo $fetch_orders['total_products']; ?></span> </p>
                      <p> total price : <span>RM<?php echo $fetch_orders['total_price']; ?>/-</span> </p>
+                     <p> total payment :<span>RM<?php echo $fetch_orders['total_payment']; ?>/-</span> </p>
                      <p> payment status :<span style="color:green"> Item received by the customer </span></p>
                   </div>
                   <?php
@@ -118,6 +120,7 @@ in both admin and customer.
                      <p> address : <span><?php echo $fetch_orders['address']; ?></span> </p>
                      <p> your orders : <span><?php echo $fetch_orders['total_products']; ?></span> </p>
                      <p> total price : <span>RM<?php echo $fetch_orders['total_price']; ?>/-</span> </p>
+                     <p> total payment :<span>RM<?php echo $fetch_orders['total_payment']; ?>/-</span> </p>
                      <p> payment status : <span style="color:<?php echo ($fetch_orders['payment_status'] == 'pending') ? 'red' : 'green'; ?>;"><?php echo $fetch_orders['payment_status']; ?></span> </p>
                   </div>
                   <?php

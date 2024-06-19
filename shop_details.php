@@ -26,9 +26,9 @@ if (!$product_details) {
     die('Product not found.');
 }
 
-// Fetch sizes and quantities for the current product
+// Fetch available sizes and quantities from product_details excluding "Sold" items
 $sizes_quantities = [];
-$get_sizes_quantities = mysqli_prepare($conn, "SELECT size, quantity FROM `product_sizes` WHERE product_id = ?");
+$get_sizes_quantities = mysqli_prepare($conn, "SELECT size, COUNT(*) as quantity FROM `product_details` WHERE product_id = ? AND stock != 'Sold' GROUP BY size");
 mysqli_stmt_bind_param($get_sizes_quantities, "i", $product_id);
 mysqli_stmt_execute($get_sizes_quantities);
 $fetch_sizes_quantities = mysqli_stmt_get_result($get_sizes_quantities);
@@ -54,7 +54,7 @@ if (isset($_POST['add_to_cart'])) {
     if (!$product_size) {
         $message[] = 'Please select a size.';
     } else {
-        $get_product_detail_id = mysqli_prepare($conn, "SELECT product_detail_id FROM `product_details` WHERE product_id = ? AND size = ?");
+        $get_product_detail_id = mysqli_prepare($conn, "SELECT product_detail_id FROM `product_details` WHERE product_id = ? AND size = ? AND stock != 'Sold' LIMIT 1");
         mysqli_stmt_bind_param($get_product_detail_id, "is", $product_id, $product_size);
         mysqli_stmt_execute($get_product_detail_id);
         $product_detail_id_result = mysqli_stmt_get_result($get_product_detail_id);
@@ -64,7 +64,7 @@ if (isset($_POST['add_to_cart'])) {
         if (!$product_detail_id) {
             $message[] = 'Product detail ID not found.';
         } else {
-            $compare_quant = mysqli_prepare($conn, "SELECT quantity FROM `product_sizes` WHERE product_id = ? AND size = ?");
+            $compare_quant = mysqli_prepare($conn, "SELECT COUNT(*) as quantity FROM `product_details` WHERE product_id = ? AND size = ? AND stock != 'Sold'");
             mysqli_stmt_bind_param($compare_quant, "is", $product_id, $product_size);
             mysqli_stmt_execute($compare_quant);
             $fetch_quantitem = mysqli_stmt_get_result($compare_quant);
@@ -105,7 +105,7 @@ if (isset($_POST['add_to_cart'])) {
             background: #C1908B;
         }
 
-                .btn,
+        .btn,
         .option-btn,
         .delete-btn,
         .white-btn {
@@ -295,9 +295,9 @@ if (isset($_POST['add_to_cart'])) {
                             <?php } ?>
                         </div>
 
-                        <div class='size-quantity-details'>
-                            <div><strong>Available Quantity:</strong></div>
-                            <div id="available-quantity"><?php echo htmlspecialchars($total_quantity); ?></div>
+                        <div class="size-quantity-details">
+                            <div><strong>Total Available Quantity:</strong></div>
+                            <div id="available-quantity"><?php echo $total_quantity; ?> available</div>
                         </div>
 
                         <div class='size-quantity-details'>
@@ -334,7 +334,7 @@ if (isset($_POST['add_to_cart'])) {
                 document.getElementById('selected-size').value = element.getAttribute('data-size');
 
                 var availableQuantity = element.getAttribute('data-quantity');
-                document.getElementById('available-quantity').textContent = availableQuantity;
+                document.getElementById('available-quantity').textContent = availableQuantity + " available";
             }
         }
     </script>

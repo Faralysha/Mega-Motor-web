@@ -20,6 +20,9 @@ function generateInvoiceNumber() {
     return $invoiceNumber;
 }
 
+// Add shipping fee if applicable
+$shipping_fee = 5; // Example shipping fee
+
 $total_itemprice = 0;
 $choose_cart = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
 if (mysqli_num_rows($choose_cart) > 0) {
@@ -27,11 +30,9 @@ if (mysqli_num_rows($choose_cart) > 0) {
         $total_Iprice = ($fetch_cart['price'] * $fetch_cart['quantity']);
         $total_itemprice += $total_Iprice;
     }
-    $final_price = $total_itemprice * 100;
+    $final_price = ($total_itemprice + $shipping_fee)* 100;
 }
 
-// Add shipping fee if applicable
-$shipping_fee = 5; // Example shipping fee
 $total_payment = $total_itemprice + $shipping_fee;
 
 if (isset($_POST['order_btn'])) {
@@ -75,8 +76,8 @@ if (isset($_POST['order_btn'])) {
 
             // Insert order details into orders table
             $tracknom = 0;
-            mysqli_query($conn, "INSERT INTO `orders` (user_id, name, number, email, address, total_products, total_price, placed_on, tracknum, invoice_number) 
-            VALUES ('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$placed_on', '$tracknom', '$invoice_number')") or die('query failed');
+            mysqli_query($conn, "INSERT INTO `orders` (user_id, name, number, email, address, total_products, total_price, total_payment, placed_on, tracknum, invoice_number) 
+            VALUES ('$user_id', '$name', '$number', '$email', '$address', '$total_products', '$cart_total', '$total_payment', '$placed_on', '$tracknom', '$invoice_number')") or die('query failed');
 
             $order_id = mysqli_insert_id($conn); // Get the last inserted order ID
 
@@ -109,17 +110,20 @@ if (isset($_POST['order_btn'])) {
                 }
             }
 
-            // Insert order history
-            $history_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
-            while ($history = mysqli_fetch_assoc($history_query)) {
-                $product_userid_rate = $history['user_id'];
-                $get_orderid = $order_id;
-                $product_brand_rate = $history['product_brand'];
-                $product_name_rate = $history['product_name'];
-                $product_id_rate = $history['product_id'];
-                $product_size_rate = $history['product_size'];
-                mysqli_query($conn, "INSERT INTO `history` (user_id, order_id, product_brand, product_name, product_id, product_size, invoice_number) VALUES ('$product_userid_rate', '$get_orderid', '$product_brand_rate', '$product_name_rate', '$product_id_rate', '$product_size_rate', '$invoice_number')") or die('query failed');
-            }
+           // Insert order history
+           $history_query = mysqli_query($conn, "SELECT * FROM `cart` WHERE user_id = '$user_id'") or die('query failed');
+           while ($history = mysqli_fetch_assoc($history_query)) {
+               $product_userid_rate = $history['user_id'];
+               $get_orderid = $order_id;
+               $product_brand_rate = $history['product_brand'];
+               $product_name_rate = $history['product_name'];
+               $product_id_rate = $history['product_id'];
+               $product_size_rate = $history['product_size'];
+
+               // Insert into history table
+               mysqli_query($conn, "INSERT INTO `history` (user_id, order_id, product_brand, product_name, product_id, product_size, invoice_number) 
+               VALUES ('$product_userid_rate', '$get_orderid', '$product_brand_rate', '$product_name_rate', '$product_id_rate', '$product_size_rate', '$invoice_number')") or die('query failed');
+           }
             $message[] = 'Order placed successfully!';
 
             // Generate bill and redirect to payment page

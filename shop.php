@@ -61,11 +61,12 @@ if (isset($_POST['add_to_cart'])) {
 }
 
 // Filter Logic
-$where = '';
+$where = 'WHERE 1';
 if (isset($_POST['apply_filters'])) {
     $price_range = $_POST['price_range'];
     $category = $_POST['category'];
     $rating_range = $_POST['rating_range'];
+    $search = mysqli_real_escape_string($conn, $_POST['search']);
 
     if (!empty($price_range)) {
         list($min_price, $max_price) = explode('-', $price_range);
@@ -74,13 +75,17 @@ if (isset($_POST['apply_filters'])) {
     if (!empty($category)) {
         $where .= " AND category = '$category'";
     }
-    if (!empty($rating_range)) { // New
+    if (!empty($rating_range)) {
         list($min_rating, $max_rating) = explode('-', $rating_range);
         $where .= " AND pro_rates BETWEEN $min_rating AND $max_rating";
+    }
+    if (!empty($search)) {
+        $where .= " AND (name LIKE '%$search%' OR description LIKE '%$search%')";
     }
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

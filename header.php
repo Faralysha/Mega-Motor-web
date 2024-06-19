@@ -1,13 +1,4 @@
-
 <?php
-
-if (isset($_SESSION['user_id'])) {
-   $user_id = $_SESSION['user_id'];
-} else {
-   header('Location: index.php');
-   exit();
-}
-
 if(isset($message)){
    foreach($message as $message){
       echo '
@@ -18,26 +9,41 @@ if(isset($message)){
       ';
    }
 }
-
 ?>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-<link rel="stylesheet" href="css/styleindex.css">
 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <header class="header">
-<div class="flex">
-            <div class="logo">
-            <a href="home.php" class="logo">Berjaya Mega Motor</a>
-            </div>
+
+   <!-- <div class="header-1">
+      <div class="flex">
+         <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+            <a href="#" class="fab fa-twitter"></a>
+            <a href="#" class="fab fa-instagram"></a>
+            <a href="#" class="fab fa-linkedin"></a>
+         </div>
+         <p><a href="newprofile.php"><span class="material-symbols-outlined">
+account_circle
+</span>Profile</a></p>
+      </div>
+   </div>-->
+
+   <div class="header-2">
+      <div class="flex">
+         
+          <!-- <img src ="images/logo.JPG" alt="Logo" width="50px"/> -->
+         <a href="home.php" class="logo">Berjaya Mega Motor</a>  
         
+         
+
          <nav class="navbar">
-         <a href="home.php">Home</a>
+            <a href="home.php">Home</a>
             <a href="about.php">About</a>
             <a href="shop.php">Shop</a>
             <a href="contact.php">Contact</a>
             <a href="orders.php">Orders</a>
             <a href="history.php">History</a>
-        </nav>
-
+         </nav>
 
          <div class="icons">
             <div id="menu-btn" class="fas fa-bars"></div>
@@ -49,10 +55,11 @@ if(isset($message)){
             <a href="cart.php"> <i class="fas fa-shopping-cart"></i> <span>(<?php echo $cart_rows_number; ?>)</span> </a>
          </div>
 
-         <div class="account-box">
-         <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>
-         <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p>
-         <a href="logout.php" class="delete-btn">logout</a>
+         <div class="user-box">
+            <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>
+            <p>email : <span><?php echo $_SESSION['user_email']; ?></span></p>
+            <a href="index.php" class="delete-btn">logout</a>
+         </div>
       </div>
    </div>
 

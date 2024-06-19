@@ -1,8 +1,5 @@
 <?php
-// Enable error reporting
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+
 
 include 'config.php';
 session_start();
@@ -24,6 +21,10 @@ if (isset($_POST['submit'])) {
         $_SESSION['user_email'] = $row['email'];
         $_SESSION['user_id'] = $row['id'];
         $_SESSION['user_type'] = $row['user_type'];
+
+        $_SESSION['admin_name'] = $row['admin_name'];
+        $_SESSION['admin_email'] = $row['admin_email'];
+        $_SESSION['admin_id'] = $row['admin_id'];
 
         if ($row['user_type'] == 'admin') {
             header('location: admin_page.php');
@@ -199,12 +200,30 @@ body {
 .form-container form .error-msg{
    margin:10px 0;
    display: block;
-   background: crimson;
+   background: #dc143c;
    color:#fff;
    border-radius: 5px;
    font-size: 20px;
    padding:10px;
 }
+
+.admin-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #dc143c;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1000; /* Ensure it's above other elements */
+   }
+
+   .admin-button:hover {
+      background: #c0392b;
+   }
+
 </style>
 
 </head>
@@ -220,6 +239,10 @@ body {
       <input type="submit" name="submit" value="Login" class="form-btn">
       <p>don't have an account? <a href="register.php">Register now</a></p>
    </form>
+
+   <div class="admin-button" onclick="location.href='admin_login.php';">
+      Admin Login
+   </div>
 
 </div>
 

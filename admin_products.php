@@ -5,7 +5,7 @@ session_start();
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: admin_login.php');
-    exit;
+    exit();
 }
 
 function handleImageUpload($file) {
@@ -331,10 +331,7 @@ if (isset($_POST['update_product'])) {
 <?php
 include 'admin_header.php';
 ?>
-    <!-- ----------------------------------------------------------------------------------------- -->
-    <!--  -->
 
-    <!-- product CRUD section starts  -->
     <!-- Add Product Form -->
 <section class="add-products">
     <h1 class="title">shop products</h1>
