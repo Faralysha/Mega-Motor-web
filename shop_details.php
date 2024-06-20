@@ -94,172 +94,117 @@ if (isset($_POST['add_to_cart'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styleindex.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/styleindex.css">
+
     <style>
-        body {
-            font-family: sans-serif;
-            background: #C1908B;
-        }
 
-        .btn,
-        .option-btn,
-        .delete-btn,
-        .white-btn {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 1rem 3rem;
-            cursor: pointer;
-            color: var(--white);
-            font-size: 1.8rem;
-            border-radius: .5rem;
-            text-transform: capitalize;
-            background-color: var(--red) !important;
-            border: var(--border);
-        }
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+    .left, .right {
+        width: 50%;
+        padding: 20px;
+    }
+    .flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .main_image {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+    .main_image img {
+        width: 100%;
+        height: auto;
+    }
+    .option img {
+        width: 75px;
+        height: 75px;
+        margin: 10px;
+        border-radius: 2px;
+        border: 0.7px solid black;
+    }
+    .right {
+        padding: 20px;
+    }
+    h3 {
+        color: #2f3542;
+        margin: 20px 0;
+        font-size: 30px;
+        font-weight: bold;
+    }
+    h5, p, small {
+        color: #57606f;
+    }
 
+    #available-quantity {
+        color: #57606f;
+        font-size: 20px; /* Increased font size for price and quantity */
+        font-weight: bold;
+    }
+
+    h4 {
+        color: #dc143c;
+        font-size: 20px; /* Increased font size for price and quantity */
+        font-weight: bold;
+    }
+    p {
+        margin: 20px 0 50px;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+    h5 {
+        font-size: 16px;
+        margin: 10px 0;
+    }
+    .size-box {
+        display: inline-block;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        margin: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 18px; /* Bigger font size */
+        font-weight: bold; /* Bold font */
+        text-align: center;
+    }
+    .size-box.selected {
+        border-color: #dc143c;
+        background-color: #dc143c;
+        color: white;
+    }
+    .size-box.out-of-stock {
+        border-color: #ddd;
+        background-color: #f0f0f0;
+        color: #999;
+        cursor: not-allowed;
+    }
+    .size-quantity-details {
+        margin-top: 10px;
+    }
+    @media only screen and (max-width: 768px) {
         .container {
-            max-width: 100%;
-            margin: auto;
-            height: 80vh;
-            margin-top: 5px;
-            background: white;
-            box-shadow: 5px 5px 10px 3px rgba(0, 0, 0, 0.3);
+            flex-direction: column;
         }
         .left, .right {
-            width: 50%;
-            padding: 30px;
-        }
-        .flex {
-            display: flex;
-            justify-content: space-between;
-        }
-        .main_image {
-            width: 40rem;
-            height: 40rem;
-            position: relative;
-            overflow: hidden;
-            border-radius: 1px;
-            box-shadow: 5px 5px 8px 3px rgba(0, 0, 0, 0.3);
-        }
-        .main_image .size_image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 30rem;
-            height: 30rem;
-        }
-        .option img {
-            width: 75px;
-            height: 75px;
-            margin: 10px;
-            border-radius: 2px;
-            border: 0.7px solid black;
-        }
-        .right {
-            padding: 50px 100px 50px 50px;
-        }
-        h3 {
-            color: #af827d;
-            margin: 20px 0;
-            font-size: 25px;
-        }
-        h5, p, small {
-            color: #837D7C;
-        }
-        h4 {
-            color: red;
-        }
-        p {
-            margin: 20px 0 50px;
-            line-height: 25px;
-        }
-        h5 {
-            font-size: 15px;
-        }
-        label, .add span, .color span {
-            width: 25px;
-            height: 25px;
-            background: #000;
-            border-radius: 50%;
-            margin: 20px 10px 20px 0;
-        }
-        .color span:nth-child(2) {
-            background: #EDEDED;
-        }
-        .color span:nth-child(3) {
-            background: #D5D6D8;
-        }
-        .color span:nth-child(4) {
-            background: #EFE0DE;
-        }
-        .color span:nth-child(5) {
-            background: #AB8ED1;
-        }
-        .color span:nth-child(6) {
-            background: #F04D44;
-        }
-        .add label, .add span {
-            background: none;
-            border: 1px solid #C1908B;
-            color: #C1908B;
-            text-align: center;
-            line-height: 25px;
-        }
-        .add label {
-            padding: 10px 30px 0 20px;
-            border-radius: 50px;
-            line-height: 0;
-        }
-        @media only screen and (max-width: 768px) {
-            .container {
-                max-width: 90%;
-                margin: auto;
-                height: auto;
-            }
-            .left, .right {
-                width: 100%;
-            }
-            .container {
-                flex-direction: column;
-            }
-        }
-        .left, .right {
-            padding: 0;
-        }
-        img {
             width: 100%;
-            height: 100%;
         }
-        .option {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .size-box {
-            display: inline-block;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            margin: 5px;
-            cursor: pointer;
-        }
-        .size-box.selected {
-            border-color: #C1908B;
-            background-color: #C1908B;
-            color: white;
-        }
-        .size-box.out-of-stock {
-            border-color: #ddd;
-            background-color: #f0f0f0;
-            color: #999;
-            cursor: not-allowed;
-        }
-        .size-quantity-details {
-            margin-top: 10px;
-        }
-    </style>
+    }
+</style>
+
 </head>
 <body>
     <?php include 'header.php'; ?>
@@ -269,21 +214,19 @@ if (isset($_POST['add_to_cart'])) {
         <div class="container flex">
             <div class="left">
                 <div class="main_image">
-                    <div class="size_image">
-                        <img class="image" src="uploaded_img/<?php echo htmlspecialchars($product_details['image']); ?>" alt="Product Image">
-                    </div>
+                    <img src="uploaded_img/<?php echo htmlspecialchars($product_details['image']); ?>" alt="Product Image">
                 </div>
             </div>
             <div class="right">
                 <div class="size-quantity-container">
                     <div class='product-details'>
-                        <div><strong>Product Name:</strong> <?php echo htmlspecialchars($product_details['name']); ?></div>
-                        <div><strong>Brand:</strong> <?php echo htmlspecialchars($product_details['brand']); ?></div>
-                        <div><strong>Category:</strong> <?php echo htmlspecialchars($product_details['category']); ?></div>
-                        <div><strong>Description:</strong> <?php echo nl2br(htmlspecialchars($product_details['description'])); ?></div>
+                        <h3><?php echo htmlspecialchars($product_details['name']); ?></h3>
+                        <h5><strong>Brand:</strong> <?php echo htmlspecialchars($product_details['brand']); ?></h5>
+                        <h5><strong>Category:</strong> <?php echo htmlspecialchars($product_details['category']); ?></h5>
+                        <p><?php echo nl2br(htmlspecialchars($product_details['description'])); ?></p>
                         
                         <div class='size-quantity-details'>
-                            <div><strong>Sizes:</strong></div>
+                            <h5><strong>Sizes:</strong></h5>
                             <?php if (is_array($sizes_quantities) && !empty($sizes_quantities)) { ?>
                                 <?php foreach ($sizes_quantities as $size_quantity) { ?>
                                     <div class="size-box <?php echo $size_quantity['quantity'] <= 0 ? 'out-of-stock' : ''; ?>" data-size="<?php echo htmlspecialchars($size_quantity['size']); ?>" data-quantity="<?php echo htmlspecialchars($size_quantity['quantity']); ?>" onclick="selectSize(this)">
@@ -296,12 +239,12 @@ if (isset($_POST['add_to_cart'])) {
                         </div>
 
                         <div class="size-quantity-details">
-                            <div><strong>Total Available Quantity:</strong></div>
+                            <h5><strong>Total Available Quantity:</strong></h5>
                             <div id="available-quantity"><?php echo $total_quantity; ?> available</div>
                         </div>
 
                         <div class='size-quantity-details'>
-                            <div><strong>Price:</strong> RM <?php echo htmlspecialchars($product_details['price']); ?></div>
+                            <h4>RM <?php echo htmlspecialchars($product_details['price']); ?></h4>
                         </div>
                     </div>
                 </div>
@@ -316,7 +259,7 @@ if (isset($_POST['add_to_cart'])) {
                     <input type="hidden" name="product_size" id="selected-size" value="">
                     <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($product_details['price']); ?>">
                     <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($product_details['image']); ?>">
-                    <input type="submit" value="Add to cart" class="btn btn-outline-primary btn-lg" name="add_to_cart">
+                    <input type="submit" value="Add to cart" class="btn btn-outline-primary btn-lg add-to-cart-btn" name="add_to_cart">
                 </form>
             </div>
         </div>

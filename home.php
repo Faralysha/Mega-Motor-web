@@ -44,11 +44,11 @@ while ($productrating_get = mysqli_fetch_assoc($get_productrating)) {
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/styleindex.css">
    <!-- Bootstrap link -->
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-
+   
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/styleindex.css">
    <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 

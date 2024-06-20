@@ -30,43 +30,67 @@ $prev_order_id = null;
 <html lang="en">
 
 <head>
-   <!-- Your head code here -->
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>history</title>
-
-   <!-- font awesome cdn link  -->
+   <title>Purchase History</title>
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/styleindex.css">
-
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+   <link rel="stylesheet" href="css/styleindex.css">
    <style>
       .material-symbols-outlined {
          font-variation-settings:
             'FILL' 0,
             'wght' 400,
             'GRAD' 0,
-            'opsz' 20
+            'opsz' 20;
       }
-    
-      .box-cont {
-         border: 2px grey solid;
-         max-width: 450px;
-         margin: 0 auto;
-         display: grid;
-         grid-template-columns: repeat(auto-fit, 30rem);
-         align-items: flex-start;
-         gap: 1.5rem;
-         justify-content: center;       
+
+      .order-card {
+         border: 1px solid #ddd;
+         border-radius: 8px;
+         background-color: #fff;
+         margin-bottom: 20px;
+         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .order-header {
+         padding: 15px;
+         background-color: #f8f8f8;
+         border-bottom: 1px solid #ddd;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+      }
+
+      .order-body {
+         padding: 15px;
+      }
+
+      .product-container {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 20px;
+      }
+
+      .product {
+         border: 1px solid #ddd;
+         padding: 10px;
+         border-radius: 5px;
+         background-color: #fff;
+         flex: 1;
+         min-width: 220px;
+         display: flex;
+         flex-direction: column;
+         justify-content: space-between;
       }
 
       .rating {
          display: flex;
          align-items: center;
          flex-direction: row-reverse;
+         justify-content: center;
+         margin-bottom: 15px;
       }
 
       .rating input[type="radio"] {
@@ -87,10 +111,26 @@ $prev_order_id = null;
       }
 
       .invoice-button {
-         margin-top: 20px; /* Adjust this value as needed */
+         text-align: center;
+         margin-top: 20px;
       }
+
+      .accordion-button:focus {
+         box-shadow: none;
+      }
+
+      .collapse:not(.show) {
+         display: block;
+         height: 0;
+         overflow: hidden;
+         transition: height 0.3s ease;
+      }
+
+      .collapse.show {
+         height: auto;
+      }
+
    </style>
-   <!-- Custom google -->
    <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,200,0,0" />
 </head>
@@ -101,94 +141,108 @@ $prev_order_id = null;
 
    <!-- heading -->
    <div class="heading">
+      <h3>History</h3>
       <p> <a href="home.php">Home</a> / History </p>
    </div>
-
+   
    <section class="products">
       <h1 class="title">History purchase</h1>
-      <?php
-      if (mysqli_num_rows($select_order_ids) > 0) {
-         while ($order_row = mysqli_fetch_assoc($select_order_ids)) {
-            $order_id = $order_row['order_id'];
-            
-            // Only display the "View Invoice" button if it's a new order ID
-            if ($order_id != $prev_order_id) {
-               ?>
-               <div class="box-cont">
-                  <h2>Order ID: <?php echo $order_id; ?></h2>
-                  <?php
-                  $select_products = mysqli_query($conn, "SELECT * FROM `history` WHERE user_id = '$user_id' AND order_id = '$order_id'") or die('query failed');
 
-                  if (mysqli_num_rows($select_products) > 0) {
-                     while ($fetch_products = mysqli_fetch_assoc($select_products)) {
-                        ?>
-                        <form action="" method="post" class="box">
-                           <!-- Display your product details here -->
-                           <div class="name">
-                              <h4>Brand: <?php echo $fetch_products['product_brand']; ?></h4>
-                           </div>
-                           <div class="name">
-                              <h4>Product name: <?php echo $fetch_products['product_name']; ?></h4>
-                           </div>
-                           <div class="name">
-                              <h4>Product size: <?php echo $fetch_products['product_size']; ?></h4>
-                           </div>
-                           <div class="name">
-                              <h4>On Order Id: <?php echo $fetch_products['order_id']; ?></h4>
-                           </div>
-                           <!-- Add the rating section -->
-                           <h5>Rating:</h5>
-                           <div class="rating">
-                              <input type="radio" name="product_rate" id="star5-<?php echo $fetch_products['id']; ?>" value="5" <?php if ($fetch_products['product_rate'] == 5) echo 'checked'; ?>>
-                              <label for="star5-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                              <input type="radio" name="product_rate" id="star4-<?php echo $fetch_products['id']; ?>" value="4" <?php if ($fetch_products['product_rate'] == 4) echo 'checked'; ?>>
-                              <label for="star4-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                              <input type="radio" name="product_rate" id="star3-<?php echo $fetch_products['id']; ?>" value="3" <?php if ($fetch_products['product_rate'] == 3) echo 'checked'; ?>>
-                              <label for="star3-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                              <input type="radio" name="product_rate" id="star2-<?php echo $fetch_products['id']; ?>" value="2" <?php if ($fetch_products['product_rate'] == 2) echo 'checked'; ?>>
-                              <label for="star2-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                              <input type="radio" name="product_rate" id="star1-<?php echo $fetch_products['id']; ?>" value="1" <?php if ($fetch_products['product_rate'] == 1) echo 'checked'; ?>>
-                              <label for="star1-<?php echo $fetch_products['id']; ?>">&#9733;</label>
-                           </div>
-                           <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">                        
-                           <input type="hidden" name="product_name" value="<?php echo $fetch_products['product_name']; ?>">
-                           <input type="submit" class="btn btn-primary btn-lg" value="Submit rating" name="submit_rate">
-                        </form>
-                        <?php
-                        $_SESSION['invoice_number']=$fetch_products['invoice_number'];
-                     }
-                  } else {
-                     echo '<p class="empty">No products added yet for this order ID!</p>';
-                  }
+      <div class="container my-4">
+         <div class="accordion" id="orderAccordion">
+         <?php
+         if (mysqli_num_rows($select_order_ids) > 0) {
+            while ($order_row = mysqli_fetch_assoc($select_order_ids)) {
+               $order_id = $order_row['order_id'];
+               
+               if ($order_id != $prev_order_id) {
                   ?>
-                  <!-- View Invoice button -->
-                  <div class="invoice-button">
-                  <form action="invoice.php" method="GET">
-                            <input type="hidden" name="invoice_number" value="<?php echo $_SESSION['invoice_number']; ?>">
-                            <button type="submit" class="btn btn-primary">View Invoice</button>
-                        </form>
+                  <div class="order-card">
+                     <div class="order-header">
+                        <h4>Order ID: <?php echo $order_id; ?></h4>
+                        <button class="btn btn-link accordion-button" type="button" data-toggle="collapse" data-target="#collapse-<?php echo $order_id; ?>" aria-expanded="true" aria-controls="collapse-<?php echo $order_id; ?>">
+                           View Details
+                        </button>
+                     </div>
+                     <div id="collapse-<?php echo $order_id; ?>" class="collapse" aria-labelledby="heading-<?php echo $order_id; ?>" data-parent="#orderAccordion">
+                        <div class="order-body">
+                           <div class="product-container">
+                           <?php
+                           $select_products = mysqli_query($conn, "SELECT * FROM `history` WHERE user_id = '$user_id' AND order_id = '$order_id'") or die('query failed');
+
+                           if (mysqli_num_rows($select_products) > 0) {
+                              while ($fetch_products = mysqli_fetch_assoc($select_products)) {
+                                 ?>
+                                 <div class="product">
+                                    <form action="" method="post">
+                                       <div class="name">
+                                          <strong>Brand:</strong> <?php echo $fetch_products['product_brand']; ?>
+                                       </div>
+                                       <div class="name">
+                                          <strong>Product Name:</strong> <?php echo $fetch_products['product_name']; ?>
+                                       </div>
+                                       <div class="name">
+                                          <strong>Product Size:</strong> <?php echo $fetch_products['product_size']; ?>
+                                       </div>
+                                       <div class="name">
+                                          <strong>Order ID:</strong> <?php echo $fetch_products['order_id']; ?>
+                                       </div>
+                                       <h5>Rating:</h5>
+                                       <div class="rating">
+                                          <input type="radio" name="product_rate" id="star5-<?php echo $fetch_products['id']; ?>" value="5" <?php if ($fetch_products['product_rate'] == 5) echo 'checked'; ?>>
+                                          <label for="star5-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                                          <input type="radio" name="product_rate" id="star4-<?php echo $fetch_products['id']; ?>" value="4" <?php if ($fetch_products['product_rate'] == 4) echo 'checked'; ?>>
+                                          <label for="star4-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                                          <input type="radio" name="product_rate" id="star3-<?php echo $fetch_products['id']; ?>" value="3" <?php if ($fetch_products['product_rate'] == 3) echo 'checked'; ?>>
+                                          <label for="star3-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                                          <input type="radio" name="product_rate" id="star2-<?php echo $fetch_products['id']; ?>" value="2" <?php if ($fetch_products['product_rate'] == 2) echo 'checked'; ?>>
+                                          <label for="star2-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                                          <input type="radio" name="product_rate" id="star1-<?php echo $fetch_products['id']; ?>" value="1" <?php if ($fetch_products['product_rate'] == 1) echo 'checked'; ?>>
+                                          <label for="star1-<?php echo $fetch_products['id']; ?>">&#9733;</label>
+                                       </div>
+                                       <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">                        
+                                       <input type="hidden" name="product_name" value="<?php echo $fetch_products['product_name']; ?>">
+                                       <div class="text-center">
+                                          <input type="submit" class="btn btn-primary" value="Submit Rating" name="submit_rate">
+                                       </div>
+                                    </form>
+                                 </div>
+                                 <?php
+                                 $_SESSION['invoice_number'] = $fetch_products['invoice_number'];
+                              }
+                           } else {
+                              echo '<p class="empty text-center">No products added yet for this order ID!</p>';
+                           }
+                           ?>
+                           </div>
+                           <div class="invoice-button">
+                              <form action="invoice.php" method="GET">
+                                 <input type="hidden" name="invoice_number" value="<?php echo $_SESSION['invoice_number']; ?>">
+                                 <button type="submit" class="btn btn-primary">View Invoice</button>
+                              </form>
+                           </div>
+                        </div>
+                     </div>
                   </div>
-                  <!-- End View Invoice button -->
-               </div>
-               <br>
-               <?php
+                  <?php
+               }
+               $prev_order_id = $order_id;
             }
-            // Update the previous order ID
-            $prev_order_id = $order_id;
+         } else {
+            echo '<p class="empty text-center">No orders found!</p>';
          }
-      } else {
-         echo '<p class="empty">No orders found!</p>';
-      }
-      ?>
+         ?>
+         </div>
+      </div>
    </section>
 
-   <!-- Your remaining HTML code here -->
    <!-- Footer -->
    <?php include 'footer.php'; ?>
-   <!-- JS -->
-   <script src="js/script.js"></script>
-   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
+   <!-- JS -->
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+   <script src="js/script.js"></script>
 </body>
 
 </html>

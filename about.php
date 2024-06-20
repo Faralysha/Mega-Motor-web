@@ -22,26 +22,12 @@ if(!isset($user_id)){
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+   <!-- bootstrap -->
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/styleindex.css">
 
-   <!-- bootstrap -->
-   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<style>
-   .heading{
-   min-height: 30vh;
-   display: flex;
-   flex-flow: column;
-   align-items: center;
-   justify-content: center;
-   gap:1rem;
-   background: url(../images/heading.png) no-repeat;
-   background:linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url(../images/heading.png) no-repeat;
-   background-size: cover;
-   background-position: center;
-   text-align: center;
-}
-</style>
 </head>
 <body>
 

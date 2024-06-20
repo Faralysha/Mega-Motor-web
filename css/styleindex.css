@@ -131,6 +131,16 @@ section{
    color:var(--black);
 }
 
+.add-to-cart-btn {
+   background-color: var(--crimson); 
+   border: 2px solid var(--crimson);
+}
+
+.add-to-cart-btn:hover {
+   background-color: var(--red); /* Change to desired hover color */
+   border-color: var(--red); /* Change to desired hover color */
+}
+
 
 .heading{
    min-height: 30vh;

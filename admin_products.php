@@ -340,14 +340,15 @@ include 'admin_header.php';
         <input type="text" name="name" class="box" placeholder="enter product name" required>
         
         <select hidden name="category" class="box">
-           <option value="helemets&visor">HELMETS & VISORS</option>
-           <option value="riding&gears">RIDING GEARS</option>
-           <option value="brakesystem">BRAKE SYSTEM</option>
-           <option value="shocks&suspension">SHOCKS & SUSPENSIONS</option>
-           <option value="tires">TIRES</option>
-           <option value="exhaust">EXHAUST</option>
-           <option value="racking">RACKING</option>
-           <option value="others">OTHERS</option>
+           <option value="HELMETS & VISORS">HELMETS & VISORS</option>
+           <option value="RIDING & GEARS">RIDING & GEARS</option>
+           <option value="BRAKE SYSTEM">BRAKE SYSTEM</option>
+           <option value="SHOCKS & SUSPENSIONS">SHOCKS & SUSPENSIONS</option>
+           <option value="TIRES">TIRES</option>
+           <option value="EXHAUST">EXHAUST</option>
+           <option value="RACKING">RACKING</option>
+           <option value="BOXES">BOXES</option>
+           <option value="OTHERS">OTHERS</option>
         </select>
 
         <input type="text" name="brand" class="box" placeholder="enter product brand" required>
