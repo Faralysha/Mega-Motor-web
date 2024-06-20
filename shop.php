@@ -61,7 +61,7 @@ if (isset($_POST['add_to_cart'])) {
 }
 
 // Filter Logic
-$where = 'WHERE 1';
+$where = 'WHERE 1=1';
 if (isset($_POST['apply_filters'])) {
     $price_range = $_POST['price_range'];
     $category = $_POST['category'];
@@ -80,12 +80,13 @@ if (isset($_POST['apply_filters'])) {
         $where .= " AND pro_rates BETWEEN $min_rating AND $max_rating";
     }
     if (!empty($search)) {
-        $where .= " AND (name LIKE '%$search%' OR description LIKE '%$search%')";
-    }
+        $where .= " AND (name LIKE '%$search%' OR description LIKE '%$search%' OR brand LIKE '%$search%' OR category LIKE '%$search%')";    }
 }
 
-?>
+$select_products_query = "SELECT * FROM `products` $where";
+$select_products = mysqli_query($conn, $select_products_query) or die('Query failed: Select products');
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -103,125 +104,114 @@ if (isset($_POST['apply_filters'])) {
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <!-- Custom CSS File Link -->
     <link rel="stylesheet" href="css/styleindex.css">
-   <style>
-      .filter-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
+    <style>
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .filter-container form {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .filter-container input[type="text"],
+        .filter-container select,
+        .filter-container button {
+            margin: 5px;
+        }
+        .filter-container input[type="text"] {
+            flex: 1 1 200px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+        .filter-container select {
+            flex: 1 1 150px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+        .filter-container button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: var(--crimson);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .filter-container button:hover {
+            background-color: var(--red);
+        }
+    </style>
 
-.filter-container form {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.filter-container input[type="text"],
-.filter-container select,
-.filter-container button {
-    margin: 5px;
-}
-
-.filter-container input[type="text"] {
-    flex: 1 1 200px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-}
-
-.filter-container select {
-    flex: 1 1 150px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-}
-
-.filter-container button {
-    padding: 5px 10px;
-    border-radius: 5px;
-    background-color: var(--crimson);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-
-.filter-container button:hover {
-    background-color: var(--red);
-}
-
-
-   </style>
 </head>
 <body>
     <?php include 'header.php'; ?>
 
     <div class="heading">
-    <h3>Shop</h3>
+        <h3>Shop</h3>
         <p><a href="home.php">Home</a> / Shop</p>
     </div>
 
     <!-- Product Section -->
     <section class="products">
-
         <!-- Filter Section -->
-    <div class="container-fluid">
-        <div class="filter-container">
-            <form method="post" onsubmit="apply_filters(); return false;" class="form-inline w-100">
-                <input type="text" id="search" name="search" class="form-control mb-2 mr-sm-2" placeholder="Search...">
-                
-                <label for="price_range" class="mr-sm-2">Price Range:</label>
-                <select id="price_range" name="price_range" class="form-control mb-2 mr-sm-2">
-                    <option value="">Select</option>
-                    <option value="0-50">$0 - $50</option>
-                    <option value="51-100">$51 - $100</option>
-                    <option value="101-200">$101 - $200</option>
-                    <option value="201-500">$201 - $500</option>
-                </select>
-
-                <label for="category" class="mr-sm-2">Category:</label>
-                <select id="category" name="category" class="form-control mb-2 mr-sm-2">
-                    <option value="">Select</option>
-                    <option value="helemets&visor">Helmets & Visor</option>
-                    <option value="riding&gears">Riding & Gears</option>
-                    <option value="brakesystem">Brake System</option>
-                    <option value="shocks&suspension">Shocks & Suspension</option>
-                    <option value="tires">Tires</option>
-                    <option value="exhaust">Exhaust</option>
-                    <option value="racking">Racking</option>
-                    <option value="others">Others</option>
-                </select>
-
-                <label for="rating_range" class="mr-sm-2">Rating Range:</label>
-                <select id="rating_range" name="rating_range" class="form-control mb-2 mr-sm-2">
-                    <option value="">Select</option>
-                    <option value="1-2">1 - 2 stars</option>
-                    <option value="2-3">2 - 3 stars</option>
-                    <option value="3-4">3 - 4 stars</option>
-                    <option value="4-5">4 - 5 stars</option>
-                </select>
-
-                <button type="submit" name="apply_filters" class="btn btn-primary filter">Apply Filters</button>
-            </form>
+        <div class="container-fluid">
+            <div class="filter-container">
+                <form method="post" class="form-inline w-100">
+                    <input type="text" id="search" name="search" class="form-control mb-2 mr-sm-2" placeholder="Search...">
+                    <label for="price_range" class="mr-sm-2">Price Range:</label>
+                    <select id="price_range" name="price_range" class="form-control mb-2 mr-sm-2">
+                        <option value="">Select</option>
+                        <option value="0-50">0 - 50</option>
+                        <option value="51-100">51 - 100</option>
+                        <option value="101-200">101 - 200</option>
+                        <option value="201-500">201 - 500</option>
+                        <option value="501-5000">501 - 5000</option>
+                    </select>
+                    <label for="category" class="mr-sm-2">Category:</label>
+                    <select id="category" name="category" class="form-control mb-2 mr-sm-2">
+                        <option value="">Select</option>
+                        <option value="HELMETS & VISORS">HELMETS & VISORS</option>
+                        <option value="RIDING & GEARS">RIDING & GEARS</option>
+                        <option value="BRAKE SYSTEM">BRAKE SYSTEM</option>
+                        <option value="SHOCKS & SUSPENSIONS">SHOCKS & SUSPENSIONS</option>
+                        <option value="TIRES">TIRES</option>
+                        <option value="EXHAUST">EXHAUST</option>
+                        <option value="RACKING">RACKING</option>
+                        <option value="BOXES">BOXES</option>
+                        <option value="OTHERS">OTHERS</option>
+                    </select>
+                    <label for="rating_range" class="mr-sm-2">Rating Range:</label>
+                    <select id="rating_range" name="rating_range" class="form-control mb-2 mr-sm-2">
+                        <option value="">Select</option>
+                        <option value="1-2">1 - 2 stars</option>
+                        <option value="2-3">2 - 3 stars</option>
+                        <option value="3-4">3 - 4 stars</option>
+                        <option value="4-5">4 - 5 stars</option>
+                    </select>
+                    <button type="submit" name="apply_filters" class="btn btn-primary filter">Apply Filters</button>
+                </form>
+            </div>
         </div>
-    </div>
+
         <h1 class="title">Our Products</h1>
-
         <div class="box-container">
-
-        <?php  
-         $select_products = mysqli_query($conn, "SELECT * FROM `products`") or die('query failed');
-         if(mysqli_num_rows($select_products) > 0){
-            while($fetch_products = mysqli_fetch_assoc($select_products)){
-      ?>
+            <?php  
+                if (mysqli_num_rows($select_products) > 0) {
+                    while ($fetch_products = mysqli_fetch_assoc($select_products)) {
+            ?>
+            
      <form action="" method="post" class="box">
       <!-- Product Image -->
       <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="Product Image">
